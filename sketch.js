@@ -1,6 +1,5 @@
 // Project Title
-// Benjamin Hover, Zeyad Mohamed
-// Dating: yes 
+
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
