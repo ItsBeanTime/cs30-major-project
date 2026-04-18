@@ -27,4 +27,6 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - sfx for everything
 # Nice To Have List
 - place to put items (chest)
+- Random NPCs
+- Dynamic Dialog
 - 
