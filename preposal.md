@@ -21,12 +21,13 @@ For my major project I would like to recreate part of the game Undertale. Undert
 - **Camera**
     - 
 - **Sprites**
-    - 
+    - use classes and arrays for each type of attack/object
+
 - **Music/sounds**
     - all music will be recreated by me in FL Studios
     - sfx for everything
 # Nice To Have List
-- place to put items (chest)
-- Random NPCs
-- Dynamic Dialog
-- 
+    - place to put items (chest)
+    - Random NPCs
+    - Dynamic Dialog
+    - 
