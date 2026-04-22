@@ -9,14 +9,26 @@ let title;
 let titleNumber = 1;
 let gameState = "cutscene";
 
+// Foo's Variables DO NOT TOUCH
+let fightStrokeWeight = 20;
+let fightBorderSize = 200;  
+let heartSize = 20;
+let x;
+let y;
+let speed = 5;
+
 function setup() {
   createCanvas(640, 480);
+  x = width/2;
+  y = height/2;
 }
 
 function draw() {
-  background(0);
-  playCutscene();
-  startTitle();
+  
+  // playCutscene();
+  // startTitle();
+  fight();
+  drawFight();
 }
 
 function keyPressed(){
@@ -30,7 +42,7 @@ function keyPressed(){
 
 function preload() {
   title = loadImage("assets/title sprites/undertale-title-3.png");
-  // redHeartImg = loadImage("red-heart.png");
+  redHeartImg = loadImage("assets/player sprites/red-heart.png");
   if (titleNumber === 1){
     cutscene = loadImage("assets/title sprites/undertale-title-1.png");
   }
@@ -76,25 +88,34 @@ function startTitle(){
   }
 }
 
-// What is you doing bruh 
 
-// function fight(fightBorderSize, heartSize, x, y, speed) { //Foo's Function DO NOT TOUCH
-//   fightBorderSize = 400;
-//   heartSize = 30;
-//   x = width/2;
-//   y = height/2;
-//   speed = 5;
 
-//   x = constrain(x, width/2 - fightBorderSize/2, width/2 + fightBorderSize/2);
-//   y = constrain(y, height/2 - fightBorderSize/2, height/2 + fightBorderSize/2);
+function fight() { //Foo's Function DO NOT TOUCH
+  if (keyIsDown(LEFT_ARROW)) {
+    x -= speed;
+  }
+  if (keyIsDown(RIGHT_ARROW)) {
+    x += speed;
+  }
+  if (keyIsDown(UP_ARROW)) {
+    y -= speed;
+  }
+  if (keyIsDown(DOWN_ARROW)) {
+    y += speed;
+  }
 
-//   function draw() {
-//     background(0);
-//     strokeWeight(20);
-//     stroke(255);
-//     noFill();
-//     rect(width/2 - fightBorderSize/2, height/2 - fightBorderSize/2, fightBorderSize, fightBorderSize);
-    
-//     image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
-//   }
-// }
+  x = constrain(x, width/2 - fightBorderSize/2 + fightStrokeWeight , width/2 + fightBorderSize/2 - fightStrokeWeight );
+  y = constrain(y, height/2 - fightBorderSize/2 + fightStrokeWeight , height/2 + fightBorderSize/2 - fightStrokeWeight );
+}
+
+function drawFight() { //Foo's Function DO NOT TOUCH
+  background(0);
+  strokeWeight(fightStrokeWeight);
+  stroke(255);
+  noFill();
+  rectMode(CENTER);
+  rect(width/2 , height/2 , fightBorderSize, fightBorderSize);
+
+
+  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+}   
