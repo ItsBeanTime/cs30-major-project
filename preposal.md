@@ -5,9 +5,8 @@ For my major project I would like to recreate part of the game Undertale. Undert
 # Needs To Have List
 
 - **Basics**
-    - camera system
     - player movement
-    - animated title screen
+    - title screen
     - tile grid for map
 
 - **Combat**
@@ -21,12 +20,10 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - inventory
 
 - **World Map**
-    - Tile set assets
+    - map uses tiles
     - puzzles
-
 - **Camera**
-    - Move with player always in the centre
-
+    - Move camera(or move the map itself) with player always in the centre
 - **Sprites**
     - use classes and arrays for each type of attack/object
     - run and movement cycle

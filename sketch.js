@@ -29,9 +29,9 @@ function setup() {
 
 function draw() {
   
-  // playCutscene();
-  // startTitle();
-  fight();
+  playCutscene();
+  startTitle();
+  //fight();
   //drawFight();
 }
 
