@@ -4,6 +4,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let determinationFont;
+let playerName;
 let cutscene;
 let title;
 let titleNumber = 1;
@@ -29,9 +31,9 @@ function setup() {
 
 function draw() {
   
-  // playCutscene();
-  // startTitle();
-  fight();
+  playCutscene();
+  startTitle();
+  // fight();
 }
 
 function keyPressed(){
@@ -44,6 +46,7 @@ function keyPressed(){
 }
 
 function preload() {
+  determinationFont = loadFont("assets/fonts/determination.otf");
   title = loadImage("assets/title sprites/undertale-title-3.png");
   redHeartImg = loadImage("assets/player sprites/red-heart.png");
   if (titleNumber === 1){
@@ -88,10 +91,27 @@ function playCutscene(){
 function startTitle(){
   if (gameState === "title"){
     image(title, 0, 0, 640, 480);
+    playerNameScreen();
+    
   }
 }
 
+function playerNameScreen(){
+  textureMode(CENTER);
+  fill(255);
+  textSize(22);
+  textFont(determinationFont);
+  text("Name the fallen human.", width /3.7, height/7);
+  text("Quit", width/5, height - height /10);
+  text("Backspace", width/2.5, height - height /10);
+  text("Done", width/1.5, height - height/10);
 
+  //display the letters (temporary: will make them jiggle later)
+  text("A    B    C    D    E    F    G", width /5, height/4);
+  text("H    I    J    K    L    M    N", width /5, height/3.3);
+  text("O    P    Q    R    S    T    U", width /5, height/2.8);
+  text("V    W    X    Y    Z          ", width /5, height/2.4);
+}
 
 function fight() { //Foo's Function DO NOT TOUCH
   if (choice === 0) {
