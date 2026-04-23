@@ -23,7 +23,7 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - map uses tiles
     - puzzles
 - **Camera**
-    - Move camera(or move the map itself) with player always in the centre
+    - Move camera(or move the map itself)
 - **Sprites**
     - use classes and arrays for each type of attack/object
     - run and movement cycle
