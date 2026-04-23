@@ -4,12 +4,39 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let startMenuTheme;
+let undertaleBoom;
+let onceUponATime;
+let oUATStartingVolume = 0.3;
+let textSound;
+let scrollCutY = -682;
+let currentFrame = 0;
+let frameDuration = 300;
+let frameTimer = 0;
+
+let cutsceneDialogue = [
+  "long ago, two races ruled over Earth: HUMANS and MONSTERS.",
+  "One day, war broke out between the two races.",
+  "After a long battle, the humans were victorious.",
+  "They sealed the monsters underground with a magic spell.",
+  "Many years later. . .",
+  "MT. Ebott               201X",
+  "Legends say that those who climb the mountain never return.",
+]
+
+let showText = "";
+let charIndex = 0;
+let textSpeed = 4;
+
 let determinationFont;
 let playerName;
-let cutscene;
+let cutscene = [];
 let title;
 let titleNumber = 1;
 let gameState = "cutscene";
+
+let fadeAlpha = 0;
+let fadeState = "in";
 
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 20;
@@ -24,80 +51,158 @@ let choice = 0;
 let selection = 0;
 
 function setup() {
+  userStartAudio();
   createCanvas(640, 480); //how does one fullscreen
+  textSound.setVolume(0.2);
+  onceUponATime.setVolume(oUATStartingVolume);
+  startMenuTheme.setVolume(0.5);
   x = width/2;
   y = height/2;
 }
 
 function draw() {
-  
-  playCutscene();
-  startTitle();
+  if (gameState === "cutscene"){
+    playCutscene();   
+  }
+
+  if (gameState === "title"){
+    startTitle();    
+  }
+
   // fight();
 }
 
-function keyPressed(){
-  if (key === "z" && gameState === "cutscene"){
-    titleNumber += 1;
-  }
-  if (titleNumber > 10){
-    gameState = "title";
-  }
-}
+function keyPressed(){}
 
 function preload() {
+  startMenuTheme = loadSound("assets/music/Start Menu.mp3");
+  undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
+  onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
+  textSound = loadSound("assets/sound effects/SND_TXT2.wav");
   determinationFont = loadFont("assets/fonts/determination.otf");
-  title = loadImage("assets/title sprites/undertale-title-3.png");
+  title = loadImage("assets/title sprites/undertale-title-5.png");
   redHeartImg = loadImage("assets/player sprites/red-heart.png");
-  if (titleNumber === 1){
-    cutscene = loadImage("assets/title sprites/undertale-title-1.png");
+
+  for(let i = 1; i <= 11; i++){
+    cutscene.push(loadImage(`assets/title sprites/undertale-title-${i}.png`));
   }
-  if (titleNumber === 2){
-    cutscene = loadImage("assets/title sprites/undertale-title-2.png");
-  }
-  if (titleNumber === 3){
-    cutscene = loadImage("assets/title sprites/undertale-title-3.png");
-  }
-  if (titleNumber === 4){
-    cutscene = loadImage("assets/title sprites/undertale-title-4.png");
-  }
-  if (titleNumber === 5){
-    cutscene = loadImage("assets/title sprites/undertale-title-5.png");
-  }
-  if (titleNumber === 6){
-    cutscene = loadImage("assets/title sprites/undertale-title-6.png");
-  }
-  if (titleNumber === 7){
-    cutscene = loadImage("assets/title sprites/undertale-title-7.png");
-  }
-  if (titleNumber === 8){
-    cutscene = loadImage("assets/title sprites/undertale-title-8.png");
-  }
-  if (titleNumber === 9){
-    cutscene = loadImage("assets/title sprites/undertale-title-9.png");
-  }
-  if (titleNumber === 10){
-    cutscene = loadImage("assets/title sprites/undertale-titlescreen.png");
-  }
+
+  cutscene.push(loadImage("assets/title sprites/undertale-titlescreen.png"));
 }
 
 function playCutscene(){
-  if (gameState === "cutscene"){
-    image(cutscene, 0, 0, 640, 480);
-    preload();    
+  if (!onceUponATime.isPlaying() && currentFrame !== 11){
+    onceUponATime.play();
   }
+    background(0);
+
+
+    if (currentFrame < 10 || currentFrame > 10){
+      tint(255, fadeAlpha);
+      image(cutscene[currentFrame], 0, 0, width, height);
+      noTint();
+    
+      frameTimer++;
+
+      if (fadeState === "in"){
+        fadeAlpha += 6;
+        if (fadeAlpha >= 255){
+          fadeAlpha = 255;
+          fadeState = "hold";
+        }
+      }
+      else if (fadeState === "hold"){
+        if (frameTimer > frameDuration){
+          fadeState = "out";
+        }
+      }
+      else if (fadeState === "out"){
+        fadeAlpha -= 6;
+
+        if (fadeAlpha <= 0){
+          fadeAlpha = 0;
+          fadeState = "in";
+
+          currentFrame++;
+          frameTimer = 0;
+          charIndex = 0;
+          showText = "";
+        }
+      }
+      let currentText = cutsceneDialogue[currentFrame] || "";
+
+      if (charIndex < currentText.length){
+        if (frameCount % textSpeed === 0){
+         charIndex++;
+         let newChar = currentText.charAt(charIndex - 1);
+         showText =  currentText.substring(0, charIndex);
+
+         if(textSound.isLoaded() && newChar !== " "){
+          textSound.stop();
+          textSound.play();
+         }
+        }      
+      }
+
+      drawCutsceneText(showText);
+
+      if (currentFrame >= cutscene.length){
+        gameState = "title";
+      }
+    }
+    if (currentFrame === 10){
+      background(0);
+
+      let img = cutscene[currentFrame];
+
+      if (frameTimer > 200 && frameTimer < 560){
+        scrollCutY += 2;
+        if (oUATStartingVolume > 0 && frameTimer > 300){
+          oUATStartingVolume -= 0.0009;
+          onceUponATime.setVolume(oUATStartingVolume); 
+        }
+      }
+      image(img, 0, scrollCutY, width, height * 2);
+
+      fill(0);
+      rect(0, 0, width, height /9);
+      rect(0, height / 1.75, width, height);
+      frameTimer++;
+
+      if (frameTimer > 700){
+        onceUponATime.stop();
+        currentFrame++;
+        frameTimer = 0;
+        undertaleBoom.play();
+      }
+
+    }
+}
+
+
+function drawCutsceneText(txt){
+  textFont(determinationFont);
+  textSize(27);
+  textAlign(LEFT,TOP);
+
+  let xPos = 120;
+  let yPos = height - 150;
+  let boxWidth = width -260
+
+  fill(255);
+  text(txt, xPos, yPos, boxWidth);
+
 }
 
 function startTitle(){
-  if (gameState === "title"){
-    image(title, 0, 0, 640, 480);
-    playerNameScreen();
-    
+  image(title, 0, 0, 640, 480);
+  if (!startMenuTheme.isPlaying()){
+    startMenuTheme.play();   
   }
+  playerNameScreen(); 
 }
 
 function playerNameScreen(){
-  textureMode(CENTER);
   fill(255);
   textSize(22);
   textFont(determinationFont);
