@@ -29,10 +29,9 @@ function setup() {
 
 function draw() {
   
-  playCutscene();
-  startTitle();
-  //fight();
-  //drawFight();
+  // playCutscene();
+  // startTitle();
+  fight();
 }
 
 function keyPressed(){
@@ -95,16 +94,22 @@ function startTitle(){
 
 
 function fight() { //Foo's Function DO NOT TOUCH
-  if (choice === choices[0]) {
+  if (choice === 0) {
     // code for options menu
     function keyPressed() {
       if (key === LEFT_ARROW && selection > 0) {
-        selection -= 1;
+        selection --;
+      }
+      if (key === RIGHT_ARROW && selection < selections.length) {
+        selection ++;
+      }
+      if (key === " ") {
+        choice = selection;
       }
     }
   }
 
-  if (selection === selections[1] && choice === choices[1]) { // not working
+  if (selection === 1 && choice === 1) { // not working
     if (keyIsDown(LEFT_ARROW)) {
       x -= speed;
     }
@@ -132,4 +137,10 @@ function fight() { //Foo's Function DO NOT TOUCH
 
     image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
   }
+
+  background(0);
+  fill(255);
+  text(70);
+  text(`selection: ${selection}
+    choice ${choice} `, width/2, height/2);
 }
