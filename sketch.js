@@ -33,7 +33,7 @@ let playerName;
 let cutscene = [];
 let title;
 let titleNumber = 1;
-let gameState = "cutscene";
+let gameState = "start";
 
 let fadeAlpha = 0;
 let fadeState = "in";
@@ -61,6 +61,13 @@ function setup() {
 }
 
 function draw() {
+  if (gameState === "start"){
+    background(0);
+    textFont(determinationFont);
+    fill(255);
+    textSize(40);
+    text("Click To Start", width /5, height /4);
+  }
   if (gameState === "cutscene"){
     playCutscene();   
   }
@@ -72,7 +79,11 @@ function draw() {
   // fight();
 }
 
-function keyPressed(){}
+function mousePressed(){
+  if (gameState === "start"){
+    gameState = "cutscene";
+  }
+}
 
 function preload() {
   startMenuTheme = loadSound("assets/music/Start Menu.mp3");
