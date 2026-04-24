@@ -22,7 +22,7 @@ let cutsceneDialogue = [
   "Many years later. . .",
   "MT. Ebott               201X",
   "Legends say that those who climb the mountain never return.",
-]
+];
 
 let showText = "";
 let charIndex = 0;
@@ -33,14 +33,14 @@ let playerName;
 let cutscene = [];
 let title;
 let titleNumber = 1;
-let gameState = "start";
+let gameState = "chooseWhatToDoWithEnemy";
 
 let fadeAlpha = 0;
 let fadeState = "in";
 
 // Foo's Variables DO NOT TOUCH
-let fightStrokeWeight = 20;
-let fightBorderSize = 200;  
+let fightStrokeWeight = 5;
+let fightBorderSize = 200; 
 let heartSize = 20;
 let x;
 let y;
@@ -52,7 +52,8 @@ let selection = 0;
 
 function setup() {
   userStartAudio();
-  createCanvas(640, 480); //how does one fullscreen
+  // createCanvas(640, 480); 
+  createCanvas(windowWidth, windowHeight);
   textSound.setVolume(0.2);
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
@@ -76,8 +77,28 @@ function draw() {
     startTitle();    
   }
 
-  // fight();
+  if (gameState === "chooseWhatToDoWithEnemy"){
+    chooseWhatToDoWithEnemy();
+  }
+
+  if (gameState === "dodge"){
+    dodge();
+  }
 }
+
+function keyPressed() {
+  if (keyCode === LEFT_ARROW && selection > 0 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
+    selection --;
+  }
+  if (keyCode === RIGHT_ARROW && selection < selections.length && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
+    selection ++;
+  }
+  if (key === " " && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
+    choice = selection;
+  }
+}
+
+
 
 function mousePressed(){
   if (gameState === "start"){
@@ -105,89 +126,89 @@ function playCutscene(){
   if (!onceUponATime.isPlaying() && currentFrame !== 11){
     onceUponATime.play();
   }
-    background(0);
+  background(0);
 
 
-    if (currentFrame < 10 || currentFrame > 10){
-      tint(255, fadeAlpha);
-      image(cutscene[currentFrame], 0, 0, width, height);
-      noTint();
+  if (currentFrame < 10 || currentFrame > 10){
+    tint(255, fadeAlpha);
+    image(cutscene[currentFrame], 0, 0, width, height);
+    noTint();
     
-      frameTimer++;
+    frameTimer++;
 
-      if (fadeState === "in"){
-        fadeAlpha += 6;
-        if (fadeAlpha >= 255){
-          fadeAlpha = 255;
-          fadeState = "hold";
-        }
-      }
-      else if (fadeState === "hold"){
-        if (frameTimer > frameDuration){
-          fadeState = "out";
-        }
-      }
-      else if (fadeState === "out"){
-        fadeAlpha -= 6;
-
-        if (fadeAlpha <= 0){
-          fadeAlpha = 0;
-          fadeState = "in";
-
-          currentFrame++;
-          frameTimer = 0;
-          charIndex = 0;
-          showText = "";
-        }
-      }
-      let currentText = cutsceneDialogue[currentFrame] || "";
-
-      if (charIndex < currentText.length){
-        if (frameCount % textSpeed === 0){
-         charIndex++;
-         let newChar = currentText.charAt(charIndex - 1);
-         showText =  currentText.substring(0, charIndex);
-
-         if(textSound.isLoaded() && newChar !== " "){
-          textSound.stop();
-          textSound.play();
-         }
-        }      
-      }
-
-      drawCutsceneText(showText);
-
-      if (currentFrame >= cutscene.length){
-        gameState = "title";
+    if (fadeState === "in"){
+      fadeAlpha += 6;
+      if (fadeAlpha >= 255){
+        fadeAlpha = 255;
+        fadeState = "hold";
       }
     }
-    if (currentFrame === 10){
-      background(0);
-
-      let img = cutscene[currentFrame];
-
-      if (frameTimer > 200 && frameTimer < 560){
-        scrollCutY += 2;
-        if (oUATStartingVolume > 0 && frameTimer > 300){
-          oUATStartingVolume -= 0.0009;
-          onceUponATime.setVolume(oUATStartingVolume); 
-        }
+    else if (fadeState === "hold"){
+      if (frameTimer > frameDuration){
+        fadeState = "out";
       }
-      image(img, 0, scrollCutY, width, height * 2);
+    }
+    else if (fadeState === "out"){
+      fadeAlpha -= 6;
 
-      fill(0);
-      rect(0, 0, width, height /9);
-      rect(0, height / 1.75, width, height);
-      frameTimer++;
+      if (fadeAlpha <= 0){
+        fadeAlpha = 0;
+        fadeState = "in";
 
-      if (frameTimer > 700){
-        onceUponATime.stop();
         currentFrame++;
         frameTimer = 0;
-        undertaleBoom.play();
+        charIndex = 0;
+        showText = "";
       }
-
     }
+    let currentText = cutsceneDialogue[currentFrame] || "";
+
+    if (charIndex < currentText.length){
+      if (frameCount % textSpeed === 0){
+        charIndex++;
+        let newChar = currentText.charAt(charIndex - 1);
+        showText =  currentText.substring(0, charIndex);
+
+        if(textSound.isLoaded() && newChar !== " "){
+          textSound.stop();
+          textSound.play();
+        }
+      }      
+    }
+
+    drawCutsceneText(showText);
+
+    if (currentFrame >= cutscene.length){
+      gameState = "title";
+    }
+  }
+  if (currentFrame === 10){
+    background(0);
+
+    let img = cutscene[currentFrame];
+
+    if (frameTimer > 200 && frameTimer < 560){
+      scrollCutY += 2;
+      if (oUATStartingVolume > 0 && frameTimer > 300){
+        oUATStartingVolume -= 0.0009;
+        onceUponATime.setVolume(oUATStartingVolume); 
+      }
+    }
+    image(img, 0, scrollCutY, width, height * 2);
+
+    fill(0);
+    rect(0, 0, width, height /9);
+    rect(0, height / 1.75, width, height);
+    frameTimer++;
+
+    if (frameTimer > 700){
+      onceUponATime.stop();
+      currentFrame++;
+      frameTimer = 0;
+      undertaleBoom.play();
+    }
+
+  }
 }
 
 
@@ -198,7 +219,7 @@ function drawCutsceneText(txt){
 
   let xPos = 120;
   let yPos = height - 150;
-  let boxWidth = width -260
+  let boxWidth = width -260;
 
   fill(255);
   text(txt, xPos, yPos, boxWidth);
@@ -229,54 +250,64 @@ function playerNameScreen(){
   text("V    W    X    Y    Z          ", width /5, height/2.4);
 }
 
-function fight() { //Foo's Function DO NOT TOUCH
-  if (choice === 0) {
-    // code for options menu
-    function keyPressed() {
-      if (key === LEFT_ARROW && selection > 0) {
-        selection --;
-      }
-      if (key === RIGHT_ARROW && selection < selections.length) {
-        selection ++;
-      }
-      if (key === " ") {
-        choice = selection;
-      }
-    }
-  }
+function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
 
-  if (selection === 1 && choice === 1) { // not working
-    if (keyIsDown(LEFT_ARROW)) {
-      x -= speed;
-    }
-    if (keyIsDown(RIGHT_ARROW)) {
-      x += speed;
-    }
-    if (keyIsDown(UP_ARROW)) {
-      y -= speed;
-    }
-    if (keyIsDown(DOWN_ARROW)) {
-      y += speed;
-    }
-    // keep player inside the fight border
-    x = constrain(x, width/2 - fightBorderSize/2 + fightStrokeWeight , width/2 + fightBorderSize/2 - fightStrokeWeight);
-    y = constrain(y, height/2 - fightBorderSize/2 + fightStrokeWeight , height/2 + fightBorderSize/2 - fightStrokeWeight);
-
-    // display fight
+  if (gameState === "chooseWhatToDoWithEnemy"){ 
     background(0);
-    strokeWeight(fightStrokeWeight);
-    stroke(255);
-    noFill();
-    rectMode(CENTER);
-    rect(width/2 , height/2 , fightBorderSize, fightBorderSize);
-
-
-    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+    fill(255);
+    textSize(20);
+    text(`selection: ${selection}
+  choice ${choice}`, width/2, height/2);
   }
 
+  if (choice === 1){
+    gameState = "dodge";
+  }
+}
+
+function dodge() { //Foo's Function DO NOT TOUCH
+  // if dodge state, move the heart with arrow keys
+  if (keyCode === LEFT_ARROW) {
+    x -= speed;
+  }
+  if (keyCode === RIGHT_ARROW) {
+    x += speed;
+  }
+  if (keyCode === UP_ARROW) {
+    y -= speed;
+  }
+  if (keyCode === DOWN_ARROW) {
+    y += speed;
+  }
+
+  // keep player inside the fight border
+  let boxSize = fightBorderSize + fightStrokeWeight;
+  let innerSize = boxSize - fightStrokeWeight;    
+
+  x = constrain(x,
+    width/2 - innerSize/2 + heartSize/2,
+    width/2 + innerSize/2 - heartSize/2
+  );
+
+  y = constrain(y,
+    height/2 - innerSize/2 + heartSize/2,
+    height/2 + innerSize/2 - heartSize/2
+  );
+
+
+
+  // display fight
   background(0);
-  fill(255);
-  text(70);
-  text(`selection: ${selection}
-    choice ${choice} `, width/2, height/2);
+  strokeWeight(fightStrokeWeight);
+  stroke(255);
+  noFill();
+  rectMode(CENTER);
+  rect(width/2 , height/2 , boxSize, boxSize);
+  // display heart
+  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  
+}
+
+function fight() { //Foo's Function DO NOT TOUCH
+  background(255, 0, 0);
 }
