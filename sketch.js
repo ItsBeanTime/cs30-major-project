@@ -33,7 +33,7 @@ let playerName;
 let cutscene = [];
 let title;
 let titleNumber = 1;
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "start";
 
 let fadeAlpha = 0;
 let fadeState = "in";
