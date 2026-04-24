@@ -4,11 +4,22 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+//GAMESTATE
+let gameState = "ruins";
+
+//MUSIC
 let startMenuTheme;
-let undertaleBoom;
 let onceUponATime;
 let oUATStartingVolume = 0.3;
+
+//SFX
+let undertaleBoom;
 let textSound;
+
+//FONTS
+let determinationFont;
+
+//cutscene variables
 let scrollCutY = -682;
 let currentFrame = 0;
 let frameDuration = 300;
@@ -27,14 +38,10 @@ let cutsceneDialogue = [
 let showText = "";
 let charIndex = 0;
 let textSpeed = 4;
-
-let determinationFont;
 let playerName;
 let cutscene = [];
 let title;
 let titleNumber = 1;
-let gameState = "start";
-
 let fadeAlpha = 0;
 let fadeState = "in";
 
@@ -50,10 +57,12 @@ let selections = ["none", "fight", "act", "item", "mercy"];
 let choice = 0;
 let selection = 0;
 
+let ruinsMap;
+
 function setup() {
   userStartAudio();
-  // createCanvas(640, 480); 
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(640, 480); 
+  //createCanvas(windowWidth, windowHeight);
   textSound.setVolume(0.2);
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
@@ -63,11 +72,7 @@ function setup() {
 
 function draw() {
   if (gameState === "start"){
-    background(0);
-    textFont(determinationFont);
-    fill(255);
-    textSize(40);
-    text("Click To Start", width /5, height /4);
+    clickToStart();
   }
   if (gameState === "cutscene"){
     playCutscene();   
@@ -84,9 +89,32 @@ function draw() {
   if (gameState === "dodge"){
     dodge();
   }
+  if (gameState === "ruins"){
+    startRuins();
+  }
+}
+
+function clickToStart(){
+  background(0);
+  textFont(determinationFont);
+  fill(255);
+  textSize(40);
+  text("Click To Start", width /5, height /4);  
 }
 
 function keyPressed() {
+  if (currentFrame === 11){
+    if (keyCode === 90){
+      gameState = "title";
+    }
+  }
+  if (gameState === "cutscene"){
+    if (keyCode === 13){
+      onceUponATime.stop();
+      currentFrame = 11;
+    }
+  }
+
   if (keyCode === LEFT_ARROW && selection > 0 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
     selection --;
   }
@@ -110,6 +138,7 @@ function mousePressed(){
 }
 
 function preload() {
+  ruinsMap = loadImage("assets/map sprites/ruins-1.png");
   startMenuTheme = loadSound("assets/music/Start Menu.mp3");
   undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
   onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
@@ -131,8 +160,7 @@ function playCutscene(){
   }
   background(0);
 
-
-  if (currentFrame < 10 || currentFrame > 10){
+  if (currentFrame < 10 || currentFrame > 10 && currentFrame !== 11){
     tint(255, fadeAlpha);
     image(cutscene[currentFrame], 0, 0, width, height);
     noTint();
@@ -180,10 +208,6 @@ function playCutscene(){
     }
 
     drawCutsceneText(showText);
-
-    if (currentFrame >= cutscene.length){
-      gameState = "title";
-    }
   }
   if (currentFrame === 10){
     background(0);
@@ -210,10 +234,36 @@ function playCutscene(){
       frameTimer = 0;
       undertaleBoom.play();
     }
+  }
+  if (currentFrame === 11){
+    image(cutscene[currentFrame], 0, 0, width, height);
+    frameTimer++;
+    if (frameTimer > 120){
+      if (frameTimer % 60  >= 20){
+        textFont(determinationFont);
+        fill(170);
+        textSize("30");
+        text("[z]", width/2 - 50, height - 100);
+      }
+      else{
+        fill(0);
+      }
 
+    }
   }
 }
 
+function startRuins(){
+  image(ruinsMap, 0,0, width * 10, height * 10);
+}
+
+function playerMove(){
+
+}
+
+function displayPlayer(){
+
+}
 
 function drawCutsceneText(txt){
   textFont(determinationFont);
