@@ -96,6 +96,9 @@ function keyPressed() {
   if (key === " " && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
     choice = selection;
   }
+  if (keyCode === 115) { // doesnt work for some reason 
+    fullscreen();
+  }
 }
 
 
@@ -256,8 +259,9 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
     background(0);
     fill(255);
     textSize(20);
+    textFont(determinationFont);
     text(`selection: ${selection}
-  choice ${choice}`, width/2, height/2);
+  choice: ${choice}`, width/2, height/2);
   }
 
   if (choice === 1){
@@ -267,16 +271,16 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
 
 function dodge() { //Foo's Function DO NOT TOUCH
   // if dodge state, move the heart with arrow keys
-  if (keyCode === LEFT_ARROW) {
+  if (keyIsDown(37)) { // left arrow
     x -= speed;
   }
-  if (keyCode === RIGHT_ARROW) {
+  if (keyIsDown(39)) { //right arrow
     x += speed;
   }
-  if (keyCode === UP_ARROW) {
+  if (keyIsDown(38)) { // up arrow
     y -= speed;
   }
-  if (keyCode === DOWN_ARROW) {
+  if (keyIsDown(40)) { // down arrow
     y += speed;
   }
 
