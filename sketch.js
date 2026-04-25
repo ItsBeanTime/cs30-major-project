@@ -16,6 +16,11 @@ let frameCountAnim = 0;
 let direction = "front";
 
 
+let screenPosY;
+let screenPosX = 0;
+let scrollSpeed = 4;
+
+
 //sprites
 let playerSpriteFront = [];
 let playerSpriteLeft = [];
@@ -26,6 +31,7 @@ let playerSpriteBack = [];
 let startMenuTheme;
 let onceUponATime;
 let oUATStartingVolume = 0.3;
+let ruinsMusic;
 
 //SFX
 let undertaleBoom;
@@ -66,18 +72,19 @@ let fightBorderSize = 200;
 let heartSize = 20;
 let x;
 let y;
-let speed = 5;
+let speed = 4;
 let choices = ["none", "fight", "act", "item", "mercy"];
 let selections = ["none", "fight", "act", "item", "mercy"];
 let choice = 0;
 let selection = 0;
 
+let mapSize = 12;
 let ruinsMap;
 
 function setup() {
   userStartAudio();
 
-  createCanvas(640, 480); 
+  createCanvas(640 * 1.5, 480 * 1.5); 
   //createCanvas(windowWidth, windowHeight);
 
   noSmooth();
@@ -85,6 +92,7 @@ function setup() {
   textSound.setVolume(0.2);
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
+  ruinsMusic.setVolume (0.5);
 
   x = width/2;
   y = height/2;
@@ -92,6 +100,8 @@ function setup() {
   playerX = width / 2;
   playerY = height / 2;
   currentSprites = playerSpriteFront;
+
+  screenPosY = -height * (mapSize - 5);
 }
 
 function draw() {
@@ -136,6 +146,7 @@ function preload() {
   //music
   onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
   startMenuTheme = loadSound("assets/music/Start Menu.mp3");
+  ruinsMusic = loadSound("assets/music/Ruins.mp3");
 
   //sfx
   undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
@@ -297,9 +308,11 @@ function playCutscene(){
 }
 
 function startRuins(){
-  let mapSize = 12;
-  image(ruinsMap, 0, -height * (mapSize - 5), width * (mapSize + 10), height * (mapSize  -4));
-
+  background(0);
+  image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
+  if (!ruinsMusic.isPlaying()){
+    ruinsMusic.play();
+  }
   playerMove();
   displayPlayer();
 }
@@ -307,29 +320,54 @@ function startRuins(){
 function playerMove(){
   let moving = false;
 
-  if (keyIsDown(65)){ //left
-    playerX -= speed;
+  if (keyIsDown(65)){
+    if (playerX > width/4){
+      playerX -= speed;
+   }
+   else{
+      screenPosX += speed;
+    }
+
     currentSprites = playerSpriteLeft;
     direction = "left";
-    moving = true
+    moving = true;
   }
-  if (keyIsDown(68)){ //right
-    playerX += speed;
+
+  if (keyIsDown(68)){ // right
+    if (playerX < width - width/4){
+      playerX += speed; // move player freely
+    }
+    else{
+      screenPosX -= speed; // scroll world instead
+   }
+
     currentSprites = playerSpriteRight;
     direction = "right";
-    moving = true
+    moving = true;
   }
-  if (keyIsDown(87)){  //up
-    playerY -= speed;
+  if (keyIsDown(87)){
+    if (playerY > height/4){
+     playerY -= speed;
+    }
+    else{
+     screenPosY += speed;
+   }
+
     currentSprites = playerSpriteBack;
     direction = "back";
-    moving = true
+    moving = true;
   }
-  if (keyIsDown(83)){ //down
-    playerY += speed;
+  if (keyIsDown(83)){
+    if (playerY < height - height/4){
+     playerY += speed;
+   }
+    else{
+     screenPosY -= speed;
+    }
+
     currentSprites = playerSpriteFront;
     direction = "front";
-    moving = true
+    moving = true;
   }
 
   //do the animation if moving
@@ -350,7 +388,7 @@ function displayPlayer(){
     let img = currentSprites[frameIndex];
 
     if (img){
-      image(currentSprites[frameIndex], playerX, playerY, 40, 60);
+      image(currentSprites[frameIndex], constrain(playerX,width/4 ,width - width/4,),constrain(playerY, height/4, height - height/4), 40 * 1.5, 60 * 1.5);
     }
   }
 }
@@ -455,3 +493,4 @@ function dodge() { //Foo's Function DO NOT TOUCH
 function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
 }
+
