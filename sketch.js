@@ -7,6 +7,21 @@
 //GAMESTATE
 let gameState = "ruins";
 
+//player variables
+let playerX, playerY;
+let currentSprites;
+let frameIndex = 0;
+let frameDelay = 10;
+let frameCountAnim = 0;
+let direction = "front";
+
+
+//sprites
+let playerSpriteFront = [];
+let playerSpriteLeft = [];
+let playerSpriteRight = [];
+let playerSpriteBack = [];
+
 //MUSIC
 let startMenuTheme;
 let onceUponATime;
@@ -61,13 +76,22 @@ let ruinsMap;
 
 function setup() {
   userStartAudio();
+
   createCanvas(640, 480); 
   //createCanvas(windowWidth, windowHeight);
+
+  noSmooth();
+
   textSound.setVolume(0.2);
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
+
   x = width/2;
   y = height/2;
+
+  playerX = width / 2;
+  playerY = height / 2;
+  currentSprites = playerSpriteFront;
 }
 
 function draw() {
@@ -92,6 +116,41 @@ function draw() {
   if (gameState === "ruins"){
     startRuins();
   }
+}
+
+function preload() {
+  //player sprite
+  for(let i = 1; i < 5; i++){
+    playerSpriteFront.push(loadImage(`assets/player sprites/frisk${i}.png`));
+  }
+  for(let i = 5; i < 7; i++){
+    playerSpriteLeft.push(loadImage(`assets/player sprites/frisk${i}.png`));
+  }
+  for(let i = 7; i < 9; i++){
+    playerSpriteRight.push(loadImage(`assets/player sprites/frisk${i}.png`));
+  }
+  for(let i = 9; i < 13; i++){
+    playerSpriteBack.push(loadImage(`assets/player sprites/frisk${i}.png`));
+  }
+
+  //music
+  onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
+  startMenuTheme = loadSound("assets/music/Start Menu.mp3");
+
+  //sfx
+  undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
+  textSound = loadSound("assets/sound effects/SND_TXT2.wav");
+
+  ruinsMap = loadImage("assets/map sprites/ruins-1.png");
+  determinationFont = loadFont("assets/fonts/determination.otf");
+  title = loadImage("assets/title sprites/undertale-title-5.png");
+  redHeartImg = loadImage("assets/player sprites/red-heart.png");
+
+  for(let i = 1; i <= 11; i++){
+    cutscene.push(loadImage(`assets/title sprites/undertale-title-${i}.png`));
+  }
+
+  cutscene.push(loadImage("assets/title sprites/undertale-titlescreen.png"));
 }
 
 function clickToStart(){
@@ -137,22 +196,6 @@ function mousePressed(){
   }
 }
 
-function preload() {
-  ruinsMap = loadImage("assets/map sprites/ruins-1.png");
-  startMenuTheme = loadSound("assets/music/Start Menu.mp3");
-  undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
-  onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
-  textSound = loadSound("assets/sound effects/SND_TXT2.wav");
-  determinationFont = loadFont("assets/fonts/determination.otf");
-  title = loadImage("assets/title sprites/undertale-title-5.png");
-  redHeartImg = loadImage("assets/player sprites/red-heart.png");
-
-  for(let i = 1; i <= 11; i++){
-    cutscene.push(loadImage(`assets/title sprites/undertale-title-${i}.png`));
-  }
-
-  cutscene.push(loadImage("assets/title sprites/undertale-titlescreen.png"));
-}
 
 function playCutscene(){
   if (!onceUponATime.isPlaying() && currentFrame !== 11){
@@ -254,15 +297,62 @@ function playCutscene(){
 }
 
 function startRuins(){
-  image(ruinsMap, 0,0, width * 10, height * 10);
+  let mapSize = 12;
+  image(ruinsMap, 0, -height * (mapSize - 5), width * (mapSize + 10), height * (mapSize  -4));
+
+  playerMove();
+  displayPlayer();
 }
 
 function playerMove(){
+  let moving = false;
 
+  if (keyIsDown(65)){ //left
+    playerX -= speed;
+    currentSprites = playerSpriteLeft;
+    direction = "left";
+    moving = true
+  }
+  if (keyIsDown(68)){ //right
+    playerX += speed;
+    currentSprites = playerSpriteRight;
+    direction = "right";
+    moving = true
+  }
+  if (keyIsDown(87)){  //up
+    playerY -= speed;
+    currentSprites = playerSpriteBack;
+    direction = "back";
+    moving = true
+  }
+  if (keyIsDown(83)){ //down
+    playerY += speed;
+    currentSprites = playerSpriteFront;
+    direction = "front";
+    moving = true
+  }
+
+  //do the animation if moving
+  if (moving){
+    frameCountAnim++;
+    if (frameCountAnim > frameDelay){
+      frameIndex = (frameIndex + 1) % currentSprites.length;
+      frameCountAnim = 0;
+    }
+  }
+  else{
+    frameIndex = 0;
+  }
 }
 
 function displayPlayer(){
+  if (currentSprites && currentSprites.length > 0){
+    let img = currentSprites[frameIndex];
 
+    if (img){
+      image(currentSprites[frameIndex], playerX, playerY, 40, 60);
+    }
+  }
 }
 
 function drawCutsceneText(txt){
