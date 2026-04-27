@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "start";
+let gameState = "ruins";
 let menuState = "instruction";
 
 //player variables
@@ -74,7 +74,7 @@ let fightBorderHeight = 500;
 let heartSize = 20;
 let x;
 let y;
-let speed = 5;
+let speed = 9;
 let choices = ["none", "fight", "act", "item", "mercy"];
 let selections = ["none", "fight", "act", "item", "mercy"];
 let choice = 0;
@@ -125,8 +125,8 @@ function setup() {
   x = width/2;
   y = height/2;
 
-  playerX = width /2 - 35;
-  playerY = height / 2 - 60;
+  playerX =  width /2 - 35;
+  playerY =  height / 2 - 60;
   currentSprites = playerSpriteFront;
 
   screenPosY = -height * (mapSize - 5);
@@ -236,7 +236,40 @@ function setupWalls(){
     makeWallM(1821,5250,150,30,),
 
     //ruins flowey room
+    makeWallM(1453,4570, 30, 800),
+    makeWallM(2300,4570, 30, 800),
+    makeWallM(1480,4570, 320, 30),
+    makeWallM(1939,4570, 400, 30),
 
+    //ruins stairs roomd
+    makeWallM(1786,4320, 200, 20),
+    makeWallM(1783, 4200, 30, 200),
+    makeWallM(1935, 4200, 30, 200),
+
+    makeWallM(1624, 4140, 128,20),
+    makeWallM(1995, 4140, 128,20),
+
+    makeWallM(1510, 3465, 60, 550),
+    makeWallM(2182, 3465, 60, 550),
+    makeWallM(1453, 2865, 60, 1300),
+    makeWallM(2240, 2865, 60, 1300),
+    makeWallM(1516, 3040, 324, 200),
+    makeWallM(1912, 3040, 324, 200),
+
+    makeWallM(1705, 3300, 355, 60),
+    makeWallM(1705, 3339, 10, 80),
+    makeWallM(2050, 3339, 10, 80),
+
+    //ruins first puzzle room
+
+    makeWallM(1813,2937,130, 30),
+    makeWallM(1695, 2883, 119, 80),
+    makeWallM(1937, 2883, 210, 80),
+
+    makeWallM(2245, 2397, 30, 400),
+    makeWallM(2182, 2235, 60, 350),
+    makeWallM(2119, 2168, 60, 350),
+    makeWallM(1876, 2226 - 37, 300, 270)
   ];
 }
 
