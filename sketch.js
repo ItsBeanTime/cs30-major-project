@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "start";
 let menuState = "instruction";
 
 //player variables
