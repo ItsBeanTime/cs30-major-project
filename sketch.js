@@ -5,8 +5,8 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "start";
-let menuState = "instruction"
+let gameState = "chooseWhatToDoWithEnemy";
+let menuState = "instruction";
 
 //player variables
 let playerX, playerY;
@@ -69,7 +69,8 @@ let fadeState = "in";
 
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 5;
-let fightBorderSize = 200; 
+let fightBorderWidth = 500;
+let fightBorderHeight = 500;
 let heartSize = 20;
 let x;
 let y;
@@ -99,7 +100,7 @@ let lowercase = [
   "a","b","c","d","e","f","g","h","i",
   "j","k","l","m","n","o","p","q","r",
   "s","t","u","v","w","x","y","z",
-]
+];
 let letters = capitals.concat(lowercase);
 let buttons = ["Quit", "Backspace", "Done"];
 let totalSlots = letters.length + buttons.length;
@@ -244,16 +245,18 @@ function setupTriggers(){
     {
       x:1825,y:5260,w:120,h:200,
       onWalk: true,
-     action: () => {
-      teleportPlayer(0, -220);
-      console.log("walked onto trigger")}
+      action: () => {
+        teleportPlayer(0, -220);
+        console.log("walked onto trigger");
+      }
     },
 
     {
       x:0,y:0,w:0,h:0,
       onInteract: true,
       action: () => {
-        console.log("interacted")}
+        console.log("interacted");
+      }
     }
   ];
 }
@@ -283,8 +286,8 @@ function checkTriggers(px, py, pressed){
 }
 
 function makeWall(px, py, pw, ph){
-  let scaleX = (width * (mapSize + 10)) / 6981;
-  let scaleY = (height * (mapSize - 4)) / 1921;
+  let scaleX = width * (mapSize + 10) / 6981;
+  let scaleY = height * (mapSize - 4) / 1921;
   return {
     x: px * scaleX,
     y: py * scaleY,
@@ -335,7 +338,7 @@ function keyPressed() {
     if (keyCode === 13){
       onceUponATime.stop();
       if (!undertaleBoom.isPlaying()){
-        undertaleBoom.play()
+        undertaleBoom.play();
       }
       currentFrame = 11;
     }
@@ -352,7 +355,7 @@ function keyPressed() {
       if (confirmSelection === 1){
         startMenuTheme.stop();
         fadeAlpha = 0;
-        menuState = "startinggame"
+        menuState = "startinggame";
       }
       else{
         menuState = "name";
@@ -369,11 +372,17 @@ function keyPressed() {
   if (keyCode === RIGHT_ARROW && selection < selections.length && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
     selection ++;
   }
+  if (keyCode === LEFT_ARROW && selection === 1 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
+    selection = selections.length-1;
+  }
+  if (keyCode === RIGHT_ARROW && selection === selections.length-1 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
+    selection = 1;
+  }
+
+
+
   if (key === " " && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
     choice = selection;
-  }
-  if (keyCode === 115) { // doesnt work for some reason 
-    fullscreen();
   }
 
   if (menuState === "name"){
@@ -381,7 +390,7 @@ function keyPressed() {
 
     if (keyCode === RIGHT_ARROW){
       if (onButton){
-        selectedLetter = min(selectedLetter + 1, letters.length + buttons.length - 1)
+        selectedLetter = min(selectedLetter + 1, letters.length + buttons.length - 1);
       }
       else{
         selectedLetter = min(selectedLetter + 1, letters.length - 1);
@@ -426,7 +435,7 @@ function keyPressed() {
           let currentCol = (selectedLetter - capitals.length) % letterCols;
           let target = lastCapRow * letterCols + currentCol;
           selectedLetter = lastCapRow * letterCols + currentCol;
-          selectedLetter = min(target, capitals.length - 1)
+          selectedLetter = min(target, capitals.length - 1);
         }
         else{
           selectedLetter = max(prevIndex, 0);
@@ -447,7 +456,7 @@ function keyPressed() {
         }
         if (buttonIndex === 2){
           if (playersName.length > 0){
-            menuState = "confirm"
+            menuState = "confirm";
             playerNameMoveY = height/5 + 36;
             playerNameMoveReady = true;
           }
@@ -637,7 +646,7 @@ function instructionScreen(){
     "[Hold Q]-Quit\n" +
     "When HP is 0, you lose.",
     width /3.5, height /4
-  )
+  );
 }
 
 function playerNameScreen(){
@@ -660,7 +669,7 @@ function playerNameScreen(){
   let lowStartY = capStartY + 3.5 * 45 + 40;
   let cellWidth = 80;
   let cellHeight = 45;
-  let startX = width/2 - (letterCols * cellWidth)/2;
+  let startX = width/2 - letterCols * cellWidth/2;
 
   for (let i = 0; i < letters.length; i++){
 
@@ -771,7 +780,7 @@ function startGameFade(){
   textAlign(CENTER);
 
   if (fadeAlpha === 0 && !musCymbal.isPlaying()){
-    musCymbal.play()
+    musCymbal.play();
   }
 
   fadeAlpha += 255 / 300;
@@ -852,10 +861,10 @@ function playerMove(){
   let newMapY = mapPlayerY;
 
   if (keyIsDown(65)){
-      newMapX -= speed;
-      currentSprites = playerSpriteLeft;
-      newDirection = "left";
-      moving = true;
+    newMapX -= speed;
+    currentSprites = playerSpriteLeft;
+    newDirection = "left";
+    moving = true;
   }
 
   if (keyIsDown(68)){ 
@@ -941,7 +950,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
     fill(255);
     textSize(20);
     textFont(determinationFont);
-    text(`selection: ${selection}
+    text(`selection: ${selections[selection]}
   choice: ${choice}`, width/2, height/2);
   }
 
@@ -966,17 +975,22 @@ function dodge() { //Foo's Function DO NOT TOUCH
   }
 
   // keep player inside the fight border
-  let boxSize = fightBorderSize + fightStrokeWeight;
-  let innerSize = boxSize - fightStrokeWeight;    
+  let boxHeight = fightBorderHeight + fightStrokeWeight;
+  let boxWidth = fightBorderWidth + fightStrokeWeight;
+  let innerHeight = boxHeight - fightStrokeWeight;
+  let innerWidth = boxWidth - fightStrokeWeight;
+
+  // let boxSize = fightBorderSize + fightStrokeWeight;
+  // let innerSize = boxSize - fightStrokeWeight;    
 
   x = constrain(x,
-    width/2 - innerSize/2 + heartSize/2,
-    width/2 + innerSize/2 - heartSize/2
+    width/2 - innerWidth/2 + heartSize/2,
+    width/2 + innerWidth/2 - heartSize/2
   );
 
   y = constrain(y,
-    height/2 - innerSize/2 + heartSize/2,
-    height/2 + innerSize/2 - heartSize/2
+    height/2 - innerHeight/2 + heartSize/2,
+    height/2 + innerHeight/2 - heartSize/2
   );
 
 
@@ -987,7 +1001,7 @@ function dodge() { //Foo's Function DO NOT TOUCH
   stroke(255);
   noFill();
   rectMode(CENTER);
-  rect(width/2 , height/2 , boxSize, boxSize);
+  rect(width/2 , height/2 , boxWidth, boxHeight);
   // display heart
   image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
   
