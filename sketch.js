@@ -980,9 +980,6 @@ function dodge() { //Foo's Function DO NOT TOUCH
   let innerHeight = boxHeight - fightStrokeWeight;
   let innerWidth = boxWidth - fightStrokeWeight;
 
-  // let boxSize = fightBorderSize + fightStrokeWeight;
-  // let innerSize = boxSize - fightStrokeWeight;    
-
   x = constrain(x,
     width/2 - innerWidth/2 + heartSize/2,
     width/2 + innerWidth/2 - heartSize/2
