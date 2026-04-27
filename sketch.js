@@ -1,4 +1,3 @@
-
 // Undertale
 // Ben H and Zeyad M
 //
@@ -6,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "title";
+let gameState = "ruins";
 let menuState = "instruction"
 
 //player variables
@@ -74,7 +73,7 @@ let fightBorderSize = 200;
 let heartSize = 20;
 let x;
 let y;
-let speed = 4;
+let speed = 5;
 let choices = ["none", "fight", "act", "item", "mercy"];
 let selections = ["none", "fight", "act", "item", "mercy"];
 let choice = 0;
@@ -112,6 +111,8 @@ let playerNameMoveY = 0;
 let playerNameMoveReady = false;
 
 let walls = [];
+let triggers = [];
+let triggerCooldown = false;
 
 function setup() {
   noSmooth();
@@ -123,8 +124,8 @@ function setup() {
   x = width/2;
   y = height/2;
 
-  playerX = width / 2;
-  playerY = height / 2;
+  playerX = width /2 - 35;
+  playerY = height / 2 - 60;
   currentSprites = playerSpriteFront;
 
   screenPosY = -height * (mapSize - 5);
@@ -135,6 +136,7 @@ function setup() {
   }
 
   setupWalls();
+  setupTriggers();
 }
 
 function draw() {
@@ -207,9 +209,115 @@ function setupSound(){
   ruinsMusic.setVolume (0.5);
 }
 
+function setupWalls(){
+  walls = [
+    //edge of map
+    makeWall(0,0,6981,0),
+    makeWall(0,0,0,1921),
+    makeWall(0,1921,6981,0),
+    makeWall(6950,0,0,1921),
 
+    //other walls
+    //ruins start room
+    makeWallM(54, 5128, 30, 700),
+    makeWallM(84, 5450 + 80, 60, 500),
+    makeWallM(84 + 60, 5450 + 140, 60, 500),
+    makeWallM(204, 5560 + 90, 60, 500),
+    makeWallM(84, 5164, 120, 75),
+    makeWallM(204, 5088, 600, 85),
+    makeWallM(264, 5715, 450, 100),
+    makeWallM(686,5624 + 30, 70, 80,),
+    makeWallM(749, 5508 + 86,1300,80,),
+    makeWallM(749,5157,200,80,),
+    makeWallM(870,5165,950,310,),
+    makeWallM(2008,5165,500,600,),
+    makeWallM(1947,5165,60,310,),
+    makeWallM(1821,5250,150,30,),
+
+    //ruins flowey room
+
+  ];
+}
+
+function setupTriggers(){
+  triggers = [
+    {
+      x:1825,y:5260,w:120,h:200,
+      onWalk: true,
+     action: () => {
+      teleportPlayer(0, -220);
+      console.log("walked onto trigger")}
+    },
+
+    {
+      x:0,y:0,w:0,h:0,
+      onInteract: true,
+      action: () => {
+        console.log("interacted")}
+    }
+  ];
+}
+
+function checkTriggers(px, py, pressed){
+  let pw = 60;
+  let ph = 20;
+  let offsetY = 70;
+
+  let inAnyTrigger = false;
+
+  for (let trigger of triggers){
+    if (px < trigger.x + trigger.w && px + pw > trigger.x && py + offsetY < trigger.y + trigger.h && py + offsetY + ph > trigger.y){
+      inAnyTrigger = true;
+      if (trigger.onWalk && !pressed && !triggerCooldown){
+        triggerCooldown = true;
+        trigger.action();
+      }
+      if (trigger.onInteract && pressed){
+        trigger.action();
+      }
+    }
+  }
+  if (!inAnyTrigger){
+    triggerCooldown = false;
+  }
+}
+
+function makeWall(px, py, pw, ph){
+  let scaleX = (width * (mapSize + 10)) / 6981;
+  let scaleY = (height * (mapSize - 4)) / 1921;
+  return {
+    x: px * scaleX,
+    y: py * scaleY,
+    w: pw * scaleX,
+    h: ph * scaleY
+  };
+}
+
+function makeWallM(mx, my, mw, mh){
+  return {x:mx, y: my, w: mw, h: mh};
+}
+
+function collidesWithWall(px, py){
+  let pw = 60;
+  let ph = 20;
+  let offsetY = 70;
+
+  for (let wall of walls){
+    if (px < wall.x + wall.w && px + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
+      return true;
+    }
+  }
+  return false;
+}
 
 function keyPressed() {
+
+  if (gameState === "ruins" && keyCode === 90){
+    let mapPlayerX = playerX - screenPosX;
+    let mapPlayerY = playerY - screenPosY;
+    checkTriggers(mapPlayerX, mapPlayerY, true);
+  }
+
 
   if (gameState === "title" && menuState === "instruction"){
     if (keyCode === 90 || keyCode === ENTER){
@@ -226,6 +334,9 @@ function keyPressed() {
   if (gameState === "cutscene"){
     if (keyCode === 13){
       onceUponATime.stop();
+      if (!undertaleBoom.isPlaying()){
+        undertaleBoom.play()
+      }
       currentFrame = 11;
     }
   }
@@ -682,6 +793,39 @@ function startGameFade(){
 function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
+
+  noFill();
+  stroke(255,0,0);
+  strokeWeight(2);
+  noStroke();
+  for (let wall of walls){
+    rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
+  }
+
+  stroke(180, 0, 255);
+  noStroke(); // hide hitbox
+  for (let trigger of triggers){
+    rect(trigger.x + screenPosX, trigger.y + screenPosY, trigger.w, trigger.h);
+  }
+
+  stroke(0, 255, 0);
+  strokeWeight(2);
+  noFill();
+  noStroke();
+  rect(playerX, playerY + 70, 60, 20);
+
+  noStroke();
+
+  fill(255);
+  noStroke();
+  textSize(20);
+  textFont(determinationFont);
+  textAlign(LEFT);
+  text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
+  text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
+  text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
+
+
   if (!ruinsMusic.isPlaying()){
     ruinsMusic.play();
   }
@@ -693,55 +837,62 @@ function playerMove(){
   let moving = false;
   let newDirection = direction;
 
-  if (keyIsDown(65)){
-    if (playerX > width/4){
-      playerX -= speed;
-   }
-   else{
-      screenPosX += speed;
-    }
+  let mapW = width * (mapSize + 10);
+  let mapH = height * (mapSize - 4);
 
-    currentSprites = playerSpriteLeft;
-    newDirection = "left";
-    moving = true;
+  let minScrollX = -(mapW - width);
+  let minScrollY = -(mapH - height);
+  let maxScrollX = 0;
+  let maxScrollY = 0;
+
+  let mapPlayerX = playerX - screenPosX;
+  let mapPlayerY = playerY - screenPosY;
+
+  let newMapX = mapPlayerX;
+  let newMapY = mapPlayerY;
+
+  if (keyIsDown(65)){
+      newMapX -= speed;
+      currentSprites = playerSpriteLeft;
+      newDirection = "left";
+      moving = true;
   }
 
   if (keyIsDown(68)){ 
-    if (playerX < width - width/4){
-      playerX += speed; // move player freely
-    }
-    else{
-      screenPosX -= speed; // scroll world instead
-   }
-
+    newMapX += speed;
     currentSprites = playerSpriteRight;
     newDirection = "right";
     moving = true;
   }
   if (keyIsDown(87)){
-    if (playerY > height/4){
-     playerY -= speed;
-    }
-    else{
-     screenPosY += speed;
-   }
-
+    newMapY -= speed;
     currentSprites = playerSpriteBack;
     newDirection = "back";
     moving = true;
   }
   if (keyIsDown(83)){
-    if (playerY < height - height/4){
-     playerY += speed;
-   }
-    else{
-     screenPosY -= speed;
-    }
-
+    newMapY += speed;
     currentSprites = playerSpriteFront;
     newDirection = "front";
     moving = true;
   }
+
+  if (!collidesWithWall(newMapX, mapPlayerY)){
+    mapPlayerX = newMapX;
+  }
+  if (!collidesWithWall(mapPlayerX, newMapY)){
+    mapPlayerY = newMapY;
+  }
+
+ 
+
+  screenPosX = constrain(width / 2 - mapPlayerX, minScrollX, maxScrollX);
+  screenPosY = constrain(height / 2 - mapPlayerY, minScrollY, maxScrollY);
+
+  playerX = mapPlayerX + screenPosX;
+  playerY = mapPlayerY + screenPosY;
+
+  checkTriggers(mapPlayerX, mapPlayerY, false);
 
   if (newDirection !== direction){
     frameIndex = 0;
@@ -772,14 +923,15 @@ function displayPlayer(){
   }
 }
 
-function setupWalls(){
-  walls = [
-    {x: 0, y:0, w:9999, h:50},
-    {x: 0, y: 0, w: 50, h: 9999},
-    {x: 0, y: 1900, w:9999, h:50},
-    {x: 2800, y:0,w:50, h:9999},
-  ];
-
+function teleportPlayer(dx, dy){
+  let mapW = width * (mapSize + 10);
+  let mapH = height * (mapSize - 4);
+  let mapPlayerX = playerX - screenPosX + dx;
+  let mapPlayerY = playerY - screenPosY + dy;
+  screenPosX = constrain(width / 2 -mapPlayerX, -(mapW - width),0);
+  screenPosY = constrain(height / 2 -mapPlayerY, -(mapH - height),0);
+  playerX = mapPlayerX + screenPosX;
+  playerY = mapPlayerY + screenPosY;
 }
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
@@ -844,4 +996,3 @@ function dodge() { //Foo's Function DO NOT TOUCH
 function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
 }
-
