@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "ruins"//"chooseWhatToDoWithEnemy"
 let menuState = "instruction";
 
 //player variables
@@ -77,6 +77,7 @@ let y;
 let speed = 9;
 let choices = ["none", "fight", "act", "item", "mercy"];
 let selections = ["none", "fight", "act", "item", "mercy"];
+let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
 let choice = 0;
 let selection = 0;
 
@@ -200,6 +201,20 @@ function preload() {
   }
 
   cutscene.push(loadImage("assets/title sprites/undertale-titlescreen.png"));
+  
+  //UI
+  for(let i = 1; i <= 2; i++){
+    FightButton = loadImage(`assets/battle menu/fightbutton${i}.png`);
+  }
+  for(let i = 1; i <= 2; i++){
+    ActButton = loadImage(`assets/battle menu/actbutton${i}.png`);
+  }
+  for(let i = 1; i <= 2; i++){
+    ItemButton = loadImage(`assets/battle menu/itembutton${i}.png`);
+  }
+  for(let i = 1; i <= 2; i++){
+    MercyButton = loadImage(`assets/battle menu/mercybutton${i}.png`);
+  }
 }
 
 function setupSound(){
@@ -218,22 +233,27 @@ function setupWalls(){
     makeWall(0,1921,6981,0),
     makeWall(6950,0,0,1921),
 
+
+    makeWall(490,722,98,38),
+    makeWall(490, 750, 30, 90),
+    makeWall(490, 765,10, 161),
+
     //other walls
     //ruins start room
-    makeWallM(54, 5128, 30, 700),
-    makeWallM(84, 5450 + 80, 60, 500),
-    makeWallM(84 + 60, 5450 + 140, 60, 500),
-    makeWallM(204, 5560 + 90, 60, 500),
-    makeWallM(84, 5164, 120, 75),
-    makeWallM(204, 5088, 600, 85),
-    makeWallM(264, 5715, 450, 100),
-    makeWallM(686,5624 + 30, 70, 80,),
-    makeWallM(749, 5508 + 86,1300,80,),
-    makeWallM(749,5157,200,80,),
-    makeWallM(870,5165,950,310,),
-    makeWallM(2008,5165,500,600,),
-    makeWallM(1947,5165,60,310,),
-    makeWallM(1821,5250,150,30,),
+    // makeWallM(54, 5128, 30, 700),
+    // makeWallM(84, 5450 + 80, 60, 500),
+    // makeWallM(84 + 60, 5450 + 140, 60, 500),
+    // makeWallM(204, 5560 + 90, 60, 500),
+    // makeWallM(84, 5164, 120, 75),
+    // makeWallM(204, 5088, 600, 85),
+    // makeWallM(264, 5715, 450, 100),
+    // makeWallM(686,5624 + 30, 70, 80,),
+    // makeWallM(749, 5508 + 86,1300,80,),
+    // makeWallM(749,5157,200,80,),
+    // makeWallM(870,5165,950,310,),
+    // makeWallM(2008,5165,500,600,),
+    // makeWallM(1947,5165,60,310,),
+    // makeWallM(1821,5250,150,30,),
 
     //ruins flowey room
     makeWallM(1453,4570, 30, 800),
@@ -269,7 +289,10 @@ function setupWalls(){
     makeWallM(2245, 2397, 30, 400),
     makeWallM(2182, 2235, 60, 350),
     makeWallM(2119, 2168, 60, 350),
-    makeWallM(1876, 2226 - 37, 300, 270)
+    makeWallM(1876, 2226 - 37, 300, 270),
+
+
+    
   ];
 }
 
@@ -334,12 +357,12 @@ function makeWallM(mx, my, mw, mh){
 }
 
 function collidesWithWall(px, py){
-  let pw = 60;
+  let pw = 50;
   let ph = 20;
-  let offsetY = 70;
+  let offsetY = 69;
 
   for (let wall of walls){
-    if (px < wall.x + wall.w && px + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
+    if (px + 2 < wall.x + wall.w && px+ 2 + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
       return true;
     }
   }
@@ -378,10 +401,10 @@ function keyPressed() {
   }
   
   if (menuState === "confirm"){
-    if (keyCode === LEFT_ARROW){
+    if (keyCode === LEFT_ARROW || keyCode === 65){
       confirmSelection = 0;
     }
-    if (keyCode === RIGHT_ARROW){
+    if (keyCode === RIGHT_ARROW || keyCode === 68){
       confirmSelection = 1;
     }
     if (keyCode === 90 || keyCode === ENTER){
@@ -398,30 +421,26 @@ function keyPressed() {
     }
     return;
   }
-
-  if (keyCode === LEFT_ARROW && selection > 0 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
-    selection --;
+  // selection with arrow keys, confirm with space and if goes off screen it starts from the beginning or end depending on the direction
+  if (keyCode === LEFT_ARROW || keyCode === 65){
+    selection = (selection - 1 + selections.length) % selections.length;
   }
-  if (keyCode === RIGHT_ARROW && selection < selections.length && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
-    selection ++;
-  }
-  if (keyCode === LEFT_ARROW && selection === 1 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
-    selection = selections.length-1;
-  }
-  if (keyCode === RIGHT_ARROW && selection === selections.length-1 && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
-    selection = 1;
-  }
+  if (keyCode === RIGHT_ARROW || keyCode === 68){
+    selection = (selection + 1) % selections.length;
+  } 
 
 
 
-  if (key === " " && choice === 0 && gameState === "chooseWhatToDoWithEnemy") {
-    choice = selection;
+  if (key === " " && gameState === "chooseWhatToDoWithEnemy") {
+    if (selection !== 0){
+      choice = selection;
+    }
   }
 
   if (menuState === "name"){
     let onButton = selectedLetter >= letters.length;
 
-    if (keyCode === RIGHT_ARROW){
+    if (keyCode === RIGHT_ARROW || keyCode === 68){
       if (onButton){
         selectedLetter = min(selectedLetter + 1, letters.length + buttons.length - 1);
       }
@@ -430,7 +449,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === LEFT_ARROW){
+    if (keyCode === LEFT_ARROW || keyCode === 65){
       if (onButton){
         selectedLetter = max(selectedLetter - 1, letters.length);
       }
@@ -439,7 +458,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === DOWN_ARROW){
+    if (keyCode === DOWN_ARROW || keyCode === 83){
       if (!onButton){
         let nextIndex = selectedLetter + letterCols;
 
@@ -456,7 +475,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === UP_ARROW){
+    if (keyCode === UP_ARROW || keyCode === 87){
       if (onButton){
         selectedLetter = letters.length - 1;
       }
@@ -839,13 +858,13 @@ function startRuins(){
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  noStroke();
+  //noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
 
   stroke(180, 0, 255);
-  noStroke(); // hide hitbox
+  //noStroke(); // hide hitbox
   for (let trigger of triggers){
     rect(trigger.x + screenPosX, trigger.y + screenPosY, trigger.w, trigger.h);
   }
@@ -853,8 +872,8 @@ function startRuins(){
   stroke(0, 255, 0);
   strokeWeight(2);
   noFill();
-  noStroke();
-  rect(playerX, playerY + 70, 60, 20);
+  //noStroke();
+  rect(playerX, playerY + 65, 50, 25);
 
   noStroke();
 
@@ -978,17 +997,19 @@ function teleportPlayer(dx, dy){
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
 
-  if (gameState === "chooseWhatToDoWithEnemy"){ 
-    background(0);
-    fill(255);
-    textSize(20);
-    textFont(determinationFont);
-    text(`selection: ${selections[selection]}
+  
+  background(0);
+  fill(255);
+  textSize(20);
+  textFont(determinationFont);
+  text(`selection: ${selections[selection]}
   choice: ${choice}`, width/2, height/2);
-  }
+  
 
-  if (choice === 1){
+
+  if (choice === 1){ 
     gameState = "dodge";
+    choice = 0;
   }
 }
 
