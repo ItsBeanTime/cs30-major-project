@@ -5,8 +5,9 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "ruins"//"chooseWhatToDoWithEnemy"
+let gameState = "ruins";//"chooseWhatToDoWithEnemy"
 let menuState = "instruction";
+let pauseState = "no";
 
 //player variables
 let playerX, playerY;
@@ -217,160 +218,16 @@ function preload() {
   }
 }
 
-function setupSound(){
-  userStartAudio();
-  textSound.setVolume(0.2);
-  onceUponATime.setVolume(oUATStartingVolume);
-  startMenuTheme.setVolume(0.5);
-  ruinsMusic.setVolume (0.5);
-}
-
-function setupWalls(){
-  walls = [
-    //edge of map
-    makeWall(0,0,6981,0),
-    makeWall(0,0,0,1921),
-    makeWall(0,1921,6981,0),
-    makeWall(6950,0,0,1921),
-
-
-    makeWall(490,722,98,38),
-    makeWall(490, 750, 30, 90),
-    makeWall(490, 765,10, 161),
-
-    //other walls
-    //ruins start room
-    // makeWallM(54, 5128, 30, 700),
-    // makeWallM(84, 5450 + 80, 60, 500),
-    // makeWallM(84 + 60, 5450 + 140, 60, 500),
-    // makeWallM(204, 5560 + 90, 60, 500),
-    // makeWallM(84, 5164, 120, 75),
-    // makeWallM(204, 5088, 600, 85),
-    // makeWallM(264, 5715, 450, 100),
-    // makeWallM(686,5624 + 30, 70, 80,),
-    // makeWallM(749, 5508 + 86,1300,80,),
-    // makeWallM(749,5157,200,80,),
-    // makeWallM(870,5165,950,310,),
-    // makeWallM(2008,5165,500,600,),
-    // makeWallM(1947,5165,60,310,),
-    // makeWallM(1821,5250,150,30,),
-
-    //ruins flowey room
-    makeWallM(1453,4570, 30, 800),
-    makeWallM(2300,4570, 30, 800),
-    makeWallM(1480,4570, 320, 30),
-    makeWallM(1939,4570, 400, 30),
-
-    //ruins stairs roomd
-    makeWallM(1786,4320, 200, 20),
-    makeWallM(1783, 4200, 30, 200),
-    makeWallM(1935, 4200, 30, 200),
-
-    makeWallM(1624, 4140, 128,20),
-    makeWallM(1995, 4140, 128,20),
-
-    makeWallM(1510, 3465, 60, 550),
-    makeWallM(2182, 3465, 60, 550),
-    makeWallM(1453, 2865, 60, 1300),
-    makeWallM(2240, 2865, 60, 1300),
-    makeWallM(1516, 3040, 324, 200),
-    makeWallM(1912, 3040, 324, 200),
-
-    makeWallM(1705, 3300, 355, 60),
-    makeWallM(1705, 3339, 10, 80),
-    makeWallM(2050, 3339, 10, 80),
-
-    //ruins first puzzle room
-
-    makeWallM(1813,2937,130, 30),
-    makeWallM(1695, 2883, 119, 80),
-    makeWallM(1937, 2883, 210, 80),
-
-    makeWallM(2245, 2397, 30, 400),
-    makeWallM(2182, 2235, 60, 350),
-    makeWallM(2119, 2168, 60, 350),
-    makeWallM(1876, 2226 - 37, 300, 270),
-
-
-    
-  ];
-}
-
-function setupTriggers(){
-  triggers = [
-    {
-      x:1825,y:5260,w:120,h:200,
-      onWalk: true,
-      action: () => {
-        teleportPlayer(0, -220);
-        console.log("walked onto trigger");
-      }
-    },
-
-    {
-      x:0,y:0,w:0,h:0,
-      onInteract: true,
-      action: () => {
-        console.log("interacted");
-      }
-    }
-  ];
-}
-
-function checkTriggers(px, py, pressed){
-  let pw = 60;
-  let ph = 20;
-  let offsetY = 70;
-
-  let inAnyTrigger = false;
-
-  for (let trigger of triggers){
-    if (px < trigger.x + trigger.w && px + pw > trigger.x && py + offsetY < trigger.y + trigger.h && py + offsetY + ph > trigger.y){
-      inAnyTrigger = true;
-      if (trigger.onWalk && !pressed && !triggerCooldown){
-        triggerCooldown = true;
-        trigger.action();
-      }
-      if (trigger.onInteract && pressed){
-        trigger.action();
-      }
-    }
-  }
-  if (!inAnyTrigger){
-    triggerCooldown = false;
-  }
-}
-
-function makeWall(px, py, pw, ph){
-  let scaleX = width * (mapSize + 10) / 6981;
-  let scaleY = height * (mapSize - 4) / 1921;
-  return {
-    x: px * scaleX,
-    y: py * scaleY,
-    w: pw * scaleX,
-    h: ph * scaleY
-  };
-}
-
-function makeWallM(mx, my, mw, mh){
-  return {x:mx, y: my, w: mw, h: mh};
-}
-
-function collidesWithWall(px, py){
-  let pw = 50;
-  let ph = 20;
-  let offsetY = 69;
-
-  for (let wall of walls){
-    if (px + 2 < wall.x + wall.w && px+ 2 + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
-      return true;
-    }
-  }
-  return false;
-}
-
 function keyPressed() {
 
+  if (pauseState === "no" && keyCode === 67){
+    pauseState = "yes";
+  }
+
+  else if (pauseState === "yes" && keyCode === 67){
+    pauseState = "no";
+  }
+  
   if (gameState === "ruins" && keyCode === 90){
     let mapPlayerX = playerX - screenPosX;
     let mapPlayerY = playerY - screenPosY;
@@ -523,12 +380,165 @@ function keyPressed() {
   }
 }
 
-
 function mousePressed(){
   if (gameState === "start"){
     gameState = "cutscene";
   }
 }
+
+function setupSound(){
+  userStartAudio();
+  textSound.setVolume(0.2);
+  onceUponATime.setVolume(oUATStartingVolume);
+  startMenuTheme.setVolume(0.5);
+  ruinsMusic.setVolume (0.5);
+}
+
+function setupWalls(){
+  walls = [
+    //edge of map
+    makeWall(0,0,6981,0),
+    makeWall(0,0,0,1921),
+    makeWall(0,1921,6981,0),
+    makeWall(6950,0,0,1921),
+
+
+    makeWall(490,722,98,38),
+    makeWall(490, 750, 30, 90),
+    makeWall(490, 765,10, 161),
+
+    //other walls
+    //ruins start room
+    // makeWallM(54, 5128, 30, 700),
+    // makeWallM(84, 5450 + 80, 60, 500),
+    // makeWallM(84 + 60, 5450 + 140, 60, 500),
+    // makeWallM(204, 5560 + 90, 60, 500),
+    // makeWallM(84, 5164, 120, 75),
+    // makeWallM(204, 5088, 600, 85),
+    // makeWallM(264, 5715, 450, 100),
+    // makeWallM(686,5624 + 30, 70, 80,),
+    // makeWallM(749, 5508 + 86,1300,80,),
+    // makeWallM(749,5157,200,80,),
+    // makeWallM(870,5165,950,310,),
+    // makeWallM(2008,5165,500,600,),
+    // makeWallM(1947,5165,60,310,),
+    // makeWallM(1821,5250,150,30,),
+
+    //ruins flowey room
+    makeWallM(1453,4570, 30, 800),
+    makeWallM(2300,4570, 30, 800),
+    makeWallM(1480,4570, 320, 30),
+    makeWallM(1939,4570, 400, 30),
+
+    //ruins stairs roomd
+    makeWallM(1786,4320, 200, 20),
+    makeWallM(1783, 4200, 30, 200),
+    makeWallM(1935, 4200, 30, 200),
+
+    makeWallM(1624, 4140, 128,20),
+    makeWallM(1995, 4140, 128,20),
+
+    makeWallM(1510, 3465, 60, 550),
+    makeWallM(2182, 3465, 60, 550),
+    makeWallM(1453, 2865, 60, 1300),
+    makeWallM(2240, 2865, 60, 1300),
+    makeWallM(1516, 3040, 324, 200),
+    makeWallM(1912, 3040, 324, 200),
+
+    makeWallM(1705, 3300, 355, 60),
+    makeWallM(1705, 3339, 10, 80),
+    makeWallM(2050, 3339, 10, 80),
+
+    //ruins first puzzle room
+
+    makeWallM(1813,2937,130, 30),
+    makeWallM(1695, 2883, 119, 80),
+    makeWallM(1937, 2883, 210, 80),
+
+    makeWallM(2245, 2397, 30, 400),
+    makeWallM(2182, 2235, 60, 350),
+    makeWallM(2119, 2168, 60, 350),
+    makeWallM(1876, 2226 - 37, 300, 270),
+
+
+    
+  ];
+}
+
+function setupTriggers(){
+  triggers = [
+    {
+      x:1825,y:5260,w:120,h:200,
+      onWalk: true,
+      action: () => {
+        teleportPlayer(0, -220);
+        console.log("walked onto trigger");
+      }
+    },
+
+    {
+      x:0,y:0,w:0,h:0,
+      onInteract: true,
+      action: () => {
+        console.log("interacted");
+      }
+    }
+  ];
+}
+
+function checkTriggers(px, py, pressed){
+  let pw = 60;
+  let ph = 20;
+  let offsetY = 70;
+
+  let inAnyTrigger = false;
+
+  for (let trigger of triggers){
+    if (px < trigger.x + trigger.w && px + pw > trigger.x && py + offsetY < trigger.y + trigger.h && py + offsetY + ph > trigger.y){
+      inAnyTrigger = true;
+      if (trigger.onWalk && !pressed && !triggerCooldown){
+        triggerCooldown = true;
+        trigger.action();
+      }
+      if (trigger.onInteract && pressed){
+        trigger.action();
+      }
+    }
+  }
+  if (!inAnyTrigger){
+    triggerCooldown = false;
+  }
+}
+
+function makeWall(px, py, pw, ph){
+  let scaleX = width * (mapSize + 10) / 6981;
+  let scaleY = height * (mapSize - 4) / 1921;
+  return {
+    x: px * scaleX,
+    y: py * scaleY,
+    w: pw * scaleX,
+    h: ph * scaleY
+  };
+}
+
+function makeWallM(mx, my, mw, mh){
+  return {x:mx, y: my, w: mw, h: mh};
+}
+
+function collidesWithWall(px, py){
+  let pw = 50;
+  let ph = 20;
+  let offsetY = 69;
+
+  for (let wall of walls){
+    if (px + 2 < wall.x + wall.w && px+ 2 + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
+      return true;
+    }
+  }
+  return false;
+}
+
+
 
 function clickToStart(){
   background(0);
@@ -890,8 +900,13 @@ function startRuins(){
   if (!ruinsMusic.isPlaying()){
     ruinsMusic.play();
   }
-  playerMove();
-  displayPlayer();
+  pauseScreen();
+  if (pauseState === "no"){
+    playerMove();
+    displayPlayer();
+  }
+
+  
 }
 
 function playerMove(){
@@ -1060,4 +1075,14 @@ function dodge() { //Foo's Function DO NOT TOUCH
 
 function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
+}
+
+function pauseScreen(){
+  if (pauseState === "yes"){
+    fill(0);
+    stroke(255);
+    strokeWeight(10);
+    rect(width/8, height/4, width/4, height/5);
+    rect(width/8, height - height /2 + 20, width/4, height/4);
+  }
 }
