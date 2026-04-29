@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "start";//"ruins""chooseWhatToDoWithEnemy"
+let gameState = "ruins";//"chooseWhatToDoWithEnemy"
 let menuState = "instruction";
 let pauseState = "no";
 
@@ -16,12 +16,6 @@ let frameIndex = 0;
 let frameDelay = 10;
 let frameCountAnim = 0;
 let direction = "front";
-
-
-let screenPosY;
-let screenPosX = 0;
-let scrollSpeed = 4;
-
 
 //sprites
 let playerSpriteFront = [];
@@ -43,12 +37,19 @@ let musCymbal;
 //FONTS
 let determinationFont;
 
-//cutscene variables
+//cutscene / title variables
 let scrollCutY = -1023;
 let currentFrame = 0;
 let frameDuration = 300;
 let frameTimer = 0;
-
+let showText = "";
+let charIndex = 0;
+let textSpeed = 4;
+let cutscene = [];
+let title;
+let titleNumber = 1;
+let fadeAlpha = 0;
+let fadeState = "in";
 let cutsceneDialogue = [
   "long ago, two races ruled over Earth: HUMANS and MONSTERS.",
   "One day, war broke out between the two races.",
@@ -59,15 +60,6 @@ let cutsceneDialogue = [
   "Legends say that those who climb the mountain never return.",
 ];
 
-let showText = "";
-let charIndex = 0;
-let textSpeed = 4;
-let cutscene = [];
-let title;
-let titleNumber = 1;
-let fadeAlpha = 0;
-let fadeState = "in";
-
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 5;
 let fightBorderWidth = 500;
@@ -75,24 +67,41 @@ let fightBorderHeight = 500;
 let heartSize = 20;
 let x;
 let y;
-let speed = 9;
+let speed = 6;
 let choices = ["none", "fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
 let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
 let choice = 0;
 let selection = 0;
 
+// map variables
 let mapSize = 12;
 let ruinsMap;
+let screenPosY;
+let screenPosX = 0;
+let scrollSpeed = 4;
 
-let playersName = "";
+//pause screen variables
+let playersName = "Ben";
+let playerLevel = 0;
+let playerCurHealth = 0;
+let playerHealthMax = 0;
+let playerGuap = 0;
+
+//player name screen variables
 let letterJitterX = [];
 let letterJitterY = [];
 let nameJitterX = 0;
 let nameJitterY = 0;
 let selectedLetter = 0;
 let letterCols = 7;
-
+let letters = capitals.concat(lowercase);
+let buttons = ["Quit", "Backspace", "Done"];
+let totalSlots = letters.length + buttons.length;
+let confirmSelection = 0;
+let textSizeIncrease = 33;
+let playerNameMoveY = 0;
+let playerNameMoveReady = false;
 let capitals = [
   "A","B","C","D","E","F","G","H","I",
   "J","K","L","M","N","O","P","Q","R",
@@ -103,16 +112,8 @@ let lowercase = [
   "j","k","l","m","n","o","p","q","r",
   "s","t","u","v","w","x","y","z",
 ];
-let letters = capitals.concat(lowercase);
-let buttons = ["Quit", "Backspace", "Done"];
-let totalSlots = letters.length + buttons.length;
 
-let confirmSelection = 0;
-let textSizeIncrease = 33;
-
-let playerNameMoveY = 0;
-let playerNameMoveReady = false;
-
+//triggers/wall variables
 let walls = [];
 let triggers = [];
 let triggerCooldown = false;
@@ -142,7 +143,7 @@ function setup() {
   setupTriggers();
 }
 
-function draw() {
+function draw() { //check game states
   noSmooth();
   if (gameState === "start"){
     clickToStart();
@@ -218,6 +219,7 @@ function preload() {
   }
 }
 
+//INPUT FUNCTIONS//
 function keyPressed() {
 
   if (pauseState === "no" && keyCode === 67){
@@ -386,6 +388,7 @@ function mousePressed(){
   }
 }
 
+//SETUP FUNCTIONS//
 function setupSound(){
   userStartAudio();
   textSound.setVolume(0.2);
@@ -486,6 +489,7 @@ function setupTriggers(){
   ];
 }
 
+//WALL / TRIGGER FUNCTIONS//
 function checkTriggers(px, py, pressed){
   let pw = 60;
   let ph = 20;
@@ -526,20 +530,19 @@ function makeWallM(mx, my, mw, mh){
 }
 
 function collidesWithWall(px, py){
-  let pw = 50;
+  let pw = 60;
   let ph = 20;
   let offsetY = 69;
 
   for (let wall of walls){
-    if (px + 2 < wall.x + wall.w && px+ 2 + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
+    if (px + 10 < wall.x + wall.w && px - 10 + pw > wall.x && py + offsetY < wall.y + wall.h && py + offsetY + ph > wall.y){
       return true;
     }
   }
   return false;
 }
 
-
-
+//TITLE/MENU FUNCTIONS//
 function clickToStart(){
   background(0);
   textFont(determinationFont);
@@ -655,6 +658,27 @@ function playCutscene(){
       }
 
     }
+  }
+}
+
+function pauseScreen(){
+  if (pauseState === "yes"){
+    fill(0);
+    stroke(255);
+    strokeWeight(9);
+    rect(width/8, height/5, width/5, height/6);
+    rect(width/8, height/2.7 + 30, width/5, height/4);
+    rect(width/2 - width/7, height/5, width/2.6, height/1.5);
+
+    strokeWeight(0);
+    textSize(32);
+    fill(255);
+    textFont(determinationFont);
+    text(`${playersName}`, width/8 + 20, height/4);
+    textSize(20);
+    text(`LV ${playerLevel}`, width/8 + 20, height/3 - 35);
+    text(`HP ${playerCurHealth} / ${playerHealthMax}`, width/8 + 20, height/3 - 12);
+    text(`G ${playerGuap}`, width/8 + 20, height/2 -   110);
   }
 }
 
@@ -860,7 +884,7 @@ function startGameFade(){
   }
 }
 
-
+//ACTUAL GAME FUNCTIONS//
 function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
@@ -883,7 +907,7 @@ function startRuins(){
   strokeWeight(2);
   noFill();
   //noStroke();
-  rect(playerX, playerY + 65, 50, 25);
+  rect(playerX + 10, playerY + 69, 40, 20);
 
   noStroke();
 
@@ -1077,12 +1101,4 @@ function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
 }
 
-function pauseScreen(){
-  if (pauseState === "yes"){
-    fill(0);
-    stroke(255);
-    strokeWeight(10);
-    rect(width/8, height/4, width/4, height/5);
-    rect(width/8, height - height /2 + 20, width/4, height/4);
-  }
-}
+
