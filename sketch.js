@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "ruins";//"chooseWhatToDoWithEnemy"
+let gameState = "start";//"ruins""chooseWhatToDoWithEnemy"
 let menuState = "instruction";
 let pauseState = "no";
 
@@ -77,7 +77,7 @@ let x;
 let y;
 let speed = 9;
 let choices = ["none", "fight", "act", "item", "mercy"];
-let selections = ["none", "fight", "act", "item", "mercy"];
+let selections = ["fight", "act", "item", "mercy"];
 let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
 let choice = 0;
 let selection = 0;
@@ -289,9 +289,9 @@ function keyPressed() {
 
 
   if (key === " " && gameState === "chooseWhatToDoWithEnemy") {
-    if (selection !== 0){
-      choice = selection;
-    }
+    if (selection === 0){
+      choice = selection + 1 ;
+    } 
   }
 
   if (menuState === "name"){
