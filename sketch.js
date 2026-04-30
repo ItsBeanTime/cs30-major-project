@@ -5,9 +5,10 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";//"ruins""start"
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
+let pauseSelection = "stat";
 
 //player variables
 let playerX, playerY;
@@ -61,7 +62,6 @@ let cutsceneDialogue = [
 ];
 
 // Foo's Variables DO NOT TOUCH
-let undefined;
 let fightStrokeWeight = 5;
 let fightBorderWidth = 500;
 let fightBorderHeight = 500;
@@ -84,13 +84,33 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = "Ben";
-let playerLevel = 0;
+let playersName = "Player";
+let playerLevel = 1;
+let playerNextLevel = 10;
 let playerCurHealth = 0;
 let playerHealthMax = 0;
 let playerGuap = 0;
+let playerAttackStat = 0;
+let playerAttackModify = 0;
+let playerDefenseStat = 0;
+let playerDefenseModify = 0;
+let playerExp = 0;
+let playerKills = 0;
+let playerWeaponEquip = "Stick";
+let playerArmorEquip = "Bandage";
 
 //player name screen variables
+
+let capitals = [
+  "A","B","C","D","E","F","G","H","I",
+  "J","K","L","M","N","O","P","Q","R",
+  "S","T","U","V","W","X","Y","Z",
+];
+let lowercase = [
+  "a","b","c","d","e","f","g","h","i",
+  "j","k","l","m","n","o","p","q","r",
+  "s","t","u","v","w","x","y","z",
+];
 let letterJitterX = [];
 let letterJitterY = [];
 let nameJitterX = 0;
@@ -104,16 +124,6 @@ let confirmSelection = 0;
 let textSizeIncrease = 33;
 let playerNameMoveY = 0;
 let playerNameMoveReady = false;
-let capitals = [
-  "A","B","C","D","E","F","G","H","I",
-  "J","K","L","M","N","O","P","Q","R",
-  "S","T","U","V","W","X","Y","Z",
-];
-let lowercase = [
-  "a","b","c","d","e","f","g","h","i",
-  "j","k","l","m","n","o","p","q","r",
-  "s","t","u","v","w","x","y","z",
-];
 
 //triggers/wall variables
 let walls = [];
@@ -679,6 +689,33 @@ function pauseScreen(){
     text(`LV ${playerLevel}`, width/8 + 20, height/3 - 35);
     text(`HP ${playerCurHealth} / ${playerHealthMax}`, width/8 + 20, height/3 - 12);
     text(`G ${playerGuap}`, width/8 + 20, height/2 -   110);
+
+    //temp
+    textSize(32);
+    text("ITEM", 175, 350);
+    text("STAT", 175, 390);
+    text("CELL", 175, 430);
+
+    if (pauseSelection === "stat"){
+      textFont(determinationFont);
+      textSize(32);
+      text(`"${playersName}"`, 380, 205 );
+
+      text(`LV ${playerLevel}`, 380, 265);
+      text(`HP ${playerCurHealth} / ${playerHealthMax}`, 380, 300);
+
+      text(`AT ${playerAttackStat}(${playerAttackModify})`, 380, 365);
+      text(`DF ${playerDefenseStat}(${playerDefenseModify})`, 380, 400);
+
+      text(`EXP:${playerExp}`, 540, 365);
+      text(`NEXT:${playerNextLevel}`, 540, 400);
+
+      text(`WEAPON:${playerWeaponEquip}`, 380, 465);
+      text(`ARMOR:${playerArmorEquip}`, 380, 500);
+
+      text(`GOLD:${playerGuap}`, 380, 565);
+
+    }
   }
 }
 
@@ -919,6 +956,8 @@ function startRuins(){
   text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
   text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
   text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
+  text(`mouseX: ${mouseX}`, 10, 100);
+  text(`mouseY: ${mouseY}`, 10, 115);
 
 
   if (!ruinsMusic.isPlaying()){
@@ -1101,4 +1140,12 @@ function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
 }
 
+function playerLevelIncrease(){ //https://www.reddit.com/r/Underminers/comments/3u5z71/undertale_lvexpatdf_table/
+  if (playerExp >= 10){
+    playerLevel = 2;
+  }
+  if (playerExp >= 30){
+    playerLevel = 3;
+  }
+}
 
