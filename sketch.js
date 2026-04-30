@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "ruins";//"chooseWhatToDoWithEnemy"
+let gameState = "chooseWhatToDoWithEnemy";//"ruins""start"
 let menuState = "instruction";
 let pauseState = "no";
 
@@ -61,17 +61,19 @@ let cutsceneDialogue = [
 ];
 
 // Foo's Variables DO NOT TOUCH
+let undefined;
 let fightStrokeWeight = 5;
 let fightBorderWidth = 500;
 let fightBorderHeight = 500;
 let heartSize = 20;
 let x;
 let y;
-let speed = 6;
-let choices = ["none", "fight", "act", "item", "mercy"];
+
+let speed = 9;
+let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
 let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
-let choice = 0;
+let choice;
 let selection = 0;
 
 // map variables
@@ -206,16 +208,16 @@ function preload() {
   
   //UI
   for(let i = 1; i <= 2; i++){
-    FightButton = loadImage(`assets/battle menu/fightbutton${i}.png`);
+    fightButton = loadImage(`assets/battle menu/fightbutton${i}.png`);
   }
   for(let i = 1; i <= 2; i++){
-    ActButton = loadImage(`assets/battle menu/actbutton${i}.png`);
+    actButton = loadImage(`assets/battle menu/actbutton${i}.png`);
   }
   for(let i = 1; i <= 2; i++){
-    ItemButton = loadImage(`assets/battle menu/itembutton${i}.png`);
+    itemButton = loadImage(`assets/battle menu/itembutton${i}.png`);
   }
   for(let i = 1; i <= 2; i++){
-    MercyButton = loadImage(`assets/battle menu/mercybutton${i}.png`);
+    mercyButton = loadImage(`assets/battle menu/mercybutton${i}.png`);
   }
 }
 
@@ -291,9 +293,7 @@ function keyPressed() {
 
 
   if (key === " " && gameState === "chooseWhatToDoWithEnemy") {
-    if (selection === 0){
-      choice = selection + 1 ;
-    } 
+    choice = selection;
   }
 
   if (menuState === "name"){
@@ -1043,10 +1043,10 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
   textFont(determinationFont);
   text(`selection: ${selections[selection]}
   choice: ${choice}`, width/2, height/2);
-  
+  let selectionSize = 50;
+  image(fightButton[1], width/2 - 200, height - 200, selectionSize, selectionSize); // broken
 
-
-  if (choice === 1){ 
+  if (choice === 0){ 
     gameState = "dodge";
     choice = 0;
   }
