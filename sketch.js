@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState ="dodge";  //"start";
+let gameState ="ruins";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -87,15 +87,16 @@ let scrollSpeed = 4;
 //pause screen variables
 let playersName = "Player";
 let playerLevel = 1;
+let levelThresh = 10;
 let playerNextLevel = 10;
-let playerCurHealth = 0;
-let playerHealthMax = 0;
+let playerCurHealth = 20;
+let playerHealthMax = 20;
 let playerGuap = 0;
 let playerAttackStat = 0;
 let playerAttackModify = 0;
 let playerDefenseStat = 0;
 let playerDefenseModify = 0;
-let playerExp = 0;
+let playerExp = 2700;
 let playerKills = 0;
 let playerWeaponEquip = "Stick";
 let playerArmorEquip = "Bandage";
@@ -924,6 +925,7 @@ function startGameFade(){
 
 //ACTUAL GAME FUNCTIONS//
 function startRuins(){
+  playerLevelIncrease();
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
@@ -1141,12 +1143,227 @@ function fight() { //Foo's Function DO NOT TOUCH
   background(255, 0, 0);
 }
 
-function playerLevelIncrease(){ //https://www.reddit.com/r/Underminers/comments/3u5z71/undertale_lvexpatdf_table/
-  if (playerExp >= 10){
+function playerLevelIncrease(){
+  //https://www.reddit.com/r/Underminers/comments/3u5z71/undertale_lvexpatdf_table/
+  playerNextLevel = levelThresh - playerExp;
+  if (playerExp >= levelThresh){
     playerLevel = 2;
+    levelThresh = 30;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
   }
-  if (playerExp >= 30){
+  if (playerExp >= levelThresh){
     playerLevel = 3;
+    levelThresh = 70
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
   }
+  if (playerExp >= levelThresh){
+    playerLevel = 4;
+    levelThresh = 120
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 5;
+    levelThresh = 200;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+    playerDefenseStat += 1;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 6;
+    levelThresh = 300;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 7;
+    levelThresh = 500
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 8;
+    levelThresh = 800
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 9;
+    levelThresh = 1200
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+    playerDefenseStat += 1;
+  }
+  if (playerExp >= levelThresh){
+    playerLevel = 10;
+    levelThresh = 1700
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 11;
+    levelThresh = 2500
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 12;
+    levelThresh = 3500;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 13;
+    levelThresh = 5000;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+    playerDefenseStat += 1;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 14;
+    levelThresh = 7000
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 15;
+    levelThresh = 10000;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 16;
+    levelThresh = 15000
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 17;
+    levelThresh = 25000;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+    playerDefenseStat += 1;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 18;
+    levelThresh = 50000;
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 19
+    levelThresh = 99999
+    playerHealthMax += 4;
+    playerCurHealth += 4;
+    playerAttackStat += 2;
+  }
+    if (playerExp >= levelThresh){
+    playerLevel = 20;
+    playerHealthMax += 7;
+    playerCurHealth += 7;
+    playerAttackStat += 2;
+  }
+}
+
+function weaponStats(){
+  if (playerWeaponEquip === "Stick"){
+    playerAttackModify = 0;
+    //single hit
+  }
+  if (playerWeaponEquip === "Toy Knife"){
+    playerAttackModify = 3;
+    //single hit
+  }
+  if (playerArmorEquip === "Tough Glove"){
+    playerAttackModify = 5;
+    //single hit then mash
+  }
+  if (playerArmorEquip === "Ballet Shoes"){
+    playerAttackModify = 7;
+    //3 hits
+  }
+  if (playerArmorEquip === "Torn Notebook"){
+    playerAttackModify = 2;
+    //increases inv by 6 | 2 hits
+  }
+  if (playerArmorEquip === "Burnt Pan"){
+    playerAttackModify = 10;
+    //items heal 4 more hp | 4 hits
+  }
+  if (playerArmorEquip === "Empty Gun"){
+    playerAttackModify = 12;
+    //4 hits very fast
+  }
+  if (playerArmorEquip === "Worn Dagger"){
+    playerAttackModify = 15;
+    //single hit
+  }
+  if (playerArmorEquip === "Real Knife"){
+    playerAttackModify = 99;
+    //single hit
+  }
+}
+
+function armorStats(){
+  if (playerArmorEquip === "Bandage"){
+    playerDefenseModify = 0;
+  }
+  if (playerArmorEquip === "Faded Ribbon"){
+    playerDefenseModify = 3;
+  }
+  if (playerArmorEquip === "Manly Bandanna"){
+    playerDefenseModify = 7;
+  }
+  if (playerArmorEquip === "Old Tutu"){
+    playerDefenseModify = 10;
+  }
+  if (playerArmorEquip === "Cloudy Glasses"){
+    playerDefenseModify = 5;
+    //increases inv by 9
+  }
+  if (playerArmorEquip === "Temmie Armor"){
+    playerDefenseModify = 20;
+    //raises attack when worn, recover hp every other turn, inv slightly increase
+  }
+  if (playerArmorEquip === "Stained Apron"){
+    playerDefenseModify = 11;
+    //heals 1 hp every other turn
+  }
+    if (playerArmorEquip === "Cowboy Hat"){
+    playerDefenseModify = 12;
+    //increases attack by 5
+  }
+  if (playerArmorEquip === "Heart Locket"){
+    playerDefenseModify = 15;
+  }
+  if (playerArmorEquip === "The Locket"){
+    playerDefenseModify = 99;
+  }
+  if (playerArmorEquip === "God Armor"){
+    playerDefenseModify = 1000;
+  }
+}
+
+function itemStats(){
+  
 }
 
