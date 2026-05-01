@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy"; //"ruins";
+let gameState ="dodge";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -63,9 +63,10 @@ let cutsceneDialogue = [
 
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 5;
-let fightBorderWidth = 500;
-let fightBorderHeight = 500;
+let fightBorderWidth = 25;
+let fightBorderHeight = 520;
 let heartSize = 20;
+let speed = 9;
 let x;
 let y;
 
@@ -1093,7 +1094,6 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
 
 function dodge() { //Foo's Function DO NOT TOUCH
   // if dodge state, move the heart with arrow keys
-  let speed = 9;
   if (keyIsDown(37)) { // left arrow
     x -= speed;
   }
