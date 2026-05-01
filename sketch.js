@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "chooseWhatToDoWithEnemy"; //"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -69,7 +69,7 @@ let heartSize = 20;
 let x;
 let y;
 
-let speed = 9;
+
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
 let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
@@ -1084,7 +1084,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
   choice: ${choice}`, width/2, height/2);
   let selectionSize = 50;
   image(fightButton[1], width/2 - 200, height - 200, selectionSize, selectionSize); // broken
-
+  let undefined;
   if (choice === 0){ 
     gameState = "dodge";
     choice = 0;
@@ -1093,6 +1093,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
 
 function dodge() { //Foo's Function DO NOT TOUCH
   // if dodge state, move the heart with arrow keys
+  let speed = 9;
   if (keyIsDown(37)) { // left arrow
     x -= speed;
   }
