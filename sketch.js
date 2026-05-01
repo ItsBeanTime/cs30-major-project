@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState ="ruins";  //"start";
+let gameState ="choseWhatToDoWithEnemy";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -1077,8 +1077,6 @@ function teleportPlayer(dx, dy){
 }
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
-
-  
   background(0);
   fill(255);
   textSize(20);
@@ -1155,14 +1153,14 @@ function playerLevelIncrease(){
   }
   if (playerExp >= levelThresh){
     playerLevel = 3;
-    levelThresh = 70
+    levelThresh = 70;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
   if (playerExp >= levelThresh){
     playerLevel = 4;
-    levelThresh = 120
+    levelThresh = 120;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
@@ -1184,21 +1182,21 @@ function playerLevelIncrease(){
   }
   if (playerExp >= levelThresh){
     playerLevel = 7;
-    levelThresh = 500
+    levelThresh = 500;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
   if (playerExp >= levelThresh){
     playerLevel = 8;
-    levelThresh = 800
+    levelThresh = 800;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
   if (playerExp >= levelThresh){
     playerLevel = 9;
-    levelThresh = 1200
+    levelThresh = 1200;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
@@ -1206,26 +1204,26 @@ function playerLevelIncrease(){
   }
   if (playerExp >= levelThresh){
     playerLevel = 10;
-    levelThresh = 1700
+    levelThresh = 1700;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 11;
-    levelThresh = 2500
+    levelThresh = 2500;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 12;
     levelThresh = 3500;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 13;
     levelThresh = 5000;
     playerHealthMax += 4;
@@ -1233,28 +1231,28 @@ function playerLevelIncrease(){
     playerAttackStat += 2;
     playerDefenseStat += 1;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 14;
-    levelThresh = 7000
+    levelThresh = 7000;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 15;
     levelThresh = 10000;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 16;
-    levelThresh = 15000
+    levelThresh = 15000;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 17;
     levelThresh = 25000;
     playerHealthMax += 4;
@@ -1262,21 +1260,21 @@ function playerLevelIncrease(){
     playerAttackStat += 2;
     playerDefenseStat += 1;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 18;
     levelThresh = 50000;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
-    playerLevel = 19
-    levelThresh = 99999
+  if (playerExp >= levelThresh){
+    playerLevel = 19;
+    levelThresh = 99999;
     playerHealthMax += 4;
     playerCurHealth += 4;
     playerAttackStat += 2;
   }
-    if (playerExp >= levelThresh){
+  if (playerExp >= levelThresh){
     playerLevel = 20;
     playerHealthMax += 7;
     playerCurHealth += 7;
@@ -1348,7 +1346,7 @@ function armorStats(){
     playerDefenseModify = 11;
     //heals 1 hp every other turn
   }
-    if (playerArmorEquip === "Cowboy Hat"){
+  if (playerArmorEquip === "Cowboy Hat"){
     playerDefenseModify = 12;
     //increases attack by 5
   }
