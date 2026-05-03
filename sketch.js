@@ -85,7 +85,7 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = "Player";
+let playersName = " ";
 let playerLevel = 1;
 let levelThresh = 10;
 let playerNextLevel = 10;
