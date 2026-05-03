@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState ="ruins";  //"start";
+let gameState ="start";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -66,7 +66,7 @@ let fightStrokeWeight = 5;
 let fightBorderWidth = 25;
 let fightBorderHeight = 520;
 let heartSize = 20;
-let speed = 9;
+let speed = 5;
 let x;
 let y;
 
