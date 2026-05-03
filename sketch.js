@@ -5,7 +5,7 @@
 // - describe what you did to take this project "above and beyond"
 
 //GAMESTATE
-let gameState ="choseWhatToDoWithEnemy";  //"start";
+let gameState ="ruins";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -132,6 +132,16 @@ let walls = [];
 let triggers = [];
 let triggerCooldown = false;
 
+let cameraZones = [];
+let activeCameraZone = null;
+
+let covers = [];
+
+let fadeScreen = 0;
+let fadeDirection = 0;
+let fadeSpeed = 8;
+let onFadeDone = null;
+
 function setup() {
   noSmooth();
   createCanvas(640 * 1.5, 480 * 1.5); 
@@ -155,6 +165,8 @@ function setup() {
 
   setupWalls();
   setupTriggers();
+  setupCameraZones();
+  setupCovers();
 }
 
 function draw() { //check game states
@@ -400,6 +412,10 @@ function mousePressed(){
   }
 }
 
+function mouseWheel(event){
+  speed = constrain(speed - event.delta * 0.01, 1, 30);
+}
+
 //SETUP FUNCTIONS//
 function setupSound(){
   userStartAudio();
@@ -417,27 +433,153 @@ function setupWalls(){
     makeWall(0,1921,6981,0),
     makeWall(6950,0,0,1921),
 
-
-    makeWall(490,722,98,38),
+    //ruins first puzzel room
+    makeWall(492,721,88,100),
     makeWall(490, 750, 30, 90),
     makeWall(490, 765,10, 161),
+    makeWall(620,721,541,100),
+
+    //ruins hall with water
+    makeWall(491, 508, 9, 221),
+    makeWall(489, 512, 671, 68),
+    makeWall(1160, 512, 78, 128),
+    makeWall(1160, 682, 99, 51),
+    makeWall(700, 681, 40, 55),
+    makeWall(700, 563, 40, 77),
+    makeWall(940, 682, 40, 64),
+    makeWall(940, 562, 40, 78),
+
+    //ruins dummy room
+    makeWall(1250, 701, 29, 41),
+    makeWall(1270,721,179, 20),
+    makeWall(1440, 702, 36, 29),
+    makeWall(1459, 682, 37, 37),
+    makeWall(1230, 552, 29, 68),
+    makeWall(1250, 532, 29, 69),
+    makeWall(1270, 512, 68, 69),
+    makeWall(1380, 511, 61, 70),
+    makeWall(1440, 512, 47, 89),
+    makeWall(1459, 601, 33, 20),
+    makeWall(1479, 620, 10, 63),
+
+    //random room above dummy room
+    makeWall(1231, 461, 107, 53),
+    makeWall(1379, 461, 221, 60),
+    makeWall(1600, 421, 78, 50),
+    makeWall(1671, 461, 240, 10),
+    makeWall(1900, 442, 79, 21),
+    makeWall(1230, 273, 370, 68),
+    makeWall(1600, 341, 120, 40),
+    makeWall(1720, 381, 140, 39),
+    makeWall(1859, 341, 121, 60),
+    makeWall(1229,339,9,136),
+
+    //spikey room
+    makeWall(1980, 441, 369, 28),
+    makeWall(1980, 280, 41, 121),
+    makeWall(2021, 280, 399, 81),
+    makeWall(2300, 403, 40, 39),
+
+    //hallway run room
+    makeWall(2340, 285, 81, 75),
+    makeWall(2338, 402, 82, 68),
+    makeWall(2410, 441, 1301, 20),
+    makeWall(2419, 280, 1292, 60),
+    makeWall(3711, 300, 99, 61),
+    makeWall(3712, 401, 98, 294),
+
+    //room with 1 npc froggit and a save
+    makeWall(3804, 221, 85, 120),
+    makeWall(3930, 221, 96, 120),
+    makeWall(4010, 272, 10, 329),
+    makeWall(3800, 681, 225, 17),
+    makeWall(4010, 642, 80, 49),
+    makeWall(4011, 531, 393, 70),
+    makeWall(4081, 661, 260, 22),
+    makeWall(4330,641, 74, 93),
+
+    //candy room
+    makeWall(3821,27, 50, 204),
+    makeWall(3950, 33, 48, 197),
+    makeWall(3865,30,94,70),
+
+    //first room with push rock
+    makeWall(4394, 702, 396, 14),
+    makeWall(4399, 513, 386, 68),
+    makeWall(4784, 641, 279, 188),
+    makeWall(4785, 540, 406, 61),
+
+    //fall down room
+    makeWall(5185, 569, 184, 112),
+    makeWall(5054, 801, 318, 17),
+    makeWall(5364, 761, 117, 74),
+    makeWall(5364, 669, 117,52),
+
+    //push rock room 2
+    makeWall(5472, 821, 425, 9),
+    makeWall(5478, 612, 410, 69),
+    makeWall(5882, 761, 158, 75),
+    makeWall(5883, 643, 456, 78),
+    makeWall(6032, 801, 184, 26),
+    makeWall(5782, 782, 38, 57),
+    makeWall(5782, 674, 40, 47),
+
+    //cheese and ghost room
+    makeWall(6200, 761, 139, 65),
+    makeWall(6328, 801, 221, 16),
+    makeWall(6419, 761, 41, 56),
+    makeWall(6420, 633, 39, 87),
+    makeWall(6330, 540, 148, 141),
+    makeWall(6519, 541, 37, 140),
+    makeWall(6540, 761, 138, 58),
+    makeWall(6540, 630, 138, 98),
+
+    //web room
+    makeWall(6675, 617, 174, 84),
+    makeWall(6666, 781, 196, 17),
+    makeWall(6838, 628, 21, 178),
+
+    //ruins area 1 final room
+    makeWall(6520, 541, 440, 24),
+    makeWall(6420, 328, 19, 238),
+    makeWall(6435, 325, 530, 96),
+    makeWall(6939, 502, 43, 53),
+    makeWall(6940, 367, 43, 94),
+
+    //falling room 1
+    makeWall(4090, 760, 25, 61),
+    makeWall(4147, 761, 128, 60),
+    makeWall(4307, 766, 27, 55),
+    makeWall(4082, 789, 9, 148),
+    makeWall(4076, 922, 273, 10),
+    makeWall(4336, 768, 17, 158),
+
+    //falling room 2
+    makeWall(4868, 916, 115, 70),
+    makeWall(4868, 982, 10, 58),
+    makeWall(4863, 1026, 215, 175),
+    makeWall(5015, 918, 193, 69),
+    makeWall(5199, 984, 204, 82),
+    makeWall(5068, 1187, 325, 18),
+    makeWall(5380, 1015, 21, 175),
+
+
 
     //other walls
     //ruins start room
-    // makeWallM(54, 5128, 30, 700),
-    // makeWallM(84, 5450 + 80, 60, 500),
-    // makeWallM(84 + 60, 5450 + 140, 60, 500),
-    // makeWallM(204, 5560 + 90, 60, 500),
-    // makeWallM(84, 5164, 120, 75),
-    // makeWallM(204, 5088, 600, 85),
-    // makeWallM(264, 5715, 450, 100),
-    // makeWallM(686,5624 + 30, 70, 80,),
-    // makeWallM(749, 5508 + 86,1300,80,),
-    // makeWallM(749,5157,200,80,),
-    // makeWallM(870,5165,950,310,),
-    // makeWallM(2008,5165,500,600,),
-    // makeWallM(1947,5165,60,310,),
-    // makeWallM(1821,5250,150,30,),
+    makeWallM(54, 5128, 30, 700),
+    makeWallM(84, 5450 + 80, 60, 500),
+    makeWallM(84 + 60, 5450 + 140, 60, 500),
+    makeWallM(204, 5560 + 90, 60, 500),
+    makeWallM(84, 5164, 120, 75),
+    makeWallM(204, 5088, 600, 85),
+    makeWallM(264, 5715, 450, 100),
+    makeWallM(686,5624 + 30, 70, 80,),
+    makeWallM(749, 5508 + 86,1300,80,),
+    makeWallM(749,5157,200,80,),
+    makeWallM(870,5165,950,310,),
+    makeWallM(2008,5165,500,600,),
+    makeWallM(1947,5165,60,310,),
 
     //ruins flowey room
     makeWallM(1453,4570, 30, 800),
@@ -473,7 +615,6 @@ function setupWalls(){
     makeWallM(2245, 2397, 30, 400),
     makeWallM(2182, 2235, 60, 350),
     makeWallM(2119, 2168, 60, 350),
-    makeWallM(1876, 2226 - 37, 300, 270),
 
 
     
@@ -482,14 +623,353 @@ function setupWalls(){
 
 function setupTriggers(){
   triggers = [
+    //door 1 flowey room ent
     {
-      x:1825,y:5260,w:120,h:200,
+      x:1825,y:5360,w:120,h:100,
       onWalk: true,
       action: () => {
-        teleportPlayer(0, -220);
-        console.log("walked onto trigger");
+        triggerFade(() => {
+          teleportPlayer(0, -230);
+          setCover("floweyRoom", false);
+          setCover("startRoom", true);          
+        });
       }
     },
+    {
+      x:1825, y:5260, w: 120, h: 100,
+      onWalk: true,
+      action: () => {
+        triggerFade(() =>{
+          teleportPlayer(0, 220);
+          setCover("floweyRoom", true);
+          setCover("startRoom", false);
+        });
+      }
+    },
+
+    //door 2 flowey ext
+    {
+      x:1790,y:4490,w:150,h:100,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -420);        
+        });
+      }
+    },
+    {
+      x:1790,y:4300,w:150,h:100,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 360);       
+        });
+      }
+    },
+
+    //door 3 save room 1
+    {
+      x:1836,y:3132,w:80,h:100,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -350);    
+        });
+      }
+    },
+    {
+      x:1810,y:2920,w:150,h:20,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 350);        
+        });
+      }
+    },
+    //door 4 bridge room 1
+    {
+      x:1750,y:2425,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -340);       
+        });
+      }
+    },
+    {
+      x:1750,y:2185,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 340);     
+        });
+      }
+    },
+
+    //door 5 
+    {
+      x:4043,y:1690,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -300);      
+        });
+      }
+    },
+    {
+      x:4043,y:1490,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 350);       
+        });
+      }
+    },
+
+    //door 6 candy door
+    {
+      x:11760,y:980,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -350);        
+        });
+      }
+    },
+    {
+      x:11760,y:752,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 350);        
+        });
+      }
+    },
+    {
+      x:19590,y:1991,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, -350);      
+        });
+      }
+    },
+
+    {
+      x:19590,y:1730,w:140,h:30,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(0, 350);        
+        });
+      }
+    },
+    //hallway
+    //hallway 1 puzzel
+    {
+      x:3560,y:1888,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(200, 0);        
+        });
+      }
+    },
+
+    {
+      x:3651,y:1888,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-200, 0);     
+        });
+      }
+    },
+
+    //hallway 2 spikey
+    {
+      x:7108,y:1074,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(230, 0);        
+        });
+      }
+    },
+    {
+      x:7231,y:1074,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-230, 0);        
+        });
+      }
+    },
+
+    //hallway 3 longggg hall
+    {
+      x:11250,y:1074,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(270, 0);        
+        });
+      }
+    },
+    {
+      x:11420,y:1074,w:30,h:140,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-260, 0);       
+        });
+      }
+    },
+
+    //hallway 4
+    {
+      x:13129,y:1768,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(230, 0);         
+        });
+      }
+    },
+       {
+      x:13250,y:1768,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-240, 0);         
+        });
+      }
+    },
+    
+    //hallway 5 rock room 1
+    {
+      x:14500,y:1768,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(200, 0);        
+        });
+      }
+    },
+    {
+      x:14611,y:1768,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-200, 0);        
+        });
+      }
+    },
+    
+    //hallway 6 fall hallway
+    {
+      x:16250,y:2145,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(250, 0);        
+        });
+      }
+    },
+    {
+      x:16371,y:2145,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-220, 0);       
+        });
+      }
+    },
+
+    //hallway 7 3 rocks
+    {
+      x:17940,y:2145,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(300, 0);       
+        });
+      }
+    },
+    {
+      x:18022,y:2145,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-200, 0);        
+        });
+      }
+    },
+
+    //hallway 8 cheese
+    {
+      x:18920,y:2150,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(200, 0);      
+        });
+      }
+    },
+    {
+      x:19000,y:2150,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-300, 0);       
+        });
+      }
+    },
+
+    //hallway 9 ghost
+    {
+      x:19920,y:2150,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(200, 0);       
+        });
+      }
+    },
+    {
+      x:20038,y:2150,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-250, 0);        
+        });
+      }
+    },
+
+    //hall 10 hoing into candy
+    {
+      x:12186,y:1762,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(200, 0);       
+        });
+      }
+    },
+    {
+      x:12233,y:1762,w:30,h:200,
+      onWalk: true,
+      action: () => {
+        triggerFade(() => {
+          teleportPlayer(-200, 0);       
+        });
+      }
+    },
+
+
+
+
+
 
     {
       x:0,y:0,w:0,h:0,
@@ -499,6 +979,110 @@ function setupTriggers(){
       }
     }
   ];
+}
+
+function setupCameraZones(){
+  cameraZones = [
+    //flowey room
+    {
+      x: 1453, y: 4350, w: 877, h: 950,
+      camX: 1876, camY: 5300, lockedX: true, lockedY:false
+    },
+
+    //start room
+    {
+      x: 40, y:5000, w: 2000, h:800, camX:435,camY:5400, lockedX:false, lockedY:true
+    },
+
+    // first save room
+    {
+      x: 1417, y:2945, w: 2281 - 1417, h: 4298 - 2945, 
+      camX:1879, camY:3587, lockedX:true, lockedY: false,
+    },
+
+    //switch room
+    {
+      x:1417, y:2217, w:2281 - 1417, h:2946 - 2217, camX:1887, camY:2582, lockedX:true, lockedY: true
+    },
+
+    //switches hall
+    {
+      x:1399, y:1482, w:3541 - 1320, h:2220 - 1482, camX:2200, camY:1849, lockedX:false, lockedY:true
+    },
+
+    //dummy room
+    {
+      x: 3591, y:1463, w:4542 - 3591, h:2246 - 1463, camX:4139, camY:1864, lockedX:true, lockedY:true
+    },
+
+    //spikey room
+    {
+      x:3630, y:754, w:7133 - 3590, h:1474 - 754, camX:5685, camY:1140, lockedX:false, lockedY:true
+    },
+
+    //really long hall
+    {
+      x:7168, y:716, w:11342 - 7168, h:1379 - 716, camX:9521, camY:1136, lockedX:false, lockedY:true
+    },
+
+    //going into candy room
+    {
+      x:11430, y:790, w: 12260 - 11490, h:2116 - 790, camX:11830, camY:1180, lockedX:true, lockedY:false
+    },
+
+    //candy room
+    {
+      x:11484, y:0, w:12138 - 11484, h:782, camX:11823, camY:395, lockedX:true, lockedY:true
+    },
+
+    //falling room
+    {
+      x:12222, y:1505, w: 13163 - 12222, h:2110 - 1505, camX:12721, camY:1815, lockedX:true, lockedY: true
+    },
+
+    //rock room 1
+    {
+      x:13176, y:1420, w:14563 - 13176, h:2189 - 1420, camX:13904, camY:1860, lockedX:false, lockedY:true
+    },
+
+    //fall room 2
+    {
+      x:14600, y:1474, w:16315 - 14600, h:2518 - 1474, camX:15580, camY:2059, lockedX:false, lockedY:false
+    },
+
+    //3 rocks
+    {
+      x:16349, y:1735, w:17993 - 16349, h:2566 - 1735, camX:17224, camY:2174, lockedX:false, lockedY:true
+    },
+
+    //cheese
+    {
+      x:17998, y:1846, w:18972 - 17998, h:2535 - 1846, camX:18513, camY:2182, lockedX:true, lockedY:true
+    },
+
+    //ghost room
+    {
+      x:18984, y:1797, w: 19948 - 18984, h:2505 - 1797, camX:19482, camY:2172,lockedX:true, lockedY:true
+    },
+
+    //spider web room
+    {
+      x:19955, y:1830, w:20813 - 19955, h:2473 - 1830, camX:20450, camY:2126, lockedX:true, lockedY:true
+    },
+
+    //ruins 1 last room
+    {
+      x:19382, y:828, w:21137 - 19400, h:1769 - 828, camX:20286, camY:1355, lockedX:false, lockedY:true
+    },
+  ]
+}
+
+function setupCovers(){
+  covers = [
+
+    { id: "floweyRoom", x: 1480, y:4570, w: 877, h: 650, visible:true},
+    { id: "startRoom", x: 1480, y: 5200, w: 1500, h: 1100, visible:false},
+  ]
 }
 
 //WALL / TRIGGER FUNCTIONS//
@@ -552,6 +1136,19 @@ function collidesWithWall(px, py){
     }
   }
   return false;
+}
+
+function triggerFade(onDone){
+  fadeDirection = 1;
+  onFadeDone = onDone;
+}
+
+function setCover(id, visible){
+  for(let cover of covers){
+    if (cover.id === id){
+      cover.visible = visible;
+    }
+  }
 }
 
 //TITLE/MENU FUNCTIONS//
@@ -929,24 +1526,41 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
+
+  noStroke();
+  fill(0)
+  for (let cover of covers){
+    if(cover.visible){
+      rect(cover.x + screenPosX, cover.y + screenPosY, cover.w, cover.h)
+    }
+  }
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  //noStroke();
+  noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
 
   stroke(180, 0, 255);
-  //noStroke(); // hide hitbox
+  noStroke(); // hide hitbox
   for (let trigger of triggers){
     rect(trigger.x + screenPosX, trigger.y + screenPosY, trigger.w, trigger.h);
   }
 
+  stroke(0, 255, 255);
+  noStroke();
+  for(let zone of cameraZones){
+    rect(zone.x + screenPosX, zone.y + screenPosY, zone.w, zone.h);
+  }
+  
+
+
+
   stroke(0, 255, 0);
   strokeWeight(2);
   noFill();
-  //noStroke();
+  noStroke();
   rect(playerX + 10, playerY + 69, 40, 20);
 
   noStroke();
@@ -972,10 +1586,33 @@ function startRuins(){
     displayPlayer();
   }
 
-  
+  if (fadeDirection !== 0 || fadeScreen > 0){
+    noStroke();
+    fill(0, fadeScreen);
+    rect(0, 0, width, height);
+
+    fadeScreen += fadeDirection * fadeSpeed;
+
+    if (fadeScreen >= 255){
+      fadeScreen = 255;
+      if (onFadeDone){
+        onFadeDone();
+        onFadeDone = null;
+      }
+      fadeDirection = -1;
+    }
+    if (fadeScreen <= 0){
+      fadeScreen = 0;
+      fadeDirection = 0;
+    }
+  }
 }
 
 function playerMove(){
+  if (fadeDirection === 1){
+    return;
+
+  }
   let moving = false;
   let newDirection = direction;
 
@@ -993,19 +1630,7 @@ function playerMove(){
   let newMapX = mapPlayerX;
   let newMapY = mapPlayerY;
 
-  if (keyIsDown(65)){
-    newMapX -= speed;
-    currentSprites = playerSpriteLeft;
-    newDirection = "left";
-    moving = true;
-  }
 
-  if (keyIsDown(68)){ 
-    newMapX += speed;
-    currentSprites = playerSpriteRight;
-    newDirection = "right";
-    moving = true;
-  }
   if (keyIsDown(87)){
     newMapY -= speed;
     currentSprites = playerSpriteBack;
@@ -1019,6 +1644,19 @@ function playerMove(){
     moving = true;
   }
 
+  if (keyIsDown(68)){ 
+    newMapX += speed;
+    currentSprites = playerSpriteRight;
+    newDirection = "right";
+    moving = true;
+  }
+  if (keyIsDown(65)){
+    newMapX -= speed;
+    currentSprites = playerSpriteLeft;
+    newDirection = "left";
+    moving = true;
+  }
+
   if (!collidesWithWall(newMapX, mapPlayerY)){
     mapPlayerX = newMapX;
   }
@@ -1026,10 +1664,41 @@ function playerMove(){
     mapPlayerY = newMapY;
   }
 
- 
+  activeCameraZone = null;
+  for(let zone of cameraZones){
+    if (mapPlayerX > zone.x &&
+       mapPlayerX < zone.x + zone.w
+       && mapPlayerY > zone.y &&
+        mapPlayerY < zone.y + zone.h)
+      {
+      activeCameraZone = zone;
+      break;
+    }
+  }
 
-  screenPosX = constrain(width / 2 - mapPlayerX, minScrollX, maxScrollX);
-  screenPosY = constrain(height / 2 - mapPlayerY, minScrollY, maxScrollY);
+  if (activeCameraZone){
+    if (activeCameraZone.lockedX){
+      screenPosX = width / 2 - activeCameraZone.camX;
+    }
+    else{
+      let zoneLeftScroll = -(activeCameraZone.x);
+      let zoneRightScroll = -(activeCameraZone.x + activeCameraZone.w - width);
+      screenPosX = constrain(width / 2 - mapPlayerX, zoneRightScroll, zoneLeftScroll);
+    }
+
+    if (activeCameraZone.lockedY){
+      screenPosY = height / 2 - activeCameraZone.camY;
+    }
+    else{
+      let zoneTopScroll = -(activeCameraZone.y);
+      let zoneBottomScroll = -(activeCameraZone.y + activeCameraZone.h - height)
+      screenPosY = constrain(height / 2 - mapPlayerY, zoneBottomScroll, zoneTopScroll);
+    }
+  }
+  else{
+    screenPosX = constrain(width / 2 - mapPlayerX, minScrollX, maxScrollX);
+    screenPosY = constrain(height / 2 - mapPlayerY, minScrollY, maxScrollY);
+  }
 
   playerX = mapPlayerX + screenPosX;
   playerY = mapPlayerY + screenPosY;
@@ -1070,8 +1739,41 @@ function teleportPlayer(dx, dy){
   let mapH = height * (mapSize - 4);
   let mapPlayerX = playerX - screenPosX + dx;
   let mapPlayerY = playerY - screenPosY + dy;
-  screenPosX = constrain(width / 2 -mapPlayerX, -(mapW - width),0);
-  screenPosY = constrain(height / 2 -mapPlayerY, -(mapH - height),0);
+
+  let destZone = null;
+  for (let zone of cameraZones){
+    if (mapPlayerX > zone.x &&
+       mapPlayerX < zone.x + zone.w &&
+       mapPlayerY > zone.y && mapPlayerY < zone.y + zone.h
+    ){
+      destZone = zone;
+      break;
+    }
+  }
+
+  if (destZone){
+     if (destZone.lockedX) {
+      screenPosX = width / 2 - destZone.camX;
+      }
+      else {
+        let zoneLeftScroll = -(destZone.x);
+        let zoneRightScroll = -(destZone.x + destZone.w - width);
+        screenPosX = constrain(width / 2 - mapPlayerX, zoneRightScroll, zoneLeftScroll);
+      }
+      if (destZone.lockedY) {
+        screenPosY = height / 2 - destZone.camY;
+      } 
+      else {
+        let zoneTopScroll = -(destZone.y);
+        let zoneBottomScroll = -(destZone.y + destZone.h - height);
+        screenPosY = constrain(height / 2 - mapPlayerY, zoneBottomScroll, zoneTopScroll);
+      }
+  }
+  else{
+    screenPosX = constrain(width / 2 -mapPlayerX, -(mapW - width),0);
+    screenPosY = constrain(height / 2 -mapPlayerY, -(mapH - height),0);
+  }
+ 
   playerX = mapPlayerX + screenPosX;
   playerY = mapPlayerY + screenPosY;
 }
