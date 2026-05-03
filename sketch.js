@@ -4,8 +4,9 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+
 //GAMESTATE
-let gameState ="start";  //"start";
+let gameState ="ruins";  //"start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -29,14 +30,41 @@ let startMenuTheme;
 let onceUponATime;
 let oUATStartingVolume = 0.3;
 let ruinsMusic;
+let yourBestFriend
 
 //SFX
 let undertaleBoom;
 let textSound;
 let musCymbal;
+let floweyTalk;
 
 //FONTS
 let determinationFont;
+
+//NPC Sprites
+let floweySprites = [];
+let floweyIdleSprites = [];
+let floweyPortSprites = [];
+let floweyFrame = 0;
+let floweyAnimTimer = 0;
+let floweyMet = false;
+let floweyGone = false;
+
+//dialogue system
+let dialogue = {
+  active: false,
+  lines: [],
+  lineIndex:0,
+  charIndex:0,
+  text:"",
+  textSpeed:3,
+  done:false,
+  portraitSprites:[],
+  portraitFrame:0,
+  portraitTimer:0,
+  portraitDelay: 15,
+  onFinish: null
+};
 
 //cutscene / title variables
 let scrollCutY = -1023;
@@ -148,7 +176,6 @@ function setup() {
   //createCanvas(windowWidth, windowHeight);
 
   setupSound();
-
   x = width/2;
   y = height/2;
 
@@ -209,15 +236,23 @@ function preload() {
     playerSpriteBack.push(loadImage(`assets/player sprites/frisk${i}.png`));
   }
 
+  //npc sprites
+  floweyPortSprites.push(loadImage("assets/npc overworld sprites/floweybattle1.png"));
+  floweyPortSprites.push(loadImage("assets/npc overworld sprites/floweybattle2.png")); 
+  floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow1.png"));
+  floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow2.png"));
+
   //music
   onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
   startMenuTheme = loadSound("assets/music/Start Menu.mp3");
   ruinsMusic = loadSound("assets/music/Ruins.mp3");
+  yourBestFriend = loadSound("assets/music/your best friend.mp3");
 
   //sfx
   undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
   textSound = loadSound("assets/sound effects/SND_TXT2.wav");
   musCymbal = loadSound("assets/sound effects/mus-cymbal.mp3");
+  floweyTalk = loadSound("assets/sound effects/flowey-normal-voice.mp3");
 
   ruinsMap = loadImage("assets/map sprites/ruins-1.png");
   determinationFont = loadFont("assets/fonts/determination.otf");
@@ -247,6 +282,30 @@ function preload() {
 
 //INPUT FUNCTIONS//
 function keyPressed() {
+
+  if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
+    if (!dialogue.done){
+      dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
+      dialogue.text = dialogue.lines[dialogue.lineIndex];
+      dialogue.done = true;
+    }
+    else{
+      dialogue.lineIndex++;
+      if (dialogue.lineIndex >= dialogue.lines.length){
+        dialogue.active = false;
+        if (dialogue.onFinish){
+          dialogue.onFinish();
+        }
+      }
+      else{
+        dialogue.charIndex = 0;
+        dialogue.text = "";
+        dialogue.done = false;
+      }
+    }
+    return;
+  }
+
 
   if (pauseState === "no" && keyCode === 67){
     pauseState = "yes";
@@ -419,6 +478,8 @@ function mouseWheel(event){
 //SETUP FUNCTIONS//
 function setupSound(){
   userStartAudio();
+  yourBestFriend.setLoop(true);
+  ruinsMusic.setLoop(true);
   textSound.setVolume(0.2);
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
@@ -623,6 +684,34 @@ function setupWalls(){
 
 function setupTriggers(){
   triggers = [
+
+    //flowey interact
+    {
+      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+      action: () => {
+        if (!floweyMet){
+          floweyMet = true;
+          yourBestFriend.play();
+          startDialogue(
+            [
+              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+              " * Hmmm...",
+              " * You're new to the UNDERGROUND, aren'tcha?",
+              " * Golly, you must be so confused.",
+              " * Someone ought to teach you how things work around here!",
+              " * I guess little old me will have to do.",
+              " * Ready? Here we go!",
+            ],
+            floweyPortSprites,
+            () => {
+              floweyGone = true;
+              yourBestFriend.stop();
+            }
+          );
+        }
+      }
+    },
+
     //door 1 flowey room ent
     {
       x:1825,y:5360,w:120,h:100,
@@ -653,6 +742,9 @@ function setupTriggers(){
       onWalk: true,
       action: () => {
         triggerFade(() => {
+          if (!ruinsMusic.isPlaying()){
+            ruinsMusic.play();
+          }
           teleportPlayer(0, -420);        
         });
       }
@@ -1526,7 +1618,7 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
-
+  drawFloweyWorld();
   noStroke();
   fill(0)
   for (let cover of covers){
@@ -1577,14 +1669,13 @@ function startRuins(){
   text(`mouseY: ${mouseY}`, 10, 115);
 
 
-  if (!ruinsMusic.isPlaying()){
-    ruinsMusic.play();
-  }
+
   pauseScreen();
   if (pauseState === "no"){
     playerMove();
     displayPlayer();
   }
+  updateDialogue();
 
   if (fadeDirection !== 0 || fadeScreen > 0){
     noStroke();
@@ -1609,6 +1700,9 @@ function startRuins(){
 }
 
 function playerMove(){
+  if (dialogue.active){
+    return;
+  }
   if (fadeDirection === 1){
     return;
 
@@ -1776,6 +1870,105 @@ function teleportPlayer(dx, dy){
  
   playerX = mapPlayerX + screenPosX;
   playerY = mapPlayerY + screenPosY;
+}
+
+function startDialogue(lines, portraits, onFinish = null){
+  dialogue.active = true;
+  dialogue.lines = lines;
+  dialogue.portraitSprites = portraits;
+  dialogue.lineIndex = 0;
+  dialogue.charIndex = 0;
+  dialogue.text = "";
+  dialogue.done = false;
+  dialogue.portraitFrame = 0;
+  dialogue.onFinish = onFinish;
+}
+
+function updateDialogue(){
+  if (!dialogue.active){
+    return;
+  }
+
+  if (!dialogue.done){
+    dialogue.portraitTimer++;
+    if (dialogue.portraitTimer > dialogue.portraitDelay){
+      dialogue.portraitTimer = 0;
+      dialogue.portraitFrame = (dialogue.portraitFrame + 1) % dialogue.portraitSprites.length;
+    }
+
+    if (frameCount % dialogue.textSpeed === 0){
+      let line = dialogue.lines[dialogue.lineIndex];
+      if (dialogue.charIndex < line.length) {
+        dialogue.charIndex++;
+        dialogue.text = line.substring(0, dialogue.charIndex);
+        let sound;
+        if (floweyMet){
+          sound = floweyTalk;
+        }
+        else{
+          sound = textSound;
+        }
+        let ch = line.charAt(dialogue.charIndex - 1);
+        if (ch !== " " && ch !== "\n" && textSound.isLoaded()) {
+          sound.stop();
+          sound.play();
+        }
+      }
+      else{
+        dialogue.done = true;
+      }
+    }
+  }
+  drawDialogueBox();
+}
+
+function drawDialogueBox(){
+  let boxX = 40;
+  let boxY = 30;
+  let boxW = width - 80;
+  let boxH = 180;
+
+  let portraitSize = 150;
+
+  fill(0);
+  stroke(255);
+  strokeWeight(5);
+  rect(boxX, boxY, boxW, boxH);
+
+  let portrait = dialogue.portraitSprites[dialogue.portraitFrame];
+  if (portrait) {
+    image(portrait, boxX + 15, boxY + 15, portraitSize, portraitSize);
+  }
+
+  noStroke();
+  fill(255);
+  textFont(determinationFont);
+  textSize(32);
+  textAlign(LEFT, TOP);
+  text(dialogue.text, boxX + portraitSize + 30, boxY + 20, boxW - portraitSize - 50, boxH - 30);
+}
+
+function drawFloweyWorld(){
+  if (floweyGone){
+    return;
+  }
+  let floweyX = 1845 + screenPosX;
+  let floweyY = 4970 + screenPosY;
+
+  let img = floweyIdleSprites[floweyFrame];
+
+  if (img){
+    image(img, floweyX, floweyY, 50 * 1.5, 50 * 1.5);
+  }
+
+  if (dialogue.active && !dialogue.done){
+    if (frameCount % 15 === 0){
+      floweyFrame = (floweyFrame + 1) % 2;
+    }
+  }
+  else{
+    floweyFrame = 0;
+  }
 }
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
