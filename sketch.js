@@ -752,12 +752,12 @@ function setupTriggers(){
         if (!floweyMet){
           floweyMet = true;
           yourBestFriend.play();
-            boxX = 40;
-            boxY = 30;
-            boxW = width - 80;
-            boxH = 200;
-            diaTextPosX = portraitSize + 30;
-            diaTextSize = 35;
+          boxX = 40;
+          boxY = 30;
+          boxW = width - 80;
+          boxH = 200;
+          diaTextPosX = portraitSize + 30;
+          diaTextSize = 35;
           startDialogue(
             [
               " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
@@ -784,12 +784,12 @@ function setupTriggers(){
       action: () => {
         if (!ghostMet){
           ghostMet = true;
-            boxX = 40;
-            boxY = height - 220;
-            boxW = width - 80;
-            boxH = 200;
-            diaTextPosX = 10;
-            diaTextSize = 39;
+          boxX = 40;
+          boxY = height - 220;
+          boxW = width - 80;
+          boxH = 200;
+          diaTextPosX = 10;
+          diaTextSize = 39;
           startDialogue(
             [
               " * zzzzzzzzzzzzzzz...             * zzzzzzzzzzzzzz...",
@@ -2003,7 +2003,8 @@ function updateDialogue(){
         else{
           sound = textSound;
         }
-        if (ghostMet){;
+        if (ghostMet){
+          ;
           sound = defaultTextSound;
         }
         let ch = line.charAt(dialogue.charIndex - 1);
