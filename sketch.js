@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
+let gameState = "start"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -311,6 +311,17 @@ function preload() {
 //INPUT FUNCTIONS//
 function keyPressed() {
 
+  if (gameState === "start"){
+      if (keyCode === 90){
+          gameState = "chooseWhatToDoWithEnemy"
+      }
+      if (keyCode === ENTER){
+          gameState = "ruins"
+      }
+  }
+
+
+  
   if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
     if (!dialogue.done){
       dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
