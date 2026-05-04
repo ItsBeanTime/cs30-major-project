@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState ="ruins";  //"start";
+let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -34,7 +34,7 @@ let startMenuTheme;
 let onceUponATime;
 let oUATStartingVolume = 0.3;
 let ruinsMusic;
-let yourBestFriend
+let yourBestFriend;
 
 //SFX
 let undertaleBoom;
@@ -107,6 +107,8 @@ let x;
 let y;
 
 let fightButton = [];
+let fightButtonX;
+let fightButtonY;
 let actButton = [];
 let mercyButton = [];
 let itemButton = [];
@@ -192,6 +194,8 @@ function setup() {
   noSmooth();
   createCanvas(640 * 1.5, 480 * 1.5); 
   //createCanvas(windowWidth, windowHeight);
+  fightButtonX = width / 10;
+  fightButtonY = height - 200;
 
   setupSound();
   x = width/2;
@@ -264,7 +268,7 @@ function preload() {
   floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow1.png"));
   floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow2.png"));
 
-  ghostSprites = (loadImage("assets/npc overworld sprites/ghostow1.png"));
+  ghostSprites = loadImage("assets/npc overworld sprites/ghostow1.png");
 
   //music
   onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
@@ -959,7 +963,7 @@ function setupTriggers(){
         });
       }
     },
-       {
+    {
       x:13250,y:1768,w:30,h:200,
       onWalk: true,
       action: () => {
@@ -1197,15 +1201,14 @@ function setupCameraZones(){
     {
       x:19382, y:828, w:21137 - 19400, h:1769 - 828, camX:20286, camY:1355, lockedX:false, lockedY:true
     },
-  ]
+  ];
 }
 
 function setupCovers(){
   covers = [
-
     { id: "floweyRoom", x: 1480, y:4570, w: 877, h: 650, visible:true},
-    { id: "startRoom", x: 1480, y: 5200, w: 1500, h: 1100, visible:false},
-  ]
+    { id: "startRoom", x: 1480, y: 5200, w: 1500, h: 1100, visible:false}
+  ];
 }
 
 //WALL / TRIGGER FUNCTIONS//
@@ -1653,10 +1656,10 @@ function startRuins(){
   drawGhostWorld();
   drawFloweyWorld();
   noStroke();
-  fill(0)
+  fill(0);
   for (let cover of covers){
     if(cover.visible){
-      rect(cover.x + screenPosX, cover.y + screenPosY, cover.w, cover.h)
+      rect(cover.x + screenPosX, cover.y + screenPosY, cover.w, cover.h);
     }
   }
   noFill();
@@ -1796,8 +1799,7 @@ function playerMove(){
     if (mapPlayerX > zone.x &&
        mapPlayerX < zone.x + zone.w
        && mapPlayerY > zone.y &&
-        mapPlayerY < zone.y + zone.h)
-      {
+        mapPlayerY < zone.y + zone.h) {
       activeCameraZone = zone;
       break;
     }
@@ -1808,7 +1810,7 @@ function playerMove(){
       screenPosX = width / 2 - activeCameraZone.camX;
     }
     else{
-      let zoneLeftScroll = -(activeCameraZone.x);
+      let zoneLeftScroll = -activeCameraZone.x;
       let zoneRightScroll = -(activeCameraZone.x + activeCameraZone.w - width);
       screenPosX = constrain(width / 2 - mapPlayerX, zoneRightScroll, zoneLeftScroll);
     }
@@ -1817,8 +1819,8 @@ function playerMove(){
       screenPosY = height / 2 - activeCameraZone.camY;
     }
     else{
-      let zoneTopScroll = -(activeCameraZone.y);
-      let zoneBottomScroll = -(activeCameraZone.y + activeCameraZone.h - height)
+      let zoneTopScroll = -activeCameraZone.y;
+      let zoneBottomScroll = -(activeCameraZone.y + activeCameraZone.h - height);
       screenPosY = constrain(height / 2 - mapPlayerY, zoneBottomScroll, zoneTopScroll);
     }
   }
@@ -1879,22 +1881,22 @@ function teleportPlayer(dx, dy){
   }
 
   if (destZone){
-     if (destZone.lockedX) {
+    if (destZone.lockedX) {
       screenPosX = width / 2 - destZone.camX;
-      }
-      else {
-        let zoneLeftScroll = -(destZone.x);
-        let zoneRightScroll = -(destZone.x + destZone.w - width);
-        screenPosX = constrain(width / 2 - mapPlayerX, zoneRightScroll, zoneLeftScroll);
-      }
-      if (destZone.lockedY) {
-        screenPosY = height / 2 - destZone.camY;
-      } 
-      else {
-        let zoneTopScroll = -(destZone.y);
-        let zoneBottomScroll = -(destZone.y + destZone.h - height);
-        screenPosY = constrain(height / 2 - mapPlayerY, zoneBottomScroll, zoneTopScroll);
-      }
+    }
+    else {
+      let zoneLeftScroll = -destZone.x;
+      let zoneRightScroll = -(destZone.x + destZone.w - width);
+      screenPosX = constrain(width / 2 - mapPlayerX, zoneRightScroll, zoneLeftScroll);
+    }
+    if (destZone.lockedY) {
+      screenPosY = height / 2 - destZone.camY;
+    } 
+    else {
+      let zoneTopScroll = -destZone.y;
+      let zoneBottomScroll = -(destZone.y + destZone.h - height);
+      screenPosY = constrain(height / 2 - mapPlayerY, zoneBottomScroll, zoneTopScroll);
+    }
   }
   else{
     screenPosX = constrain(width / 2 -mapPlayerX, -(mapW - width),0);
@@ -2017,16 +2019,17 @@ function drawCandyBowl(){
 
   image(candyBowl[0], candyBowlX, candyBowlY, 40 * 1.5, 54 * 1.5);
 }
+function heartAnimation() {
+  x = px; //which variable do i use to place the heart at the player's position whenever an enemy is encountered?
+  y = py;
+
+  //...
+
+  image(redHeartImg, x, y, heartSize, heartSize);
+
+}
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching cause you might be slightly slow)
-  background(0);
-  fill(255);
-  textSize(20);
-  textFont(determinationFont);
-
-  text(`selection: ${selections[selection]}
-
-  choice: ${choice}`, width/2, height/2);
 
   //this is unoptimized but i made it in 1 minute so you can change it
   //also i dont think you had the buttons as an array so thats why it wasnt working
@@ -2055,12 +2058,28 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   else{
     choiceMercy = 0;
   }
-  // let selectionSize = 50; why is it a square kid
-  let undefined;
-  image(fightButton[choiceFight], width / 10, height - 200, 110 * 1.5, 42 * 1.5); // fixed it foo
-  image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
-  image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
-  image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
+
+  background(0);
+  fill(255);
+  textSize(20);
+  textFont(determinationFont);
+
+  text(`selection: ${selections[selection]}
+
+  choice: ${choice}`, width/2, height/2);
+  let opacity = 0;
+  while (opacity !== 255) {
+    tint(255, opacity);
+    image(fightButton[choiceFight], fightButtonX, fightButtonY, 110 * 1.5, 42 * 1.5); // fixed it foo
+    image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
+    image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
+    image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
+   
+    opacity++;
+    
+  
+  }
+  
 
   if (choice === 0){ 
     gameState = "dodge";
