@@ -41,6 +41,7 @@ let undertaleBoom;
 let textSound;
 let musCymbal;
 let floweyTalk;
+let defaultTextSound;
 
 //FONTS
 let determinationFont;
@@ -57,6 +58,8 @@ let floweyGone = false;
 
 //ghost
 let ghostSprites;
+let ghostMet = false;
+let ghostGone = false;
 
 //dialogue system
 let dialogue = {
@@ -65,7 +68,7 @@ let dialogue = {
   lineIndex:0,
   charIndex:0,
   text:"",
-  textSpeed:3,
+  textSpeed:2,
   done:false,
   portraitSprites:[],
   portraitFrame:0,
@@ -73,6 +76,15 @@ let dialogue = {
   portraitDelay: 15,
   onFinish: null
 };
+let boxX;
+let boxY;
+let boxW;
+let boxH;
+let diaTextPosX;
+let diaTextSize;
+let portraitSize = 150;
+
+
 
 //cutscene / title variables
 let scrollCutY = -1023;
@@ -282,6 +294,7 @@ function preload() {
   textSound = loadSound("assets/sound effects/SND_TXT2.wav");
   musCymbal = loadSound("assets/sound effects/mus-cymbal.mp3");
   floweyTalk = loadSound("assets/sound effects/flowey-normal-voice.mp3");
+  defaultTextSound = loadSound("assets/sound effects/snd_txt1.mp3");
 
   ruinsMap = loadImage("assets/map sprites/ruins-1.png");
   determinationFont = loadFont("assets/fonts/determination.otf");
@@ -420,8 +433,8 @@ function keyPressed() {
   }
 
   if (gameState === "ruins" && key === " "){
-    playerX = 11799 + screenPosX;
-    playerY = 355 + screenPosY;
+    playerX = 19420 + screenPosX;
+    playerY = 2203 + screenPosY;
   }
 
   if (menuState === "name"){
@@ -739,6 +752,12 @@ function setupTriggers(){
         if (!floweyMet){
           floweyMet = true;
           yourBestFriend.play();
+            boxX = 40;
+            boxY = 30;
+            boxW = width - 80;
+            boxH = 200;
+            diaTextPosX = portraitSize + 30;
+            diaTextSize = 35;
           startDialogue(
             [
               " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
@@ -753,6 +772,33 @@ function setupTriggers(){
             () => {
               floweyGone = true;
               yourBestFriend.stop();
+            }
+          );
+        }
+      }
+    },
+
+    //ghost interact
+    {
+      x:19405, y:2107, w:60, h:2307 - 2107, onWalk: true,
+      action: () => {
+        if (!ghostMet){
+          ghostMet = true;
+            boxX = 40;
+            boxY = height - 220;
+            boxW = width - 80;
+            boxH = 200;
+            diaTextPosX = 10;
+            diaTextSize = 39;
+          startDialogue(
+            [
+              " * zzzzzzzzzzzzzzz...             * zzzzzzzzzzzzzz...",
+              " * zzzzzzzzzz...                  * (are they gone yet)        * zzzzzzzzzzzzzzz...",
+              " * (This ghost keeps saying 'z' out loud repeatedly,         pretending to sleep.) ",
+              " * Move it with force?",
+            ],
+            () => {
+              ghostGone = true;
             }
           );
         }
@@ -1957,6 +2003,9 @@ function updateDialogue(){
         else{
           sound = textSound;
         }
+        if (ghostMet){;
+          sound = defaultTextSound;
+        }
         let ch = line.charAt(dialogue.charIndex - 1);
         if (ch !== " " && ch !== "\n" && textSound.isLoaded()) {
           sound.stop();
@@ -1972,29 +2021,28 @@ function updateDialogue(){
 }
 
 function drawDialogueBox(){
-  let boxX = 40;
-  let boxY = 30;
-  let boxW = width - 80;
-  let boxH = 180;
+  let newboxX = boxX;
+  let newboxY = boxY;
+  let newboxW = boxW;
+  let newboxH = boxH;
 
-  let portraitSize = 150;
 
   fill(0);
   stroke(255);
-  strokeWeight(5);
-  rect(boxX, boxY, boxW, boxH);
+  strokeWeight(6);
+  rect(newboxX, newboxY, newboxW, newboxH);
 
   let portrait = dialogue.portraitSprites[dialogue.portraitFrame];
   if (portrait) {
-    image(portrait, boxX + 15, boxY + 15, portraitSize, portraitSize);
+    image(portrait, newboxX + 15, newboxY + 15, portraitSize, portraitSize);
   }
 
   noStroke();
   fill(255);
   textFont(determinationFont);
-  textSize(32);
+  textSize(diaTextSize);
   textAlign(LEFT, TOP);
-  text(dialogue.text, boxX + portraitSize + 30, boxY + 20, boxW - portraitSize - 50, boxH - 30);
+  text(dialogue.text, newboxX + diaTextPosX, newboxY + 20, newboxW - portraitSize - 50, newboxH - 30);
 }
 
 function drawFloweyWorld(){
@@ -2021,6 +2069,9 @@ function drawFloweyWorld(){
 }
 
 function drawGhostWorld(){
+  if (ghostGone){
+    return;
+  }
   let ghostX = 19444 + screenPosX;
   let ghostY = 2203 + screenPosY;
 
