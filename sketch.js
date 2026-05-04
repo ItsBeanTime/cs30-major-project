@@ -20,10 +20,14 @@ let frameCountAnim = 0;
 let direction = "front";
 
 //sprites
+//player sprites
 let playerSpriteFront = [];
 let playerSpriteLeft = [];
 let playerSpriteRight = [];
 let playerSpriteBack = [];
+
+//misc sprites
+let candyBowl = [];
 
 //MUSIC
 let startMenuTheme;
@@ -42,6 +46,7 @@ let floweyTalk;
 let determinationFont;
 
 //NPC Sprites
+//flowey
 let floweySprites = [];
 let floweyIdleSprites = [];
 let floweyPortSprites = [];
@@ -49,6 +54,9 @@ let floweyFrame = 0;
 let floweyAnimTimer = 0;
 let floweyMet = false;
 let floweyGone = false;
+
+//ghost
+let ghostSprites;
 
 //dialogue system
 let dialogue = {
@@ -98,6 +106,11 @@ let speed = 5;
 let x;
 let y;
 
+let fightButton = [];
+let actButton = [];
+let mercyButton = [];
+let itemButton = [];
+
 
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
@@ -124,7 +137,7 @@ let playerAttackStat = 0;
 let playerAttackModify = 0;
 let playerDefenseStat = 0;
 let playerDefenseModify = 0;
-let playerExp = 2700;
+let playerExp = 23000;
 let playerKills = 0;
 let playerWeaponEquip = "Stick";
 let playerArmorEquip = "Bandage";
@@ -169,6 +182,11 @@ let fadeScreen = 0;
 let fadeDirection = 0;
 let fadeSpeed = 8;
 let onFadeDone = null;
+
+let choiceFight = 0;
+let choiceItem = 0;
+let choiceAct = 0;
+let choiceMercy = 0;
 
 function setup() {
   noSmooth();
@@ -236,11 +254,17 @@ function preload() {
     playerSpriteBack.push(loadImage(`assets/player sprites/frisk${i}.png`));
   }
 
+  //misc sprites
+  for (let i = 1; i < 2; i++){
+    candyBowl.push(loadImage(`assets/miscellaneus sprites/candybowl${i}.png`));
+  }
   //npc sprites
   floweyPortSprites.push(loadImage("assets/npc overworld sprites/floweybattle1.png"));
   floweyPortSprites.push(loadImage("assets/npc overworld sprites/floweybattle2.png")); 
   floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow1.png"));
   floweyIdleSprites.push(loadImage("assets/npc overworld sprites/floweyow2.png"));
+
+  ghostSprites = (loadImage("assets/npc overworld sprites/ghostow1.png"));
 
   //music
   onceUponATime = loadSound("assets/music/Once Upon A Time.mp3");
@@ -267,16 +291,16 @@ function preload() {
   
   //UI
   for(let i = 1; i <= 2; i++){
-    fightButton = loadImage(`assets/battle menu/fightbutton${i}.png`);
+    fightButton.push(loadImage(`assets/battle menu/fightbutton${i}.png`));
   }
   for(let i = 1; i <= 2; i++){
-    actButton = loadImage(`assets/battle menu/actbutton${i}.png`);
+    actButton.push(loadImage(`assets/battle menu/actbutton${i}.png`));
   }
   for(let i = 1; i <= 2; i++){
-    itemButton = loadImage(`assets/battle menu/itembutton${i}.png`);
+    itemButton.push(loadImage(`assets/battle menu/itembutton${i}.png`));
   }
   for(let i = 1; i <= 2; i++){
-    mercyButton = loadImage(`assets/battle menu/mercybutton${i}.png`);
+    mercyButton.push(loadImage(`assets/battle menu/mercybutton${i}.png`));
   }
 }
 
@@ -375,8 +399,13 @@ function keyPressed() {
 
 
 
-  if (key === " " && gameState === "chooseWhatToDoWithEnemy") {
+  if (keyCode === ENTER || key === " " && gameState === "chooseWhatToDoWithEnemy") {
     choice = selection;
+  }
+
+  if (gameState === "ruins" && key === " "){
+    playerX = 11799 + screenPosX;
+    playerY = 355 + screenPosY;
   }
 
   if (menuState === "name"){
@@ -472,7 +501,7 @@ function mousePressed(){
 }
 
 function mouseWheel(event){
-  speed = constrain(speed - event.delta * 0.01, 1, 30);
+  speed = constrain(speed - event.delta * 0.01, 1, 50);
 }
 
 //SETUP FUNCTIONS//
@@ -484,6 +513,8 @@ function setupSound(){
   onceUponATime.setVolume(oUATStartingVolume);
   startMenuTheme.setVolume(0.5);
   ruinsMusic.setVolume (0.5);
+  yourBestFriend.setVolume(0.3);
+  floweyTalk.setVolume(0.5);
 }
 
 function setupWalls(){
@@ -1618,6 +1649,8 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
+  drawCandyBowl();
+  drawGhostWorld();
   drawFloweyWorld();
   noStroke();
   fill(0)
@@ -1971,16 +2004,64 @@ function drawFloweyWorld(){
   }
 }
 
-function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH
+function drawGhostWorld(){
+  let ghostX = 19444 + screenPosX;
+  let ghostY = 2203 + screenPosY;
+
+  image(ghostSprites, ghostX, ghostY, 66 * 1.5, 34 * 1.5 );
+}
+
+function drawCandyBowl(){
+  let candyBowlX = 11799 + screenPosX;
+  let candyBowlY = 345 + screenPosY;
+
+  image(candyBowl[0], candyBowlX, candyBowlY, 40 * 1.5, 54 * 1.5);
+}
+
+function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching cause you might be slightly slow)
   background(0);
   fill(255);
   textSize(20);
   textFont(determinationFont);
+
   text(`selection: ${selections[selection]}
+
   choice: ${choice}`, width/2, height/2);
-  let selectionSize = 50;
-  image(fightButton[1], width/2 - 200, height - 200, selectionSize, selectionSize); // broken
+
+  //this is unoptimized but i made it in 1 minute so you can change it
+  //also i dont think you had the buttons as an array so thats why it wasnt working
+  //i made an array for them at the top and fixed it in preload youre welcome 
+  if (selection === 0){
+    choiceFight = 1;
+  }
+  else{
+    choiceFight = 0;
+  }
+  if (selection === 1){
+    choiceAct = 1;
+  }
+  else{
+    choiceAct = 0;
+  }
+  if (selection === 2){
+    choiceItem = 1;
+  }
+  else{
+    choiceItem = 0;
+  }
+  if (selection === 3){
+    choiceMercy = 1;
+  }
+  else{
+    choiceMercy = 0;
+  }
+  // let selectionSize = 50; why is it a square kid
   let undefined;
+  image(fightButton[choiceFight], width / 10, height - 200, 110 * 1.5, 42 * 1.5); // fixed it foo
+  image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
+  image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
+  image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
+
   if (choice === 0){ 
     gameState = "dodge";
     choice = 0;
