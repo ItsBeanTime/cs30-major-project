@@ -192,7 +192,8 @@ let choiceMercy = 0;
 
 function setup() {
   noSmooth();
-  createCanvas(640 * 1.5, 480 * 1.5); 
+  let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
+  cnv.position(width/2, 0);
   //createCanvas(windowWidth, windowHeight);
   fightButtonX = width / 10;
   fightButtonY = height - 200;
@@ -312,12 +313,12 @@ function preload() {
 function keyPressed() {
 
   if (gameState === "start"){
-      if (keyCode === 90){
-          gameState = "chooseWhatToDoWithEnemy"
-      }
-      if (keyCode === ENTER){
-          gameState = "ruins"
-      }
+    if (keyCode === 90){
+      gameState = "chooseWhatToDoWithEnemy";
+    }
+    if (keyCode === ENTER){
+      gameState = "ruins";
+    }
   }
 
 
@@ -368,7 +369,7 @@ function keyPressed() {
     }
   }
 
-  if (currentFrame === 11){
+  if (currentFrame === 11 && gameState === "cutscene"){
     if (keyCode === 90 || keyCode === ENTER){
       gameState = "title";
     }
@@ -1663,7 +1664,7 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
-  drawCandyBowl();
+
   drawGhostWorld();
   drawFloweyWorld();
   noStroke();
@@ -1676,7 +1677,7 @@ function startRuins(){
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  noStroke();
+  //noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
@@ -1723,6 +1724,8 @@ function startRuins(){
     displayPlayer();
   }
   updateDialogue();
+
+  drawCandyBowl();
 
   if (fadeDirection !== 0 || fadeScreen > 0){
     noStroke();
@@ -2031,8 +2034,8 @@ function drawCandyBowl(){
   image(candyBowl[0], candyBowlX, candyBowlY, 40 * 1.5, 54 * 1.5);
 }
 function heartAnimation() {
-  x = px; //which variable do i use to place the heart at the player's position whenever an enemy is encountered?
-  y = py;
+  x = playerX;
+  y = playerY;
 
   //...
 
