@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "start"; //"start";"ruins";
+let gameState = "ruins"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -140,7 +140,7 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = " ";
+let playersName = "Name";
 let playerLevel = 1;
 let levelThresh = 10;
 let playerNextLevel = 10;
@@ -360,11 +360,11 @@ function keyPressed() {
   }
 
 
-  if (pauseState === "no" && keyCode === 67){
+  if (pauseState === "no" && keyCode === 67 && !dialogue.active){
     pauseState = "yes";
   }
 
-  else if (pauseState === "yes" && keyCode === 67){
+  else if (pauseState === "yes" && keyCode === 67 && !dialogue.active){
     pauseState = "no";
   }
   
@@ -1458,26 +1458,27 @@ function pauseScreen(){
   if (pauseState === "yes"){
     fill(0);
     stroke(255);
-    strokeWeight(9);
-    rect(width/8, height/5, width/5, height/6);
-    rect(width/8, height/2.7 + 30, width/5, height/4);
-    rect(width/2 - width/7, height/5, width/2.6, height/1.5);
+    strokeWeight(6);
+    rect(width/8, height/5, width/5, height/5);
+    rect(width/8, height/2.7 + 40, width/5, height/4);
+    rect(width/2 - width/7, height/5, width/2.1, height/1.5);
 
     strokeWeight(0);
     textSize(32);
     fill(255);
     textFont(determinationFont);
-    text(`${playersName}`, width/8 + 20, height/4);
-    textSize(20);
-    text(`LV ${playerLevel}`, width/8 + 20, height/3 - 35);
-    text(`HP ${playerCurHealth} / ${playerHealthMax}`, width/8 + 20, height/3 - 12);
-    text(`G ${playerGuap}`, width/8 + 20, height/2 -   110);
+    textAlign(LEFT, BOTTOM);
+    text(`${playersName}`, width/8 + width / 55, height/4);
+    textSize(25);
+    text(`LV ${playerLevel}`, width/8 + width/55, height/3 - 35);
+    text(`HP ${playerCurHealth} / ${playerHealthMax}`, width/8 + width/55, height/3 - 12);
+    text(`G ${playerGuap}`, width/8 + width/55, height/2 - 110);
 
     //temp
     textSize(32);
-    text("ITEM", 175, 350);
-    text("STAT", 175, 390);
-    text("CELL", 175, 430);
+    text("ITEM", 185, 360);
+    text("STAT", 185, 410);
+    text("CELL", 185, 460);
 
     if (pauseSelection === "stat"){
       textFont(determinationFont);
