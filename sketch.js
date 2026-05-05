@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins"; //"start";"ruins";
+let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -111,8 +111,12 @@ let cutsceneDialogue = [
 
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 5;
-let fightBorderWidth = 25;
-let fightBorderHeight = 520;
+let fightBorderWidth = 250;
+let fightBorderHeight = 250;
+let boxHeight = fightBorderHeight + fightStrokeWeight;
+let boxWidth = fightBorderWidth + fightStrokeWeight;
+let innerHeight = boxHeight - fightStrokeWeight;
+let innerWidth = boxWidth - fightStrokeWeight;
 let heartSize = 20;
 let speed = 5;
 let x;
@@ -122,8 +126,14 @@ let fightButton = [];
 let fightButtonX;
 let fightButtonY;
 let actButton = [];
+let actButtonX;
+let actButtonY;
 let mercyButton = [];
+let mercyButtonX;
+let mercyButtonY;
 let itemButton = [];
+let itemButtonX;
+let itemButtonY;
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -2131,21 +2141,22 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   textSize(20);
   textFont(determinationFont);
 
-  text(`selection: ${selections[selection]}
 
-  choice: ${choice}`, width/2, height/2);
-  let opacity = 0;
-  while (opacity !== 255) {
-    tint(255, opacity);
-    image(fightButton[choiceFight], fightButtonX, fightButtonY, 110 * 1.5, 42 * 1.5); // fixed it foo
-    image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
-    image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
-    image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
-   
-    opacity++;
-    
   
-  }
+  strokeWeight(fightStrokeWeight);
+  stroke(255);
+  noFill();
+  rectMode(CENTER);
+  rect(width/2 , height/2 , boxWidth, boxHeight);
+  // display heart
+  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  // add fade
+  tint(255);
+  image(fightButton[choiceFight], fightButtonX, fightButtonY, 110 * 1.5, 42 * 1.5); // fixed it foo
+  image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
+  image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
+  image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
+ 
   
 
   if (choice === 0){ 
@@ -2170,10 +2181,7 @@ function dodge() { //Foo's Function DO NOT TOUCH
   }
 
   // keep player inside the fight border
-  let boxHeight = fightBorderHeight + fightStrokeWeight;
-  let boxWidth = fightBorderWidth + fightStrokeWeight;
-  let innerHeight = boxHeight - fightStrokeWeight;
-  let innerWidth = boxWidth - fightStrokeWeight;
+
 
   x = constrain(x,
     width/2 - innerWidth/2 + heartSize/2,
@@ -2184,7 +2192,6 @@ function dodge() { //Foo's Function DO NOT TOUCH
     height/2 - innerHeight/2 + heartSize/2,
     height/2 + innerHeight/2 - heartSize/2
   );
-
 
 
   // display fight
