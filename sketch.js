@@ -6,10 +6,11 @@
 
 
 //GAMESTATE
-let gameState = "start"; //"start";"ruins";
+let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
+let fightState = "choose";
 
 //player variables
 let playerX, playerY;
@@ -111,7 +112,7 @@ let cutsceneDialogue = [
 
 // Foo's Variables DO NOT TOUCH
 let fightStrokeWeight = 5;
-let fightBorderWidth = 250;
+let fightBorderWidth = 500;
 let fightBorderHeight = 250;
 let boxHeight = fightBorderHeight + fightStrokeWeight;
 let boxWidth = fightBorderWidth + fightStrokeWeight;
@@ -221,17 +222,17 @@ function setup() {
 
   //fight and dodge function shared variables (horrible code I know still experimenting though)
 
-  fightButtonX = width / 10;
-  fightButtonY = height - 200;
+  fightButtonX = width / 10 - 25;
+  fightButtonY = height - 100;
 
-  actButtonX = width/2 - width / 6;
-  actButtonY = height - 200;
+  actButtonX = width/2 - width / 6 - 25;
+  actButtonY = height - 100;
 
-  itemButtonX = width - width / 2.3;
-  itemButtonY = height - 200;
+  itemButtonX = width - width / 2.3 - 25;
+  itemButtonY = height - 100;
   
-  mercyButtonX = width - width/ 5;
-  mercyButtonY = height - 200;
+  mercyButtonX = width - width/ 5 - 25;
+  mercyButtonY = height - 100;
 
   setupSound();
   x = width/2;
@@ -1533,10 +1534,10 @@ function drawCutsceneText(txt){
 
   let xPos = 180;
   let yPos = height - 225;
-  let boxWidth = width -390;
+  let cutBoxWidth = width -390;
 
   fill(255);
-  text(txt, xPos, yPos, boxWidth);
+  text(txt, xPos, yPos, cutBoxWidth);
 
 }
 
@@ -2125,46 +2126,22 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   //this is unoptimized but i made it in 1 minute so you can change it
   //also i dont think you had the buttons as an array so thats why it wasnt working
   //i made an array for them at the top and fixed it in preload youre welcome 
-  if (selection === 0){
-    choiceFight = 1;
-    image(redHeartImg, fightButtonX, fightButtonY, heartSize, heartSize); // fix me or else
-  }
-  else{
-    choiceFight = 0;
-  }
-  if (selection === 1){
-    choiceAct = 1;
-  }
-  else{
-    choiceAct = 0;
-  }
-  if (selection === 2){
-    choiceItem = 1;
-  }
-  else{
-    choiceItem = 0;
-  }
-  if (selection === 3){
-    choiceMercy = 1;
-  }
-  else{
-    choiceMercy = 0;
-  }
-
+  
   background(0);
   fill(255);
   textSize(20);
   textFont(determinationFont);
 
-
-  
   strokeWeight(fightStrokeWeight);
   stroke(255);
   noFill();
   rectMode(CENTER);
   rect(width/2 , height/2 , boxWidth, boxHeight);
   // display heart
-  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  if (gameState === "dodge"){
+    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize); 
+  }
+
   // add fade
   tint(255);
   let buttonHeight = 42 * 1.5;
@@ -2174,12 +2151,53 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   image(itemButton[choiceItem], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
   image(mercyButton[choiceMercy], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
  
-  
+  if (selection === 0){
+    choiceFight = 1;
+    image(redHeartImg, fightButtonX + heartSize - 5, fightButtonY + heartSize, heartSize, heartSize); // fix me or else ( it didnt work because you were drawing 
+    // the hearts then drawing the button on top foo 🥀)
+  }
+  else{
+    choiceFight = 0;
+  }
+  if (selection === 1){
+    choiceAct = 1;
+    image(redHeartImg, actButtonX + heartSize - 5, actButtonY + heartSize, heartSize, heartSize);
+  }
+  else{
+    choiceAct = 0;
+  }
+  if (selection === 2){
+    choiceItem = 1;
+    image(redHeartImg, itemButtonX + heartSize - 5, itemButtonY + heartSize, heartSize, heartSize);
+  }
+  else{
+    choiceItem = 0;
+  }
+  if (selection === 3){
+    choiceMercy = 1;
+    image(redHeartImg, mercyButtonX + heartSize - 5, mercyButtonY + heartSize, heartSize, heartSize);
+  }
+  else{
+    choiceMercy = 0;
+  }
+ 
 
   if (choice === 0){ 
     gameState = "dodge";
     choice = 0;   
-  }
+  } 
+
+  // boxX = 40;
+  // boxY = 30;
+  // boxW = width - 80;
+  // boxH = 200;
+  // diaTextPosX = 10;
+  // diaTextSize = 39;
+  // startDialogue(
+  //   [
+  //     "foo",
+  //   ],
+  // );
 }
 
 function dodge() { //Foo's Function DO NOT TOUCH
@@ -2219,7 +2237,9 @@ function dodge() { //Foo's Function DO NOT TOUCH
   rectMode(CENTER);
   rect(width/2 , height/2 , boxWidth, boxHeight);
   // display heart
-  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  if (gameState === "dodge"){
+    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  }
   
 }
 
