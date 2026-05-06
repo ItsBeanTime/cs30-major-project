@@ -82,7 +82,7 @@ let boxW;
 let boxH;
 let diaTextPosX;
 let diaTextSize;
-let portraitSize = 150;
+let portraitSize = 125;
 
 
 
@@ -780,7 +780,7 @@ function setupTriggers(){
           boxW = width - 80;
           boxH = 200;
           diaTextPosX = portraitSize + 30;
-          diaTextSize = 35;
+          diaTextSize = 33;
           startDialogue(
             [
               " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
@@ -1622,7 +1622,7 @@ function playerNameScreen(){
       ly = lowStartY + lrow * cellHeight;
     }
 
-    if (frameCount % 4 === 0){
+    if (frameCount % 3 === 0){
       letterJitterX[i] = random(-1, 1);
       letterJitterY[i] = random(-1, 1);
     }
@@ -1747,7 +1747,7 @@ function startRuins(){
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  //noStroke();
+  noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
@@ -1780,11 +1780,12 @@ function startRuins(){
   textSize(20);
   textFont(determinationFont);
   textAlign(LEFT);
-  text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
-  text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
-  text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
-  text(`mouseX: ${mouseX}`, 10, 100);
-  text(`mouseY: ${mouseY}`, 10, 115);
+
+  // text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
+  // text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
+  // text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
+  // text(`mouseX: ${mouseX}`, 10, 100);
+  // text(`mouseY: ${mouseY}`, 10, 115);
 
 
 
@@ -2059,7 +2060,7 @@ function drawDialogueBox(){
 
   let portrait = dialogue.portraitSprites[dialogue.portraitFrame];
   if (portrait) {
-    image(portrait, newboxX + 15, newboxY + 15, portraitSize, portraitSize);
+    image(portrait, newboxX + 15, newboxY + 35, portraitSize, portraitSize);
   }
 
   noStroke();
