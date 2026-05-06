@@ -217,8 +217,21 @@ function setup() {
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
   cnv.position(width/2, 0);
   //createCanvas(windowWidth, windowHeight);
+
+
+  //fight and dodge function shared variables (horrible code I know still experimenting though)
+
   fightButtonX = width / 10;
   fightButtonY = height - 200;
+
+  actButtonX = width/2 - width / 6;
+  actButtonY = height - 200;
+
+  itemButtonX = width - width / 2.3;
+  itemButtonY = height - 200;
+  
+  mercyButtonX = width - width/ 5;
+  mercyButtonY = height - 200;
 
   setupSound();
   x = width/2;
@@ -2113,6 +2126,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   //i made an array for them at the top and fixed it in preload youre welcome 
   if (selection === 0){
     choiceFight = 1;
+    image(redHeartImg, fightButtonX, fightButtonY, heartSize, heartSize); // fix me or else
   }
   else{
     choiceFight = 0;
@@ -2152,16 +2166,18 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
   // add fade
   tint(255);
-  image(fightButton[choiceFight], fightButtonX, fightButtonY, 110 * 1.5, 42 * 1.5); // fixed it foo
-  image(actButton[choiceAct], width/2 - width / 6, height - 200, 110 * 1.5, 42 * 1.5);
-  image(itemButton[choiceItem], width - width / 2.3, height - 200, 110 * 1.5, 42 * 1.5);
-  image(mercyButton[choiceMercy], width - width/ 5, height - 200, 110 * 1.5, 42 * 1.5);
+  let buttonHeight = 42 * 1.5;
+  let buttonWidth = 110 * 1.5;
+  image(fightButton[choiceFight], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+  image(actButton[choiceAct], actButtonX, actButtonY, buttonWidth, buttonHeight);
+  image(itemButton[choiceItem], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+  image(mercyButton[choiceMercy], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
  
   
 
   if (choice === 0){ 
     gameState = "dodge";
-    choice = 0;
+    choice = 0;   
   }
 }
 
