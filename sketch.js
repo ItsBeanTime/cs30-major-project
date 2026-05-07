@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "start"; //"start";"ruins";
+let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -29,6 +29,11 @@ let playerSpriteBack = [];
 
 //misc sprites
 let candyBowl = [];
+
+//battle sprites
+let battleBar;
+let damageTarget;
+let slash = [];
 
 //MUSIC
 let startMenuTheme;
@@ -141,6 +146,8 @@ let mercyButtonY;
 let itemButton = [];
 let itemButtonX;
 let itemButtonY;
+let battleBarX;
+let battleBarDir = "right";
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -249,6 +256,8 @@ function setup() {
   //fight and dodge function shared variables (horrible code I know still experimenting though)
 
   fightButtonX = width / 10 - 40;
+  battleBarX = width / 10 - 40;
+
   fightButtonY = height - 70;
 
   actButtonX = width/2 - width / 6 - 30;
@@ -379,13 +388,28 @@ function preload() {
     ghostBattleSprite.push(loadImage(`assets/npc battle sprites/ghostbattle${i}.png`));
   }
 
+  battleBar = loadImage("assets/battle menu/battlebar.png");
+  damageTarget = loadImage("assets/battle menu/damagetarget.png");
+
+  for (let i = 1; i <= 6; i++){
+    slash.push(loadImage(`assets/battle menu/slash${i}.png`));
+  }
+
 }
 
 //INPUT FUNCTIONS//
 function keyPressed() {
 
-  
+
   if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
+    if (selection === 1 && gameState === "chooseWhatToDoWithEnemy"){
+      actState = "choosing";
+    }
+    if (selection === 0 && gameState === "chooseWhatToDoWithEnemy"){
+      fightState = "fighting";
+      x = boxX;
+      y = boxY;
+    }
     if (!dialogue.done){
       dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
       dialogue.text = dialogue.lines[dialogue.lineIndex];
@@ -442,7 +466,7 @@ function keyPressed() {
       rectMode(CENTER);
       startDialogue(currentActDialogue[currentMonsterActs[actSelection]], () => {
         actState = "none";
-        fightState = "fighting";
+        fightState = "dodge";
         boxX = width/2;
         boxY = height/2 + height/5.4;
         boxW = width - 120;
@@ -453,15 +477,14 @@ function keyPressed() {
       return;
     }
     if (keyCode === 88 || keyCode === SHIFT){
-      actState = "none";
-      fightState = "choose";
+      actState = "choose";
     }
     return;
   }
 
   if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && keyCode === ENTER || keyCode === 90){
     if (selection === 0){
-      fightState = "fighting";
+      fightState = "dodge";
       dialogue.active = false;
       x = boxX;
       y = boxY;
@@ -473,6 +496,10 @@ function keyPressed() {
       actState = "choosing";
       return;
     }
+  }
+
+  if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && keyCode === 90 || keyCode === ENTER){
+    battleBarDir = "left";
   }
 
   if (gameState === "start"){
@@ -2219,7 +2246,6 @@ function heartAnimation() {
 
 
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching cause you might be slightly slow)
-
   //this is unoptimized but i made it in 1 minute so you can change it
   //also i dont think you had the buttons as an array so thats why it wasnt working
   //i made an array for them at the top and fixed it in preload youre welcome 
@@ -2307,11 +2333,32 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
     image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
 
+    image(damageTarget, fightButtonX, fightButtonY/1.6, 562 * 1.5, 128 * 1.5);
+    image(battleBar, battleBarX, fightButtonY/1.6, 14 * 1.5, 128 * 1.5);
+
+    if (battleBarX <= width - fightButtonX && battleBarDir === "right"){
+      battleBarX += 10;
+    }
+    else{
+      battleBarDir = "left";
+      image(slash[1], width/2.4, height/4 + 20, 30, 30);
+    }
+  }
+
+  if (fightState === "dodge"){
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+    image(fightButton[0], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[0], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
+
     strokeWeight(6);
     stroke(255);
     fill(0);
     rectMode(CENTER);
     rect(boxX, boxY, boxW, boxH);
+    
     if (boxW > width/4){
       boxW -= 20;
     }
@@ -2334,6 +2381,8 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       y += speed;
     }
   }
+
+
   if (actState === "choosing"){
     let buttonHeight = 42 * 1.5;
     let buttonWidth = 110 * 1.5;
