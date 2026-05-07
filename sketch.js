@@ -1825,11 +1825,6 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
-
-    playerX = 19350 + screenPosX;
-    playerY = 2203 + screenPosY;
-
-
   drawGhostWorld();
   drawFloweyWorld();
   noStroke();
