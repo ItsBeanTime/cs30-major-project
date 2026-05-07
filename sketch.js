@@ -221,11 +221,11 @@ let choiceMercy = 0;
 
 let fightDialogueDone = false;
 
-let actState = "none"
+let actState = "none";
 let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
-let currentMonster = "Napstablook"
+let currentMonster = "Napstablook";
 
 let monsterData = {
   "Napstablook": {
@@ -468,7 +468,7 @@ function keyPressed() {
       return;
     }
     if (selection === 1){
-      fightState = "choose"
+      fightState = "choose";
       actSelection = 0;
       actState = "choosing";
       return;
@@ -912,7 +912,7 @@ function setupTriggers(){
             ],
             () => {
               ghostGone = true;
-              gameState = "chooseWhatToDoWithEnemy"
+              gameState = "chooseWhatToDoWithEnemy";
             }
           );
         }
@@ -2216,6 +2216,8 @@ function heartAnimation() {
 
 }
 
+
+
 function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching cause you might be slightly slow)
 
   //this is unoptimized but i made it in 1 minute so you can change it
@@ -2230,7 +2232,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   textFont(determinationFont);
 
 
-  let frame = Math.floor(frameCount / 15 % 2)
+  let frame = Math.floor(frameCount / 15 % 2);
   image(ghostBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);    
   image(battleBackground,15,20, 620 * 1.5, 250 * 1.5);
 
@@ -2250,7 +2252,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     choiceMercy = 0; 
     
     if (selection === 0){
-       choiceFight = 1;
+      choiceFight = 1;
     }
     if (selection === 1) {
       choiceAct = 1;
@@ -2262,7 +2264,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       choiceMercy = 1;
     }
     
-  // add fade
+  
   
 
     image(fightButton[choiceFight], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
@@ -2290,7 +2292,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       boxW = width - 120;
       boxH = 180;
       diaTextPosX = -70;
-      diaTextPosY = -20
+      diaTextPosY = -20;
       diaTextSize = 35;
       rectMode(CENTER);
       startDialogue([" * Here comes Napstablook.",]);
@@ -2317,7 +2319,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
 
-    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize)
+    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
 
     if (keyIsDown(37) || keyIsDown(65)) { // left 
       x -= speed;
@@ -2402,9 +2404,7 @@ function battleInfo(monsterName){
   actSelection = 0;
 }
 
-function fight() { //Foo's Function DO NOT TOUCH
-  background(255, 0, 0);
-}
+
 
 function playerLevelIncrease(){
   //https://www.reddit.com/r/Underminers/comments/3u5z71/undertale_lvexpatdf_table/
