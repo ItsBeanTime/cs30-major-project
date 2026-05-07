@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
+let gameState = "start"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -36,6 +36,7 @@ let onceUponATime;
 let oUATStartingVolume = 0.3;
 let ruinsMusic;
 let yourBestFriend;
+let ghostFight;
 
 //SFX
 let undertaleBoom;
@@ -46,6 +47,9 @@ let defaultTextSound;
 
 //FONTS
 let determinationFont;
+
+//background image
+let battleBackground;
 
 //NPC Sprites
 //flowey
@@ -61,6 +65,7 @@ let floweyGone = false;
 let ghostSprites;
 let ghostMet = false;
 let ghostGone = false;
+let ghostBattleSprite =  [];
 
 //dialogue system
 let dialogue = {
@@ -82,6 +87,7 @@ let boxY;
 let boxW;
 let boxH;
 let diaTextPosX;
+let diaTextPosY = 0;
 let diaTextSize;
 let portraitSize = 125;
 
@@ -118,7 +124,7 @@ let boxHeight = fightBorderHeight + fightStrokeWeight;
 let boxWidth = fightBorderWidth + fightStrokeWeight;
 let innerHeight = boxHeight - fightStrokeWeight;
 let innerWidth = boxWidth - fightStrokeWeight;
-let heartSize = 20;
+let heartSize = 16 * 1.5;
 let speed = 5;
 let x;
 let y;
@@ -213,6 +219,26 @@ let choiceItem = 0;
 let choiceAct = 0;
 let choiceMercy = 0;
 
+let fightDialogueDone = false;
+
+let actState = "none"
+let actSelection = 0;
+let currentMonsterActs = [];
+let currentActDialogue = {};
+let currentMonster = "Napstablook"
+
+let monsterData = {
+  "Napstablook": {
+    acts: ["Check", "Flirt", "Threat", "Cheer"],
+    actDialogues: {
+      "Check": [" * NAPSTABLOOK - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
+      "Flirt": [" * You flirt with Napstablook.",],
+      "Threat": [" * You give Napstablook a cruel look."],
+      "Cheer": [" * You gave Napstablook a patient smile."]
+    }
+  }
+};
+
 function setup() {
   noSmooth();
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
@@ -222,17 +248,17 @@ function setup() {
 
   //fight and dodge function shared variables (horrible code I know still experimenting though)
 
-  fightButtonX = width / 10 - 25;
-  fightButtonY = height - 100;
+  fightButtonX = width / 10 - 40;
+  fightButtonY = height - 70;
 
-  actButtonX = width/2 - width / 6 - 25;
-  actButtonY = height - 100;
+  actButtonX = width/2 - width / 6 - 30;
+  actButtonY = height - 70;
 
   itemButtonX = width - width / 2.3 - 25;
-  itemButtonY = height - 100;
+  itemButtonY = height - 70;
   
   mercyButtonX = width - width/ 5 - 25;
-  mercyButtonY = height - 100;
+  mercyButtonY = height - 70;
 
   setupSound();
   x = width/2;
@@ -253,6 +279,7 @@ function setup() {
   setupTriggers();
   setupCameraZones();
   setupCovers();
+  battleInfo("Napstablook");
 }
 
 function draw() { //check game states
@@ -281,6 +308,8 @@ function draw() { //check game states
 }
 
 function preload() {
+
+  battleBackground = loadImage("assets/battle menu/battlebg2.png");
   //player sprite
   for(let i = 1; i < 5; i++){
     playerSpriteFront.push(loadImage(`assets/player sprites/frisk${i}.png`));
@@ -312,6 +341,7 @@ function preload() {
   startMenuTheme = loadSound("assets/music/Start Menu.mp3");
   ruinsMusic = loadSound("assets/music/Ruins.mp3");
   yourBestFriend = loadSound("assets/music/your best friend.mp3");
+  ghostFight = loadSound("assets/music/Ghost Fight (1).mp3");
 
   //sfx
   undertaleBoom = loadSound("assets/sound effects/undertale.mp3");
@@ -344,20 +374,15 @@ function preload() {
   for(let i = 1; i <= 2; i++){
     mercyButton.push(loadImage(`assets/battle menu/mercybutton${i}.png`));
   }
+
+  for (let i = 1; i <= 2; i++){
+    ghostBattleSprite.push(loadImage(`assets/npc battle sprites/ghostbattle${i}.png`));
+  }
+
 }
 
 //INPUT FUNCTIONS//
 function keyPressed() {
-
-  if (gameState === "start"){
-    if (keyCode === 90){
-      gameState = "chooseWhatToDoWithEnemy";
-    }
-    if (keyCode === ENTER){
-      gameState = "ruins";
-    }
-  }
-
 
   
   if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
@@ -381,6 +406,82 @@ function keyPressed() {
       }
     }
     return;
+  }
+  
+  if (keyCode === LEFT_ARROW || keyCode === 65){
+    selection = (selection - 1 + selections.length) % selections.length;
+  }
+  if (keyCode === RIGHT_ARROW || keyCode === 68){
+    selection = (selection + 1) % selections.length;
+  } 
+
+  
+  if (gameState === "chooseWhatToDoWithEnemy" && actState === "choosing"){
+    if (keyCode === LEFT_ARROW || keyCode === 65){
+      actSelection = (actSelection - 1 + currentMonsterActs.length) % currentMonsterActs.length;
+    }
+    if (keyCode === RIGHT_ARROW || keyCode === 68){
+      actSelection = (actSelection + 1) % currentMonsterActs.length;
+    }
+    if (keyCode === UP_ARROW || keyCode === 87){
+      actSelection = (actSelection - 2 + currentMonsterActs.length) % currentMonsterActs.length;
+    }
+    if (keyCode === DOWN_ARROW || keyCode === 83){
+      actSelection = (actSelection + 2) % currentMonsterActs.length;
+    }
+    if (keyCode === ENTER || keyCode === 90){
+      actState = "result";
+      boxX = width/2;
+      boxY = height/2 + height/5.4;
+      boxW = width - 120;
+      boxH = 180;
+      diaTextPosX = -70;
+      diaTextPosY = -20;
+      diaTextSize = 34;
+
+      rectMode(CENTER);
+      startDialogue(currentActDialogue[currentMonsterActs[actSelection]], () => {
+        actState = "none";
+        fightState = "fighting";
+        boxX = width/2;
+        boxY = height/2 + height/5.4;
+        boxW = width - 120;
+        boxH = 180;
+        x = boxX;
+        y = boxY;
+      });
+      return;
+    }
+    if (keyCode === 88 || keyCode === SHIFT){
+      actState = "none";
+      fightState = "choose";
+    }
+    return;
+  }
+
+  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && keyCode === ENTER || keyCode === 90){
+    if (selection === 0){
+      fightState = "fighting";
+      dialogue.active = false;
+      x = boxX;
+      y = boxY;
+      return;
+    }
+    if (selection === 1){
+      fightState = "choose"
+      actSelection = 0;
+      actState = "choosing";
+      return;
+    }
+  }
+
+  if (gameState === "start"){
+    if (keyCode === 90){
+      gameState = "chooseWhatToDoWithEnemy";
+    }
+    if (keyCode === ENTER){
+      gameState = "ruins";
+    }
   }
 
 
@@ -443,18 +544,6 @@ function keyPressed() {
     return;
   }
   // selection with arrow keys, confirm with space and if goes off screen it starts from the beginning or end depending on the direction
-  if (keyCode === LEFT_ARROW || keyCode === 65){
-    selection = (selection - 1 + selections.length) % selections.length;
-  }
-  if (keyCode === RIGHT_ARROW || keyCode === 68){
-    selection = (selection + 1) % selections.length;
-  } 
-
-
-
-  if (keyCode === ENTER || key === " " && gameState === "chooseWhatToDoWithEnemy") {
-    choice = selection;
-  }
 
   if (gameState === "ruins" && key === " "){
     playerX = 19420 + screenPosX;
@@ -823,6 +912,7 @@ function setupTriggers(){
             ],
             () => {
               ghostGone = true;
+              gameState = "chooseWhatToDoWithEnemy"
             }
           );
         }
@@ -1736,6 +1826,10 @@ function startRuins(){
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
 
+    playerX = 19350 + screenPosX;
+    playerY = 2203 + screenPosY;
+
+
   drawGhostWorld();
   drawFloweyWorld();
   noStroke();
@@ -1994,9 +2088,13 @@ function teleportPlayer(dx, dy){
 }
 
 function startDialogue(lines, portraits, onFinish = null){
+  if(typeof portraits === "function"){
+    onFinish = portraits;
+    portraits = [];
+  }
   dialogue.active = true;
   dialogue.lines = lines;
-  dialogue.portraitSprites = portraits;
+  dialogue.portraitSprites = portraits || [];
   dialogue.lineIndex = 0;
   dialogue.charIndex = 0;
   dialogue.text = "";
@@ -2030,8 +2128,10 @@ function updateDialogue(){
           sound = textSound;
         }
         if (ghostMet){
-          ;
           sound = defaultTextSound;
+        }
+        if (gameState === "chooseWhatToDoWithEnemy"){
+          sound = textSound;
         }
         let ch = line.charAt(dialogue.charIndex - 1);
         if (ch !== " " && ch !== "\n" && textSound.isLoaded()) {
@@ -2069,7 +2169,7 @@ function drawDialogueBox(){
   textFont(determinationFont);
   textSize(diaTextSize);
   textAlign(LEFT, TOP);
-  text(dialogue.text, newboxX + diaTextPosX, newboxY + 20, newboxW - portraitSize - 50, newboxH - 30);
+  text(dialogue.text, newboxX + diaTextPosX, newboxY + 20 + diaTextPosY, newboxW - portraitSize - 50, newboxH - 30);
 }
 
 function drawFloweyWorld(){
@@ -2126,121 +2226,185 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   //this is unoptimized but i made it in 1 minute so you can change it
   //also i dont think you had the buttons as an array so thats why it wasnt working
   //i made an array for them at the top and fixed it in preload youre welcome 
-  
+  if (!ghostFight.isPlaying()){
+    ghostFight.play();
+  }
   background(0);
   fill(255);
   textSize(20);
   textFont(determinationFont);
 
-  strokeWeight(fightStrokeWeight);
-  stroke(255);
-  noFill();
-  rectMode(CENTER);
-  rect(width/2 , height/2 , boxWidth, boxHeight);
-  // display heart
-  if (gameState === "dodge"){
-    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize); 
-  }
 
-  // add fade
-  tint(255);
-  let buttonHeight = 42 * 1.5;
-  let buttonWidth = 110 * 1.5;
-  image(fightButton[choiceFight], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
-  image(actButton[choiceAct], actButtonX, actButtonY, buttonWidth, buttonHeight);
-  image(itemButton[choiceItem], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
-  image(mercyButton[choiceMercy], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
- 
-  if (selection === 0){
-    choiceFight = 1;
-    image(redHeartImg, fightButtonX + heartSize - 5, fightButtonY + heartSize, heartSize, heartSize); // fix me or else ( it didnt work because you were drawing 
-    // the hearts then drawing the button on top foo 🥀)
-  }
-  else{
+  let frame = Math.floor(frameCount / 15 % 2)
+  image(ghostBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);    
+  image(battleBackground,15,20, 620 * 1.5, 250 * 1.5);
+
+  textSize(36);
+  stroke(0);
+  fill(255);
+  text(`${playersName}  lV ${playerLevel}`, fightButtonX, fightButtonY - 55);
+  text(`HP ${playerCurHealth} / ${playerHealthMax}`, actButtonX + actButtonX/3, fightButtonY - 55);
+    
+  if (fightState === "choose"){
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+
     choiceFight = 0;
-  }
-  if (selection === 1){
-    choiceAct = 1;
-    image(redHeartImg, actButtonX + heartSize - 5, actButtonY + heartSize, heartSize, heartSize);
-  }
-  else{
     choiceAct = 0;
-  }
-  if (selection === 2){
-    choiceItem = 1;
-    image(redHeartImg, itemButtonX + heartSize - 5, itemButtonY + heartSize, heartSize, heartSize);
-  }
-  else{
     choiceItem = 0;
-  }
-  if (selection === 3){
-    choiceMercy = 1;
-    image(redHeartImg, mercyButtonX + heartSize - 5, mercyButtonY + heartSize, heartSize, heartSize);
-  }
-  else{
-    choiceMercy = 0;
-  }
- 
+    choiceMercy = 0; 
+    
+    if (selection === 0){
+       choiceFight = 1;
+    }
+    if (selection === 1) {
+      choiceAct = 1;
+    }
+    if (selection === 2) {
+      choiceItem = 1;
+    }
+    if (selection === 3) {
+      choiceMercy = 1;
+    }
+    
+  // add fade
+  
 
-  if (choice === 0){ 
-    gameState = "dodge";
-    choice = 0;   
-  } 
+    image(fightButton[choiceFight], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[choiceAct], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[choiceItem], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[choiceMercy], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
 
-  // boxX = 40;
-  // boxY = 30;
-  // boxW = width - 80;
-  // boxH = 200;
-  // diaTextPosX = 10;
-  // diaTextSize = 39;
-  // startDialogue(
-  //   [
-  //     "foo",
-  //   ],
-  // );
+    if (selection === 0){
+      image(redHeartImg, fightButtonX + heartSize - 10, fightButtonY + heartSize - 3, heartSize, heartSize);
+    }
+    if (selection === 1) {
+      image(redHeartImg, actButtonX + heartSize - 10, actButtonY + heartSize - 3, heartSize, heartSize);
+    }
+    if (selection === 2) {
+      image(redHeartImg, itemButtonX + heartSize - 10, itemButtonY + heartSize - 3, heartSize, heartSize);
+    }
+    if (selection === 3) {
+      image(redHeartImg, mercyButtonX + heartSize - 10, mercyButtonY + heartSize - 3, heartSize, heartSize);
+    }
+
+    if (!dialogue.active && !fightDialogueDone){
+      fightDialogueDone = true;
+      boxX = width/2;
+      boxY = height/2 + height/5.4;
+      boxW = width - 120;
+      boxH = 180;
+      diaTextPosX = -70;
+      diaTextPosY = -20
+      diaTextSize = 35;
+      rectMode(CENTER);
+      startDialogue([" * Here comes Napstablook.",]);
+    }
+    updateDialogue();
+  }
+  if (fightState === "fighting"){
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+    image(fightButton[0], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[0], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
+
+    strokeWeight(6);
+    stroke(255);
+    fill(0);
+    rectMode(CENTER);
+    rect(boxX, boxY, boxW, boxH);
+    if (boxW > width/4){
+      boxW -= 20;
+    }
+
+    x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
+    y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
+
+    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize)
+
+    if (keyIsDown(37) || keyIsDown(65)) { // left 
+      x -= speed;
+    }
+    if (keyIsDown(39) || keyIsDown(68)) { //right 
+      x += speed;
+    }
+    if (keyIsDown(38) || keyIsDown(87)) { // up 
+      y -= speed;
+    }
+    if (keyIsDown(40) || keyIsDown(83)) { // down 
+      y += speed;
+    }
+  }
+  if (actState === "choosing"){
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+    image(fightButton[0], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[0], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
+
+    strokeWeight(6);
+    stroke(255);
+    fill(0);
+    rectMode(CENTER);
+    rect(boxX, boxY, boxW, boxH);
+
+    noStroke();
+    fill(255);
+    textFont(determinationFont);
+    textSize(36);
+    textAlign(LEFT, TOP);
+
+    let cols = 2;
+    let colW = boxW /3;
+    let rowH = boxH /4;
+    let startX = boxX/3;
+    let startY = boxY - boxH/2 + 20;
+
+    for(let i = 0; i < currentMonsterActs.length; i++){
+      let col = i % cols;
+      let row = Math.floor(i / cols);
+      let ax = startX + col * colW;
+      let ay = startY + row * rowH;
+
+      if (actSelection === 0){
+        image(redHeartImg, colW/2, startY + 10, heartSize, heartSize);
+      }
+      if (actSelection === 1){
+        image(redHeartImg, colW * 1.5, startY + 10, heartSize, heartSize);
+      }
+      if (actSelection === 2){
+        image(redHeartImg, colW/2, startY + 56, heartSize, heartSize);
+      }
+      if (actSelection === 3){
+        image(redHeartImg, colW * 1.5, startY + 56, heartSize, heartSize);
+      }
+
+      text(" * " + currentMonsterActs[i], ax, ay);
+    }
+  }
+  if (actState === "result"){
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+    image(fightButton[0], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[0], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
+    rectMode(CENTER);
+    updateDialogue();
+  }
+
 }
 
-function dodge() { //Foo's Function DO NOT TOUCH
-  // if dodge state, move the heart with arrow keys
-  if (keyIsDown(37)) { // left arrow
-    x -= speed;
-  }
-  if (keyIsDown(39)) { //right arrow
-    x += speed;
-  }
-  if (keyIsDown(38)) { // up arrow
-    y -= speed;
-  }
-  if (keyIsDown(40)) { // down arrow
-    y += speed;
-  }
-
-  // keep player inside the fight border
-
-
-  x = constrain(x,
-    width/2 - innerWidth/2 + heartSize/2,
-    width/2 + innerWidth/2 - heartSize/2
-  );
-
-  y = constrain(y,
-    height/2 - innerHeight/2 + heartSize/2,
-    height/2 + innerHeight/2 - heartSize/2
-  );
-
-
-  // display fight
-  background(0);
-  strokeWeight(fightStrokeWeight);
-  stroke(255);
-  noFill();
-  rectMode(CENTER);
-  rect(width/2 , height/2 , boxWidth, boxHeight);
-  // display heart
-  if (gameState === "dodge"){
-    image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
-  }
-  
+function battleInfo(monsterName){
+  currentMonster = monsterName;
+  currentMonsterActs = monsterData[monsterName].acts;
+  currentActDialogue = monsterData[monsterName].actDialogues;
+  fightState = "choose";
+  actState = "none";
+  actSelection = 0;
 }
 
 function fight() { //Foo's Function DO NOT TOUCH
