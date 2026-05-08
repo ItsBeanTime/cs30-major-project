@@ -2343,6 +2343,16 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       battleBarDir = "left";
       image(slash[1], width/2.4, height/4 + 20, 30, 30);
     }
+
+    if (BattleBarX - width/2 <= 12 && BattleBarX - width/2 >= -12) {
+      //critical hit (times 2.2 dmg)
+    }
+    if (BattleBarX - width/2 <= 20 && BattleBarX - width/2 >= -20) {
+      //(times 2 dmg)
+    }
+    if (BattleBarX - width/2 <= 50 && BattleBarX - width/2 >= -50) {
+      //(times 1 dmg)   
+    }
   }
 
   if (fightState === "dodge"){
