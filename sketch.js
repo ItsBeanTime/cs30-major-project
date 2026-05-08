@@ -148,6 +148,7 @@ let itemButtonX;
 let itemButtonY;
 let battleBarX;
 let battleBarDir = "right";
+let hasAttacked = false;
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -225,6 +226,8 @@ let choiceFight = 0;
 let choiceItem = 0;
 let choiceAct = 0;
 let choiceMercy = 0;
+
+let slashIndex = 1;
 
 let fightDialogueDone = false;
 
@@ -391,7 +394,7 @@ function preload() {
   battleBar = loadImage("assets/battle menu/battlebar.png");
   damageTarget = loadImage("assets/battle menu/damagetarget.png");
 
-  for (let i = 1; i <= 6; i++){
+  for (let i = 1; i < 7; i++){
     slash.push(loadImage(`assets/battle menu/slash${i}.png`));
   }
 
@@ -464,6 +467,7 @@ function keyPressed() {
       diaTextSize = 34;
 
       rectMode(CENTER);
+
       startDialogue(currentActDialogue[currentMonsterActs[actSelection]], () => {
         actState = "none";
         fightState = "dodge";
@@ -477,14 +481,16 @@ function keyPressed() {
       return;
     }
     if (keyCode === 88 || keyCode === SHIFT){
-      actState = "choose";
+      actState = "none";
+      fightState = "choose";
+      fightDialogueDone = false;
     }
     return;
   }
 
   if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && keyCode === ENTER || keyCode === 90){
     if (selection === 0){
-      fightState = "dodge";
+      fightState = "fighting";
       dialogue.active = false;
       x = boxX;
       y = boxY;
@@ -502,31 +508,33 @@ function keyPressed() {
     battleBarDir = "left";
     if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
       console.log("1X");
+      hasAttacked = true;
 
     }
     else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
       console.log("2X");
-
+      hasAttacked = true;
     }
     else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
       console.log("crit");
-
+      hasAttacked = true;
     }
     else{
       console.log("miss");
+      hasAttacked = true;
     }
   }
 
-    // stroke(255, 0 ,0)
-    // line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
-    // line(itemButtonX + 110, height/2, mercyButtonX + 43, height /2);
+  // stroke(255, 0 ,0)
+  // line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
+  // line(itemButtonX + 110, height/2, mercyButtonX + 43, height /2);
 
-    // stroke(100, 255 ,0)
-    // line(actButtonX + 30, height/2, width/2- 35, height /2);
-    // line(width/2 + 30, height/2, width/2 + 150, height /2);
+  // stroke(100, 255 ,0)
+  // line(actButtonX + 30, height/2, width/2- 35, height /2);
+  // line(width/2 + 30, height/2, width/2 + 150, height /2);
 
-    // stroke(0,0, 255)
-    // line(width/2 - 30, height/2, width/2 + 30, height/2)
+  // stroke(0,0, 255)
+  // line(width/2 - 30, height/2, width/2 + 30, height/2)
 
 
   if (gameState === "start"){
@@ -2283,6 +2291,9 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   fill(255);
   textSize(20);
   textFont(determinationFont);
+  stroke(0);
+  text(`fightState:${fightState}`, 100, height/10);
+  text(`actState:${actState}`, 100, height/8);
 
 
   let frame = Math.floor(frameCount / 15 % 2);
@@ -2363,25 +2374,24 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     image(damageTarget, fightButtonX, fightButtonY/1.6, 562 * 1.5, 128 * 1.5);
     image(battleBar, battleBarX, fightButtonY/1.6, 14 * 1.5, 128 * 1.5);
 
-    stroke(255, 0 ,0)
-    line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
-    line(itemButtonX + 110, height/2, mercyButtonX + 43, height /2);
-
-    stroke(100, 255 ,0)
-    line(actButtonX + 30, height/2, width/2- 35, height /2);
-    line(width/2 + 30, height/2, width/2 + 150, height /2);
-
-    stroke(0,0, 255)
-    line(width/2 - 30, height/2, width/2 + 30, height/2)
-
     if (battleBarX <= width - fightButtonX && battleBarDir === "right"){
       battleBarX += 10;
     }
     else{
       battleBarDir = "left";
-      image(slash[1], width/2.4, height/4 + 20, 30, 30);
+      image(slash[slashIndex], width/2 - 30, height/4, 52 * 1.5, 220 * 1.5);
+      if (frameCount % 3 === 0 && slashIndex <= 4){
+        slashIndex ++;
+      }
     }
   }
+
+  // if (hasAttacked){
+  //   frameTimer++;
+  //   if (frameTimer >= 200){
+  //     fightState = "dodge";
+  //   }
+  // }
 
   if (fightState === "dodge"){
     let buttonHeight = 42 * 1.5;
