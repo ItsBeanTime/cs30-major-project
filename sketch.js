@@ -500,7 +500,34 @@ function keyPressed() {
 
   if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && keyCode === 90 || keyCode === ENTER){
     battleBarDir = "left";
+    if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
+      console.log("1X");
+
+    }
+    else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
+      console.log("2X");
+
+    }
+    else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
+      console.log("crit");
+
+    }
+    else{
+      console.log("miss");
+    }
   }
+
+    // stroke(255, 0 ,0)
+    // line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
+    // line(itemButtonX + 110, height/2, mercyButtonX + 43, height /2);
+
+    // stroke(100, 255 ,0)
+    // line(actButtonX + 30, height/2, width/2- 35, height /2);
+    // line(width/2 + 30, height/2, width/2 + 150, height /2);
+
+    // stroke(0,0, 255)
+    // line(width/2 - 30, height/2, width/2 + 30, height/2)
+
 
   if (gameState === "start"){
     if (keyCode === 90){
@@ -2336,22 +2363,23 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     image(damageTarget, fightButtonX, fightButtonY/1.6, 562 * 1.5, 128 * 1.5);
     image(battleBar, battleBarX, fightButtonY/1.6, 14 * 1.5, 128 * 1.5);
 
+    stroke(255, 0 ,0)
+    line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
+    line(itemButtonX + 110, height/2, mercyButtonX + 43, height /2);
+
+    stroke(100, 255 ,0)
+    line(actButtonX + 30, height/2, width/2- 35, height /2);
+    line(width/2 + 30, height/2, width/2 + 150, height /2);
+
+    stroke(0,0, 255)
+    line(width/2 - 30, height/2, width/2 + 30, height/2)
+
     if (battleBarX <= width - fightButtonX && battleBarDir === "right"){
       battleBarX += 10;
     }
     else{
       battleBarDir = "left";
       image(slash[1], width/2.4, height/4 + 20, 30, 30);
-    }
-
-    if (BattleBarX - width/2 <= 12 && BattleBarX - width/2 >= -12) {
-      //critical hit (times 2.2 dmg)
-    }
-    if (BattleBarX - width/2 <= 20 && BattleBarX - width/2 >= -20) {
-      //(times 2 dmg)
-    }
-    if (BattleBarX - width/2 <= 50 && BattleBarX - width/2 >= -50) {
-      //(times 1 dmg)   
     }
   }
 
