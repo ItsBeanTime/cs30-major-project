@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy"; //"start";"ruins";
+let gameState = "ruins"; //"start";"ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -2296,7 +2296,10 @@ function updateDialogue(){
 }
 
 function drawDialogueBox(){
-  rectMode(CENTER);
+  if (gameState === "chooseWhatToDoWithEnemy"){
+    rectMode(CENTER);
+  }
+  
   let newboxX = boxX;
   let newboxY = boxY;
   let newboxW = boxW;
