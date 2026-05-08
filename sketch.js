@@ -149,6 +149,12 @@ let itemButtonY;
 let battleBarX;
 let battleBarDir = "right";
 let hasAttacked = false;
+let attackTimer = 0;
+let savedTurnText = "";
+let dodgeTimer = 0;
+let dodgeDuration = 180;
+let boxWTarget = 0;
+let boxExpanding = false;
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -180,6 +186,7 @@ let playerExp = 23000;
 let playerKills = 0;
 let playerWeaponEquip = "Stick";
 let playerArmorEquip = "Bandage";
+let healthBarMaxWidth = 120;
 
 //player name screen variables
 
@@ -227,7 +234,7 @@ let choiceItem = 0;
 let choiceAct = 0;
 let choiceMercy = 0;
 
-let slashIndex = 1;
+let slashIndex = 0;
 
 let fightDialogueDone = false;
 
@@ -237,6 +244,19 @@ let currentMonsterActs = [];
 let currentActDialogue = {};
 let currentMonster = "Napstablook";
 
+let napstablookMood = 0;
+let napstablookCheerCount = 0;
+let napstablookThreatened = false;
+let napstablookTurnMessage = false;
+let napstablookSparable = false;
+let napstablookMaxHp = 100;
+let napstablookCurHp = 100;
+let firstTurn = true;
+
+let targetBoxW = 562 * 1.5;
+let targetBoxShrinking = false;
+let targetAlpha = 255;
+
 let monsterData = {
   "Napstablook": {
     acts: ["Check", "Flirt", "Threat", "Cheer"],
@@ -244,7 +264,7 @@ let monsterData = {
       "Check": [" * NAPSTABLOOK - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
       "Flirt": [" * You flirt with Napstablook.",],
       "Threat": [" * You give Napstablook a cruel look."],
-      "Cheer": [" * You gave Napstablook a patient smile."]
+      "Cheer": ["CHEER_SPECIAL"],
     }
   }
 };
@@ -271,6 +291,8 @@ function setup() {
   
   mercyButtonX = width - width/ 5 - 25;
   mercyButtonY = height - 70;
+
+  boxWTarget = width - 120;
 
   setupSound();
   x = width/2;
@@ -405,10 +427,10 @@ function keyPressed() {
 
 
   if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
-    if (selection === 1 && gameState === "chooseWhatToDoWithEnemy"){
+    if (selection === 1 && gameState === "chooseWhatToDoWithEnemy" && actState === "none"){
       actState = "choosing";
     }
-    if (selection === 0 && gameState === "chooseWhatToDoWithEnemy"){
+    if (selection === 0 && gameState === "chooseWhatToDoWithEnemy" && fightState === "choose"){
       fightState = "fighting";
       x = boxX;
       y = boxY;
@@ -457,38 +479,66 @@ function keyPressed() {
       actSelection = (actSelection + 2) % currentMonsterActs.length;
     }
     if (keyCode === ENTER || keyCode === 90){
+      let actName = currentMonsterActs[actSelection];
+      let actLine;
+
+      if (actName === "Cheer"){
+        napstablookThreatened = false;
+        napstablookCheerCount++;
+        napstablookTurnMessage = true;
+
+        if (napstablookCheerCount === 1){
+          actLine = " * You gave Napstablook a patient smile.";
+        }
+        else if (napstablookCheerCount === 2){
+          actLine = " * You told Napstablook a little joke."
+        }
+        else{
+          actLine = " * Napstablook wants to show you something."
+        }
+      }
+      else if(actName === "Threat"){
+        napstablookThreatened = true;
+        napstablookMood = max(0, napstablookMood - 1);
+        napstablookSparable = false;
+        napstablookTurnMessage = true;
+        actLine = " * You give Napstablook a cruel look."
+      }
+      else{
+        actLine = currentActDialogue[actName][0];
+      }
+
       actState = "result";
       boxX = width/2;
-      boxY = height/2 + height/5.4;
+      boxY = height /2 + height/5.4;
       boxW = width - 120;
       boxH = 180;
       diaTextPosX = -70;
       diaTextPosY = -20;
       diaTextSize = 34;
 
-      rectMode(CENTER);
-
-      startDialogue(currentActDialogue[currentMonsterActs[actSelection]], () => {
+      startDialogue([actLine], () => {
         actState = "none";
         fightState = "dodge";
         boxX = width/2;
-        boxY = height/2 + height/5.4;
+        boxY = height /2 + height/5.4;
         boxW = width - 120;
         boxH = 180;
         x = boxX;
         y = boxY;
+        fightDialogueDone = true;
       });
       return;
     }
     if (keyCode === 88 || keyCode === SHIFT){
       actState = "none";
       fightState = "choose";
-      fightDialogueDone = false;
+      selection = 1;
     }
     return;
   }
 
-  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && keyCode === ENTER || keyCode === 90){
+  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90)){
     if (selection === 0){
       fightState = "fighting";
       dialogue.active = false;
@@ -502,27 +552,68 @@ function keyPressed() {
       actState = "choosing";
       return;
     }
+    if (selection === 3){
+      if (napstablookSparable){
+        fightDialogueDone = false;
+        ghostFight.stop();
+        boxX = width/2;
+        boxY = height /2 + height/5.4;
+        boxW = width - 120;
+        boxH = 180;
+        diaTextPosX = -70;
+        diaTextPosY = -20;
+        diaTextSize = 35;
+         startDialogue(
+          [" * rewards"],
+          () => {
+            gameState = "ruins";
+            ghostGone = true;
+            ghostFight.stop();
+          }
+         );
+      }
+      else{
+        fightDialogueDone = false;
+        boxX = width/2;
+        boxY = height /2 + height/5.4;
+        boxW = width - 120;
+        boxH = 180;
+        diaTextPosX = -70;
+        diaTextPosY = -20;
+        diaTextSize = 35;
+        startDialogue([" * But Napstablook doesn't want to be spared yet"]);
+      }
+      return;
+    }
   }
 
-  if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && keyCode === 90 || keyCode === ENTER){
+  if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && (keyCode === 90 || keyCode === ENTER) && !hasAttacked){
     battleBarDir = "left";
     if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
       console.log("1X");
+      napstablookCurHp -= 10;
       hasAttacked = true;
+      slashIndex = 0;
 
     }
     else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
       console.log("2X");
+      napstablookCurHp -= 20;
       hasAttacked = true;
+      slashIndex = 0;
     }
     else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
       console.log("crit");
+      napstablookCurHp -= 35;
       hasAttacked = true;
+      slashIndex = 0;
     }
     else{
       console.log("miss");
       hasAttacked = true;
+      slashIndex = 0;
     }
+    napstablookCurHp = constrain(napstablookCurHp, 0, napstablookMaxHp);
   }
 
   // stroke(255, 0 ,0)
@@ -2205,6 +2296,7 @@ function updateDialogue(){
 }
 
 function drawDialogueBox(){
+  rectMode(CENTER);
   let newboxX = boxX;
   let newboxY = boxY;
   let newboxW = boxW;
@@ -2287,7 +2379,9 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   if (!ghostFight.isPlaying()){
     ghostFight.play();
   }
-  background(0);
+  background(0); 
+
+
   fill(255);
   textSize(20);
   textFont(determinationFont);
@@ -2299,12 +2393,70 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
   let frame = Math.floor(frameCount / 15 % 2);
   image(ghostBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);    
   image(battleBackground,15,20, 620 * 1.5, 250 * 1.5);
+  
+  if (hasAttacked){
+    drawNapstablookHealthBar();    
+  }
+
+
+  let targetY = fightButtonY / 1.6;
+  let targetH = 128 * 1.5;
+  if (targetBoxW > 0 && fightState === "fighting"){
+    let centeredTarget = width/2 - targetBoxW/2;
+    stroke(255);
+    strokeWeight(6);
+    rectMode(CORNER);
+    fill(0)
+    rect(centeredTarget, targetY, targetBoxW, targetH);
+
+    tint(255, targetAlpha);
+    image(damageTarget, centeredTarget, targetY, targetBoxW, targetH);
+    noTint();
+    noStroke();
+    if (fightState === "fighting" && battleBarDir === "right"){
+      image(battleBar, battleBarX, targetY, 14 * 1.5, 128 * 1.5); 
+    }
+  }
+
+
+  if (boxExpanding){
+    boxW += 20;
+    if (boxW >= width - 120){
+      boxW = width - 120;
+      boxExpanding = false;
+    }
+    fill(0);
+    stroke(255);
+    strokeWeight(6);
+    rectMode(CENTER);
+    rect(boxX, boxY, boxW, boxH);
+  }
 
   textSize(36);
   stroke(0);
   fill(255);
   text(`${playersName}  lV ${playerLevel}`, fightButtonX, fightButtonY - 55);
-  text(`HP ${playerCurHealth} / ${playerHealthMax}`, actButtonX + actButtonX/3, fightButtonY - 55);
+  textSize(28);
+  text(`HP`, actButtonX + actButtonX/3 - 60, fightButtonY - 55);
+
+  let hpBarX = actButtonX + actButtonX/3;
+  let hpBarY = fightButtonY - 45;
+  let hpBarW = playerHealthMax * 2;
+  let hpBarH = 30;
+  let hpPercent = playerCurHealth / playerHealthMax;
+
+  noStroke();
+  fill(255, 255, 0);
+  rectMode(CORNER);
+  rect(hpBarX, hpBarY, hpBarW, hpBarH);
+
+  fill(180,0,0);
+  rect(hpBarX + hpBarW * hpPercent, hpBarY, hpBarW * (1 - hpPercent), hpBarH);
+
+  textSize(36);
+  stroke(0);
+  fill(255);
+  text(`${playerCurHealth}/${playerHealthMax}`, hpBarX + hpBarW + 10, fightButtonY - 55);
     
   if (fightState === "choose"){
     let buttonHeight = 42 * 1.5;
@@ -2327,9 +2479,6 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     if (selection === 3) {
       choiceMercy = 1;
     }
-    
-  
-  
 
     image(fightButton[choiceFight], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
     image(actButton[choiceAct], actButtonX, actButtonY, buttonWidth, buttonHeight);
@@ -2349,20 +2498,52 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       image(redHeartImg, mercyButtonX + heartSize - 10, mercyButtonY + heartSize - 3, heartSize, heartSize);
     }
 
-    if (!dialogue.active && !fightDialogueDone){
+
+
+    if (!dialogue.active && !fightDialogueDone && !boxExpanding){
       fightDialogueDone = true;
       boxX = width/2;
       boxY = height/2 + height/5.4;
-      boxW = width - 120;
+      if (!boxExpanding){
+        boxW = width - 120;
+      }
       boxH = 180;
       diaTextPosX = -70;
       diaTextPosY = -20;
       diaTextSize = 35;
       rectMode(CENTER);
-      startDialogue([" * Here comes Napstablook.",]);
+
+      let turnText;
+      if (firstTurn){
+        firstTurn = false;
+        turnText = " * Here comes Napstablook.";
+      }
+      else{
+        turnText = getNapstablookFlavorText();
+      }
+      savedTurnText = turnText;
+      startDialogue([turnText]);
     }
-    updateDialogue();
+
+    if (dialogue.active){
+      updateDialogue();
+    }
+    else if(fightDialogueDone){
+      rectMode(CORNER);
+      fill(0);
+      stroke(255);
+      strokeWeight(6);
+      rect(width/2 - (width - 120)/2, height/2 + height/5.4 - 90, width - 120, 180);
+      noStroke();
+
+      fill(255);
+      textFont(determinationFont);
+      textSize(35);
+      textAlign(LEFT, TOP);
+      text(savedTurnText, width/2 - (width - 120)/2+15, height/2 + height/5.4 - 90 + 15, width - 120 - portraitSize - 50, 150);
+    } 
   }
+
   if (fightState === "fighting"){
     let buttonHeight = 42 * 1.5;
     let buttonWidth = 110 * 1.5;
@@ -2371,27 +2552,36 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
     image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
 
-    image(damageTarget, fightButtonX, fightButtonY/1.6, 562 * 1.5, 128 * 1.5);
-    image(battleBar, battleBarX, fightButtonY/1.6, 14 * 1.5, 128 * 1.5);
-
-    if (battleBarX <= width - fightButtonX && battleBarDir === "right"){
+    if (battleBarDir === "right"){
       battleBarX += 10;
+      if (battleBarX >= width - fightButtonX){
+        hasAttacked = true;
+        slashIndex = slash.length;
+        battleBarDir = "left";
+        targetBoxShrinking = true;
+      }
     }
     else{
-      battleBarDir = "left";
-      image(slash[slashIndex], width/2 - 30, height/4, 52 * 1.5, 220 * 1.5);
-      if (frameCount % 3 === 0 && slashIndex <= 4){
+      if (slashIndex < slash.length){
+        image(slash[slashIndex], width/2 - 30, height/4, 52 * 1.5, 220 * 1.5);
+        if (frameCount % 3 === 0){
         slashIndex ++;
+        }        
       }
     }
   }
 
-  // if (hasAttacked){
-  //   frameTimer++;
-  //   if (frameTimer >= 200){
-  //     fightState = "dodge";
-  //   }
-  // }
+  if (hasAttacked){
+    attackTimer++
+    if (attackTimer >= 60){
+      hasAttacked = false;
+      attackTimer = 0;
+      slashIndex = 0;
+      battleBarDir = "right";
+      battleBarX = fightButtonX;
+      fightState = "dodge";
+    }
+  }
 
   if (fightState === "dodge"){
     let buttonHeight = 42 * 1.5;
@@ -2407,10 +2597,27 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     rectMode(CENTER);
     rect(boxX, boxY, boxW, boxH);
     
-    if (boxW > width/4){
+    if (boxW > width/4 && !boxExpanding){
       boxW -= 20;
+      targetBoxW = boxW;
+      targetAlpha = map(boxW, width/4, width - 120,0, 255);
     }
 
+    dodgeTimer++;
+    if(dodgeTimer >= dodgeDuration){
+      dodgeTimer = 0;
+      fightState = "choose";
+      fightDialogueDone = false;
+      selection = 0;
+      boxX = width/2;
+      boxY = height/2 + height/5.4;
+      boxH = 180;
+      boxW = width/4;
+      boxExpanding = true;
+      targetBoxW = 562 * 1.5;
+      targetAlpha = 255;
+      targetBoxShrinking = false;
+    }
     x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
 
@@ -2501,7 +2708,49 @@ function battleInfo(monsterName){
   actSelection = 0;
 }
 
+function getNapstablookFlavorText(){
+  if (napstablookTurnMessage){
+    napstablookTurnMessage = false;
+    if (napstablookThreatened){
+      return " * You try to console Napstablook...";
+    }
+    if (napstablookCheerCount === 1){
+      return " * Napstablook looks just a little bit better.";
+    }
+    if (napstablookCheerCount === 2){
+      return " * Cheering seems to have improved Napstablook's mood again.";
+    }
+    if (napstablookCheerCount >= 3){
+      napstablookSparable = true;
+      return " * Napstablook eagerly awaits your response.";
+    }
+  }
 
+  let neutralMessage = [
+    " * Napstablook is wishing they weren't here.",
+    " * Napstablook is staring into the distance.",
+    " * Napstablook is pretending to sleep.",
+    " * The faint odor of ectoplasm permeates the vicinity."
+  ];
+  return neutralMessage[floor(random(neutralMessage.length))];
+}
+
+function drawNapstablookHealthBar(){
+  let barW = 104 * 1.5;
+  let barH = 12;
+  let barX = width/2.4;
+  let barY = height/4;
+  let hpPercent = napstablookCurHp / napstablookMaxHp;
+
+  rectMode(CORNER);
+  noStroke();
+  fill(100);
+  rect(barX, barY, barW, barH);
+
+  fill(0, 200, 0);
+  rect(barX, barY, barW * hpPercent, barH);
+  rectMode(CENTER);
+}
 
 function playerLevelIncrease(){
   //https://www.reddit.com/r/Underminers/comments/3u5z71/undertale_lvexpatdf_table/
