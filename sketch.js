@@ -425,42 +425,40 @@ function preload() {
 //INPUT FUNCTIONS//
 function keyPressed() {
 
+  if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && (keyCode === 90 || keyCode === ENTER) && !hasAttacked){
+    battleBarDir = "left";
+    if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
+      console.log("1X");
+      napstablookCurHp -= 10;
+      hasAttacked = true;
+      slashIndex = 0;
 
-  if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
-    if (selection === 1 && gameState === "chooseWhatToDoWithEnemy" && actState === "none"){
-      actState = "choosing";
     }
-    if (selection === 0 && gameState === "chooseWhatToDoWithEnemy" && fightState === "choose"){
-      fightState = "fighting";
-      x = boxX;
-      y = boxY;
+    else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
+      console.log("2X");
+      napstablookCurHp -= 20;
+      hasAttacked = true;
+      slashIndex = 0;
     }
-    if (!dialogue.done){
-      dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
-      dialogue.text = dialogue.lines[dialogue.lineIndex];
-      dialogue.done = true;
+    else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
+      console.log("crit");
+      napstablookCurHp -= 35;
+      hasAttacked = true;
+      slashIndex = 0;
     }
     else{
-      dialogue.lineIndex++;
-      if (dialogue.lineIndex >= dialogue.lines.length){
-        dialogue.active = false;
-        if (dialogue.onFinish){
-          dialogue.onFinish();
-        }
-      }
-      else{
-        dialogue.charIndex = 0;
-        dialogue.text = "";
-        dialogue.done = false;
-      }
+      console.log("miss");
+      hasAttacked = true;
+      slashIndex = 0;
     }
-    return;
+    napstablookCurHp = constrain(napstablookCurHp, 0, napstablookMaxHp);
   }
-  
-  if (keyCode === LEFT_ARROW || keyCode === 65){
+
+ 
+  if ((keyCode === LEFT_ARROW || keyCode === 65) && fightState === "choose"){
     selection = (selection - 1 + selections.length) % selections.length;
   }
-  if (keyCode === RIGHT_ARROW || keyCode === 68){
+  if ((keyCode === RIGHT_ARROW || keyCode === 68) && fightState === "choose"){
     selection = (selection + 1) % selections.length;
   } 
 
@@ -533,11 +531,40 @@ function keyPressed() {
     if (keyCode === 88 || keyCode === SHIFT){
       actState = "none";
       fightState = "choose";
-      selection = 1;
     }
     return;
   }
-
+  if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
+    if (selection === 1 && gameState === "chooseWhatToDoWithEnemy" && actState === "none"){
+      actState = "choosing";
+    }
+    if (selection === 0 && gameState === "chooseWhatToDoWithEnemy" && fightState === "choose"){
+      fightState = "fighting";
+      x = boxX;
+      y = boxY;
+    }
+    if (!dialogue.done){
+      dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
+      dialogue.text = dialogue.lines[dialogue.lineIndex];
+      dialogue.done = true;
+    }
+    else{
+      dialogue.lineIndex++;
+      if (dialogue.lineIndex >= dialogue.lines.length){
+        dialogue.active = false;
+        if (dialogue.onFinish){
+          dialogue.onFinish();
+        }
+      }
+      else{
+        dialogue.charIndex = 0;
+        dialogue.text = "";
+        dialogue.done = false;
+      }
+    }
+    return;
+  }
+  
   if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90)){
     if (selection === 0){
       fightState = "fighting";
@@ -573,48 +600,13 @@ function keyPressed() {
          );
       }
       else{
-        fightDialogueDone = false;
-        boxX = width/2;
-        boxY = height /2 + height/5.4;
-        boxW = width - 120;
-        boxH = 180;
-        diaTextPosX = -70;
-        diaTextPosY = -20;
-        diaTextSize = 35;
         startDialogue([" * But Napstablook doesn't want to be spared yet"]);
       }
       return;
     }
   }
 
-  if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && (keyCode === 90 || keyCode === ENTER) && !hasAttacked){
-    battleBarDir = "left";
-    if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
-      console.log("1X");
-      napstablookCurHp -= 10;
-      hasAttacked = true;
-      slashIndex = 0;
 
-    }
-    else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
-      console.log("2X");
-      napstablookCurHp -= 20;
-      hasAttacked = true;
-      slashIndex = 0;
-    }
-    else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
-      console.log("crit");
-      napstablookCurHp -= 35;
-      hasAttacked = true;
-      slashIndex = 0;
-    }
-    else{
-      console.log("miss");
-      hasAttacked = true;
-      slashIndex = 0;
-    }
-    napstablookCurHp = constrain(napstablookCurHp, 0, napstablookMaxHp);
-  }
 
   // stroke(255, 0 ,0)
   // line(fightButtonX + 100, height/2, actButtonX + 29, height /2);
@@ -2375,13 +2367,39 @@ function heartAnimation() {
 
 
 
-function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching cause you might be slightly slow)
-  //this is unoptimized but i made it in 1 minute so you can change it
-  //also i dont think you had the buttons as an array so thats why it wasnt working
-  //i made an array for them at the top and fixed it in preload youre welcome 
+function chooseWhatToDoWithEnemy() { 
   if (!ghostFight.isPlaying()){
     ghostFight.play();
   }
+  if (ruinsMusic.isPlaying()){
+    ruinsMusic.stop();
+  }
+  // if (napstablookCurHp <= 0){
+  //   startDialogue(
+  //         [" * umm... you do know you cant kill a ghost, right?",
+  //           " * we're sorta incorporeal and all",
+  //           " * i was just lowering my hp because i didn't want to be rude",
+  //           " * sorry... i just made it more awkward...",
+  //           " * pretend you beat me...",
+  //           " * oooooooooo",
+  //           " * rewards",
+  //         ],
+  //         () => {
+  //           gameState = "ruins";
+  //           ghostGone = true;
+  //           ghostFight.stop();
+  //         }
+  //        );
+  if (napstablookCurHp <= 0){
+    if (!ruinsMusic.isPlaying()){
+      ruinsMusic.play();
+      ghostFight.stop();
+      gameState = "ruins";
+    }   
+  }
+ 
+    
+
   background(0); 
 
 
@@ -2416,9 +2434,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
     image(damageTarget, centeredTarget, targetY, targetBoxW, targetH);
     noTint();
     noStroke();
-    if (fightState === "fighting" && battleBarDir === "right"){
-      image(battleBar, battleBarX, targetY, 14 * 1.5, 128 * 1.5); 
-    }
+    image(battleBar, battleBarX, targetY, 14 * 1.5, 128 * 1.5); 
   }
 
 
@@ -2576,7 +2592,7 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
 
   if (hasAttacked){
     attackTimer++
-    if (attackTimer >= 60){
+    if (attackTimer >= 120){
       hasAttacked = false;
       attackTimer = 0;
       slashIndex = 0;
@@ -2611,7 +2627,6 @@ function chooseWhatToDoWithEnemy() { //Foo's Function DO NOT TOUCH(im touching c
       dodgeTimer = 0;
       fightState = "choose";
       fightDialogueDone = false;
-      selection = 0;
       boxX = width/2;
       boxY = height/2 + height/5.4;
       boxH = 180;
