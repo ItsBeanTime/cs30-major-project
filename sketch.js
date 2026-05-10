@@ -52,6 +52,7 @@ let ruinsDoor;
 let ruinsSwitch = [];
 let yellowArrow;
 let spikes;
+let rock;
 
 //battle sprites
 let battleBar;
@@ -179,6 +180,7 @@ let selection = 0;
 // map variables
 let mapSize = 12;
 let ruinsMap;
+let ruinsMap2;
 let screenPosY;
 let screenPosX = 0;
 let scrollSpeed = 4;
@@ -269,6 +271,8 @@ let firstTurn = true;
 let targetBoxW = 562 * 1.5;
 let targetBoxShrinking = false;
 let targetAlpha = 255;
+
+let ruinsMap2OffsetX = 21200
 
 let monsterData = {
   "Napstablook": {
@@ -398,6 +402,7 @@ function preload() {
   defaultTextSound = loadSound("assets/sound effects/snd_txt1.mp3");
 
   ruinsMap = loadImage("assets/map sprites/ruins-1.png");
+  ruinsMap2 = loadImage("assets/map sprites/ruins-2.png");
   determinationFont = loadFont("assets/fonts/determination.otf");
   title = loadImage("assets/title sprites/undertale-title-5.png");
   redHeartImg = loadImage("assets/player sprites/red-heart.png");
@@ -454,6 +459,8 @@ function preload() {
   for (let i = 1; i <= 4; i++){
     froggitSprite.push(loadImage(`assets/npc overworld sprites/froggitow${i}.png`))
   }
+
+  rock = loadImage("assets/miscellaneus sprites/rock.png");
 }
 
 //INPUT FUNCTIONS//
@@ -725,8 +732,8 @@ function keyPressed() {
   // selection with arrow keys, confirm with space and if goes off screen it starts from the beginning or end depending on the direction
 
   if (gameState === "ruins" && key === " "){
-    playerX = 19420 + screenPosX;
-    playerY = 2203 + screenPosY;
+    playerX = 21349 + screenPosX;
+    playerY = 1768 + screenPosY;
   }
 
   if (menuState === "name"){
@@ -841,10 +848,10 @@ function setupSound(){
 function setupWalls(){
   walls = [
     //edge of map
-    makeWall(0,0,6981,0),
-    makeWall(0,0,0,1921),
-    makeWall(0,1921,6981,0),
-    makeWall(6950,0,0,1921),
+    // makeWall(0,0,6981,0),
+    // makeWall(0,0,0,1921),
+    // makeWall(0,1921,6981,0),
+    // makeWall(6950,0,0,1921),
 
     //ruins first puzzel room
     makeWall(492,721,88,100),
@@ -1614,6 +1621,17 @@ function makeWallM(mx, my, mw, mh){
   return {x:mx, y: my, w: mw, h: mh};
 }
 
+function makeWall2(px, py, pw, ph){
+  let scaleX = width * (mapSize + 10) / 3178;
+  let scaleY = height * (mapSize - 4) / 3499;
+  return {
+    x: px * scaleX + ruinsMap2OffsetX,
+    y: py * scaleY,
+    w: pw * scaleX,
+    h: ph * scaleY
+  };
+}
+
 function collidesWithWall(px, py){
   let pw = 60;
   let ph = 20;
@@ -2015,7 +2033,7 @@ function startRuins(){
   playerLevelIncrease();
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
-
+  image(ruinsMap2, screenPosX + ruinsMap2OffsetX, screenPosY, width * (mapSize - 2), height * (mapSize + 2.5));
   //stuff behind player
   drawGhostWorld();
   drawFloweyWorld();
@@ -2027,6 +2045,7 @@ function startRuins(){
   drawSpikes();
   drawDummyWorld();
   drawFrogWorld();
+  drawRock();
 
   noStroke();
   fill(0);
@@ -2095,6 +2114,7 @@ function startRuins(){
   if (fadeDirection !== 0 || fadeScreen > 0){
     noStroke();
     fill(0, fadeScreen);
+    rectMode(CORNER);
     rect(0, 0, width, height);
 
     fadeScreen += fadeDirection * fadeSpeed;
@@ -2125,8 +2145,8 @@ function playerMove(){
   let moving = false;
   let newDirection = direction;
 
-  let mapW = width * (mapSize + 10);
-  let mapH = height * (mapSize - 4);
+  let mapW = width * (mapSize + 10) + ruinsMap2OffsetX;
+  let mapH = height * (mapSize - 4) + 4000;
 
   let minScrollX = -(mapW - width);
   let minScrollY = -(mapH - height);
@@ -2402,8 +2422,8 @@ function drawGhostWorld(){
   if (ghostGone){
     return;
   }
-  let ghostX = 19444 + screenPosX;
-  let ghostY = 2203 + screenPosY;
+  let ghostX = 19430 + screenPosX;
+  let ghostY = 2195 + screenPosY;
 
   image(ghostSprites, ghostX, ghostY, 66 * 1.5, 34 * 1.5 );
 }
@@ -2420,6 +2440,8 @@ function drawSaveSpot(){
   let pos = makeImagePos(612, 1158)
   image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
   pos = makeImagePos(3960, 400)
+  image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
+  pos = makeImagePos(6068, 764)
   image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
 }
 
@@ -2484,8 +2506,17 @@ function drawSpikes(){
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   }
 
-  for (i = 0; i < 120; i+= 20){
+  for (let i = 0; i < 120; i+= 20){
     pos = makeImagePos(4644, 581 + i);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+
+  for (let i = 0; i < 60;i+= 20){
+    pos = makeImagePos(5782, 721+ i)
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+  for (let i = 0; i < 60;i+= 20){
+    pos = makeImagePos(5802, 721+ i)
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   }
 }
@@ -2496,8 +2527,14 @@ function drawDummyWorld(){
 }
 
 function drawFrogWorld(){
-  let pos = makeImagePos(3851, 341);
   let frame = Math.floor(frameCount / 20) % 4;
+  let pos = makeImagePos(3851, 341);
+  image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
+  pos = makeImagePos(6559, 441);
+  image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
+  pos = makeImagePos(6679, 441);
+  image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
+  pos = makeImagePos(6799, 441);
   image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
 }
 
@@ -2511,7 +2548,18 @@ function heartAnimation() {
 
 }
 
+function drawRock(){
+  let pos = makeImagePos(4524, 636);
+  image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(5601, 696);
+  image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(5581, 736);
+  image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
 
+  //funny rock
+  pos = makeImagePos(5621, 776);
+  image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+}
 
 function chooseWhatToDoWithEnemy() { 
   if (!ghostFight.isPlaying()){
