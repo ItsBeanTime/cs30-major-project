@@ -20,21 +20,6 @@ let frameDelay = 10;
 let frameCountAnim = 0;
 let direction = "front";
 
-//sprites
-//player sprites
-let playerSpriteFront = [];
-let playerSpriteLeft = [];
-let playerSpriteRight = [];
-let playerSpriteBack = [];
-
-//misc sprites
-let candyBowl = [];
-
-//battle sprites
-let battleBar;
-let damageTarget;
-let slash = [];
-
 //MUSIC
 let startMenuTheme;
 let onceUponATime;
@@ -52,6 +37,28 @@ let defaultTextSound;
 
 //FONTS
 let determinationFont;
+//sprites
+//player sprites
+let playerSpriteFront = [];
+let playerSpriteLeft = [];
+let playerSpriteRight = [];
+let playerSpriteBack = [];
+
+//misc sprites
+let candyBowl = [];
+let saveSpot = [];
+let floorButton = [];
+let ruinsDoor;
+let ruinsSwitch = [];
+let yellowArrow;
+let spikes;
+
+//battle sprites
+let battleBar;
+let damageTarget;
+let slash = [];
+
+
 
 //background image
 let battleBackground;
@@ -71,6 +78,12 @@ let ghostSprites;
 let ghostMet = false;
 let ghostGone = false;
 let ghostBattleSprite =  [];
+
+//dummy
+let dummySprite;
+
+//froggit
+let froggitSprite = [];
 
 //dialogue system
 let dialogue = {
@@ -420,6 +433,27 @@ function preload() {
     slash.push(loadImage(`assets/battle menu/slash${i}.png`));
   }
 
+  for (let i = 1; i <= 2; i++){
+    saveSpot.push(loadImage(`assets/miscellaneus sprites/save${i}.png`));
+  }
+
+  for (let i = 1; i <=2; i++){
+    floorButton.push(loadImage(`assets/miscellaneus sprites/floorbutton${i}.png`));
+  }
+
+  ruinsDoor = loadImage("assets/map sprites/ruinsdoor.png");
+
+  for (let i = 1; i <= 2; i++){
+    ruinsSwitch.push(loadImage(`assets/miscellaneus sprites/lever${i}.png`))
+  }
+
+  yellowArrow = loadImage("assets/miscellaneus sprites/yellowarrow.png");
+  spikes = loadImage("assets/map sprites/spikes.png");
+  dummySprite = loadImage("assets/npc overworld sprites/dummyow.png");
+
+  for (let i = 1; i <= 4; i++){
+    froggitSprite.push(loadImage(`assets/npc overworld sprites/froggitow${i}.png`))
+  }
 }
 
 //INPUT FUNCTIONS//
@@ -995,6 +1029,9 @@ function setupWalls(){
     makeWallM(2182, 2235, 60, 350),
     makeWallM(2119, 2168, 60, 350),
 
+    //ruins first save spot
+    makeWallM(1850, 3490, 40 * 1.5, 15 * 1.5)
+
 
     
   ];
@@ -1003,38 +1040,38 @@ function setupWalls(){
 function setupTriggers(){
   triggers = [
 
-    //flowey interact
-    {
-      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
-      action: () => {
-        if (!floweyMet){
-          floweyMet = true;
-          yourBestFriend.play();
-          boxX = 40;
-          boxY = 30;
-          boxW = width - 80;
-          boxH = 200;
-          diaTextPosX = portraitSize + 30;
-          diaTextSize = 33;
-          startDialogue(
-            [
-              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
-              " * Hmmm...",
-              " * You're new to the UNDERGROUND, aren'tcha?",
-              " * Golly, you must be so confused.",
-              " * Someone ought to teach you how things work around here!",
-              " * I guess little old me will have to do.",
-              " * Ready? Here we go!",
-            ],
-            floweyPortSprites,
-            () => {
-              floweyGone = true;
-              yourBestFriend.stop();
-            }
-          );
-        }
-      }
-    },
+    // //flowey interact
+    // {
+    //   x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+    //   action: () => {
+    //     if (!floweyMet){
+    //       floweyMet = true;
+    //       yourBestFriend.play();
+    //       boxX = 40;
+    //       boxY = 30;
+    //       boxW = width - 80;
+    //       boxH = 200;
+    //       diaTextPosX = portraitSize + 30;
+    //       diaTextSize = 33;
+    //       startDialogue(
+    //         [
+    //           " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+    //           " * Hmmm...",
+    //           " * You're new to the UNDERGROUND, aren'tcha?",
+    //           " * Golly, you must be so confused.",
+    //           " * Someone ought to teach you how things work around here!",
+    //           " * I guess little old me will have to do.",
+    //           " * Ready? Here we go!",
+    //         ],
+    //         floweyPortSprites,
+    //         () => {
+    //           floweyGone = true;
+    //           yourBestFriend.stop();
+    //         }
+    //       );
+    //     }
+    //   }
+    // },
 
     //ghost interact
     {
@@ -1528,6 +1565,15 @@ function setupCovers(){
   ];
 }
 
+function makeImagePos(px, py){
+  let scaleX = width * (mapSize + 10) / 6981;
+  let scaleY = height * (mapSize - 4) / 1921;
+  return {
+    x: px * scaleX,
+    y: py * scaleY
+  };
+}
+
 //WALL / TRIGGER FUNCTIONS//
 function checkTriggers(px, py, pressed){
   let pw = 60;
@@ -1970,8 +2016,18 @@ function startRuins(){
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
 
+  //stuff behind player
   drawGhostWorld();
   drawFloweyWorld();
+  drawSaveSpot();
+  drawFloorButton();
+  drawRuinsDoor();
+  drawRuinsSwitch();
+  drawYellowArrow();
+  drawSpikes();
+  drawDummyWorld();
+  drawFrogWorld();
+
   noStroke();
   fill(0);
   for (let cover of covers){
@@ -1982,7 +2038,7 @@ function startRuins(){
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  noStroke();
+  //noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
@@ -2016,7 +2072,7 @@ function startRuins(){
   textFont(determinationFont);
   textAlign(LEFT);
 
-  // text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
+  text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
   // text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
   // text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
   // text(`mouseX: ${mouseX}`, 10, 100);
@@ -2031,7 +2087,10 @@ function startRuins(){
   }
   updateDialogue();
 
+  //stuff ontop of player
   drawCandyBowl();
+
+
 
   if (fadeDirection !== 0 || fadeScreen > 0){
     noStroke();
@@ -2355,6 +2414,93 @@ function drawCandyBowl(){
 
   image(candyBowl[0], candyBowlX, candyBowlY, 40 * 1.5, 54 * 1.5);
 }
+
+function drawSaveSpot(){
+  let frame = Math.floor(frameCount / 10 % 2);
+  let pos = makeImagePos(612, 1158)
+  image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
+  pos = makeImagePos(3960, 400)
+  image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
+}
+
+function drawFloorButton(){
+  let pos = makeImagePos(660, 900);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  pos = makeImagePos(640, 880)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  pos = makeImagePos(680, 880)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  pos = makeImagePos(660, 860)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  pos = makeImagePos(640, 840)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  pos = makeImagePos(680, 840)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+}
+
+function drawRuinsDoor(){
+  let pos = makeImagePos(580, 761);
+  image(ruinsDoor,pos.x + screenPosX, pos.y + screenPosY, 80 * 1.5, 120 * 1.5);
+}
+
+function drawRuinsSwitch(){
+  let pos = makeImagePos(660,789);
+  image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(843,551);
+  image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(1039,551);
+  image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(1077,551);
+  image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+}
+
+function drawYellowArrow(){
+  let pos = makeImagePos(818, 541);
+  image(yellowArrow, pos.x + screenPosX, pos.y + screenPosY, 80 * 1.5, 80 * 1.5);
+  pos = makeImagePos(1013, 541);
+  image(yellowArrow, pos.x + screenPosX, pos.y + screenPosY, 80 * 1.5, 80 * 1.5);
+}
+
+function drawSpikes(){
+  let pos = makeImagePos(1160, 641);
+  image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(1160, 661);
+  image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+
+  for(let i = 0; i < 280; i+= 20){
+    pos = makeImagePos(2020 + i, 361);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+  for(let i = 0; i < 280; i+= 20){
+    pos = makeImagePos(2020 + i, 361 + 20);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+  for(let i = 0; i < 280; i+= 20){
+    pos = makeImagePos(2020 + i, 361 + 40);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+  for(let i = 0; i < 280; i+= 20){
+    pos = makeImagePos(2020 + i, 361 + 60);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+
+  for (i = 0; i < 120; i+= 20){
+    pos = makeImagePos(4644, 581 + i);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+}
+
+function drawDummyWorld(){
+  let pos = makeImagePos(1398, 591);
+  image(dummySprite, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 60 * 1.5);
+}
+
+function drawFrogWorld(){
+  let pos = makeImagePos(3851, 341);
+  let frame = Math.floor(frameCount / 20) % 4;
+  image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
+}
+
 function heartAnimation() {
   x = playerX;
   y = playerY;
