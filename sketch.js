@@ -952,7 +952,7 @@ function setupWalls(){
     makeWall(6330, 540, 148, 141),
     makeWall(6519, 541, 37, 140),
     makeWall(6540, 761, 138, 58),
-    makeWall(6540, 630, 138, 98),
+    makeWall(6540, 630, 138, 91),
 
     //web room
     makeWall(6675, 617, 174, 84),
