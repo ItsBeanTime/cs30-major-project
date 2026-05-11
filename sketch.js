@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins"; //"start";"ruins";
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -37,6 +37,7 @@ let defaultTextSound;
 
 //FONTS
 let determinationFont;
+
 //sprites
 //player sprites
 let playerSpriteFront = [];
@@ -58,8 +59,6 @@ let rock;
 let battleBar;
 let damageTarget;
 let slash = [];
-
-
 
 //background image
 let battleBackground;
@@ -109,8 +108,6 @@ let diaTextPosX;
 let diaTextPosY = 0;
 let diaTextSize;
 let portraitSize = 125;
-
-
 
 //cutscene / title variables
 let scrollCutY = -1023;
@@ -169,7 +166,6 @@ let dodgeTimer = 0;
 let dodgeDuration = 180;
 let boxWTarget = 0;
 let boxExpanding = false;
-
 
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
@@ -679,7 +675,7 @@ function keyPressed() {
     pauseState = "no";
   }
   
-  if (gameState === "ruins" && keyCode === 90){
+  if (gameState === "ruins" && (keyCode === 90 || keyCode === ENTER)){
     let mapPlayerX = playerX - screenPosX;
     let mapPlayerY = playerY - screenPosY;
     checkTriggers(mapPlayerX, mapPlayerY, true);
@@ -1047,42 +1043,42 @@ function setupWalls(){
 function setupTriggers(){
   triggers = [
 
-    // //flowey interact
-    // {
-    //   x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
-    //   action: () => {
-    //     if (!floweyMet){
-    //       floweyMet = true;
-    //       yourBestFriend.play();
-    //       boxX = 40;
-    //       boxY = 30;
-    //       boxW = width - 80;
-    //       boxH = 200;
-    //       diaTextPosX = portraitSize + 30;
-    //       diaTextSize = 33;
-    //       startDialogue(
-    //         [
-    //           " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
-    //           " * Hmmm...",
-    //           " * You're new to the UNDERGROUND, aren'tcha?",
-    //           " * Golly, you must be so confused.",
-    //           " * Someone ought to teach you how things work around here!",
-    //           " * I guess little old me will have to do.",
-    //           " * Ready? Here we go!",
-    //         ],
-    //         floweyPortSprites,
-    //         () => {
-    //           floweyGone = true;
-    //           yourBestFriend.stop();
-    //         }
-    //       );
-    //     }
-    //   }
-    // },
+    //flowey interact
+    {
+      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+      action: () => {
+        if (!floweyMet){
+          floweyMet = true;
+          yourBestFriend.play();
+          boxX = 40;
+          boxY = 30;
+          boxW = width - 80;
+          boxH = 200;
+          diaTextPosX = portraitSize + 30;
+          diaTextSize = 33;
+          startDialogue(
+            [
+              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+              " * Hmmm...",
+              " * You're new to the UNDERGROUND, aren'tcha?",
+              " * Golly, you must be so confused.",
+              " * Someone ought to teach you how things work around here!",
+              " * I guess little old me will have to do.",
+              " * Ready? Here we go!",
+            ],
+            floweyPortSprites,
+            () => {
+              floweyGone = true;
+              yourBestFriend.stop();
+            }
+          );
+        }
+      }
+    },
 
     //ghost interact
     {
-      x:19405, y:2107, w:60, h:2307 - 2107, onWalk: true,
+      x:19405, y:2107, w:60, h:2307 - 2107, onInteract: true,
       action: () => {
         if (!ghostMet){
           ghostMet = true;
@@ -1453,10 +1449,6 @@ function setupTriggers(){
         });
       }
     },
-
-
-
-
 
 
     {
@@ -2063,7 +2055,7 @@ function startRuins(){
   }
 
   stroke(180, 0, 255);
-  noStroke(); // hide hitbox
+  //noStroke(); // hide hitbox
   for (let trigger of triggers){
     rect(trigger.x + screenPosX, trigger.y + screenPosY, trigger.w, trigger.h);
   }
@@ -2631,7 +2623,6 @@ function chooseWhatToDoWithEnemy() {
     image(battleBar, battleBarX, targetY, 14 * 1.5, 128 * 1.5); 
   }
 
-
   if (boxExpanding){
     boxW += 20;
     if (boxW >= width - 120){
@@ -2710,8 +2701,6 @@ function chooseWhatToDoWithEnemy() {
     if (selection === 3) {
       image(redHeartImg, mercyButtonX + heartSize - 10, mercyButtonY + heartSize - 3, heartSize, heartSize);
     }
-
-
 
     if (!dialogue.active && !fightDialogueDone && !boxExpanding){
       fightDialogueDone = true;
