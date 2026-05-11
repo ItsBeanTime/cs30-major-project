@@ -272,7 +272,7 @@ let targetBoxW = 562 * 1.5;
 let targetBoxShrinking = false;
 let targetAlpha = 255;
 
-let ruinsMap2OffsetX = 21200
+let ruinsMap2OffsetX = 21200;
 
 let monsterData = {
   "Napstablook": {
@@ -449,7 +449,7 @@ function preload() {
   ruinsDoor = loadImage("assets/map sprites/ruinsdoor.png");
 
   for (let i = 1; i <= 2; i++){
-    ruinsSwitch.push(loadImage(`assets/miscellaneus sprites/lever${i}.png`))
+    ruinsSwitch.push(loadImage(`assets/miscellaneus sprites/lever${i}.png`));
   }
 
   yellowArrow = loadImage("assets/miscellaneus sprites/yellowarrow.png");
@@ -457,7 +457,7 @@ function preload() {
   dummySprite = loadImage("assets/npc overworld sprites/dummyow.png");
 
   for (let i = 1; i <= 4; i++){
-    froggitSprite.push(loadImage(`assets/npc overworld sprites/froggitow${i}.png`))
+    froggitSprite.push(loadImage(`assets/npc overworld sprites/froggitow${i}.png`));
   }
 
   rock = loadImage("assets/miscellaneus sprites/rock.png");
@@ -530,10 +530,10 @@ function keyPressed() {
           actLine = " * You gave Napstablook a patient smile.";
         }
         else if (napstablookCheerCount === 2){
-          actLine = " * You told Napstablook a little joke."
+          actLine = " * You told Napstablook a little joke.";
         }
         else{
-          actLine = " * Napstablook wants to show you something."
+          actLine = " * Napstablook wants to show you something.";
         }
       }
       else if(actName === "Threat"){
@@ -541,7 +541,7 @@ function keyPressed() {
         napstablookMood = max(0, napstablookMood - 1);
         napstablookSparable = false;
         napstablookTurnMessage = true;
-        actLine = " * You give Napstablook a cruel look."
+        actLine = " * You give Napstablook a cruel look.";
       }
       else{
         actLine = currentActDialogue[actName][0];
@@ -631,14 +631,14 @@ function keyPressed() {
         diaTextPosX = -70;
         diaTextPosY = -20;
         diaTextSize = 35;
-         startDialogue(
+        startDialogue(
           [" * rewards"],
           () => {
             gameState = "ruins";
             ghostGone = true;
             ghostFight.stop();
           }
-         );
+        );
       }
       else{
         startDialogue([" * But Napstablook doesn't want to be spared yet"]);
@@ -2437,27 +2437,27 @@ function drawCandyBowl(){
 
 function drawSaveSpot(){
   let frame = Math.floor(frameCount / 10 % 2);
-  let pos = makeImagePos(612, 1158)
+  let pos = makeImagePos(612, 1158);
   image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
-  pos = makeImagePos(3960, 400)
+  pos = makeImagePos(3960, 400);
   image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
-  pos = makeImagePos(6068, 764)
+  pos = makeImagePos(6068, 764);
   image(saveSpot[frame], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 38 * 1.5);
 }
 
 function drawFloorButton(){
   let pos = makeImagePos(660, 900);
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
-  pos = makeImagePos(640, 880)
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
-  pos = makeImagePos(680, 880)
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
-  pos = makeImagePos(660, 860)
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
-  pos = makeImagePos(640, 840)
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
-  pos = makeImagePos(680, 840)
-  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5)
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(640, 880);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(680, 880);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(660, 860);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(640, 840);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  pos = makeImagePos(680, 840);
+  image(floorButton[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
 }
 
 function drawRuinsDoor(){
@@ -2512,11 +2512,11 @@ function drawSpikes(){
   }
 
   for (let i = 0; i < 60;i+= 20){
-    pos = makeImagePos(5782, 721+ i)
+    pos = makeImagePos(5782, 721+ i);
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   }
   for (let i = 0; i < 60;i+= 20){
-    pos = makeImagePos(5802, 721+ i)
+    pos = makeImagePos(5802, 721+ i);
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   }
 }
@@ -2621,7 +2621,7 @@ function chooseWhatToDoWithEnemy() {
     stroke(255);
     strokeWeight(6);
     rectMode(CORNER);
-    fill(0)
+    fill(0);
     rect(centeredTarget, targetY, targetBoxW, targetH);
 
     tint(255, targetAlpha);
@@ -2778,14 +2778,14 @@ function chooseWhatToDoWithEnemy() {
       if (slashIndex < slash.length){
         image(slash[slashIndex], width/2 - 30, height/4, 52 * 1.5, 220 * 1.5);
         if (frameCount % 3 === 0){
-        slashIndex ++;
+          slashIndex ++;
         }        
       }
     }
   }
 
   if (hasAttacked){
-    attackTimer++
+    attackTimer++;
     if (attackTimer >= 120){
       hasAttacked = false;
       attackTimer = 0;
