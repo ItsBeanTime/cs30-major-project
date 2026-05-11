@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "floweyFight";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -37,6 +37,9 @@ let defaultTextSound;
 
 //FONTS
 let determinationFont;
+let mercyFont;
+let mfbFont;
+let cotFont;
 
 //sprites
 //player sprites
@@ -59,6 +62,7 @@ let rock;
 let battleBar;
 let damageTarget;
 let slash = [];
+let friendPel = [];
 
 //background image
 let battleBackground;
@@ -403,6 +407,9 @@ function preload() {
   ruinsMap = loadImage("assets/map sprites/ruins-1.png");
   ruinsMap2 = loadImage("assets/map sprites/ruins-2.png");
   determinationFont = loadFont("assets/fonts/determination.otf");
+  mercyFont = loadFont("assets/fonts/MERCY.otf");
+  mfbFont = loadFont("assets/fonts/Monster Friend Back.otf");
+  cotFont = loadFont("assets/fonts/CryptOfTomorrow.otf");
   title = loadImage("assets/title sprites/undertale-title-5.png");
   redHeartImg = loadImage("assets/player sprites/red-heart.png");
 
@@ -1073,7 +1080,7 @@ function setupTriggers(){
             () => {
               floweyGone = true;
               // yourBestFriend.stop();
-              gameState = "floweyFight"
+              gameState = "floweyFight";
             }
           );
         }
@@ -2889,20 +2896,52 @@ function chooseWhatToDoWithEnemy() {
 }
 
 function floweyFight(){
-  background(0)
-  strokeWeight(6);
+  textAlign(LEFT, BOTTOM);
+  background(0);
+  strokeWeight(9);
   stroke(255);
   fill(0);
   rectMode(CENTER);
-  boxX = width/2
-  boxY = height/1.5
-  boxW = width/4
+  boxX = width/2;
+  boxY = height/1.5 - 20;
+  boxW = width/4;
+  boxH = 200;
   rect(boxX, boxY, boxW, boxH);
+
+  textFont(cotFont);
+  textSize(40);
+  noStroke();
+  fill(255);
+  text(`lV ${playerLevel}`, width/4 + 50, fightButtonY - 40);
+  textSize(28);
+  text(`HP`, width/2 - 60, fightButtonY - 45);
+
+  
+  let hpBarX = width/2;
+  let hpBarY = fightButtonY - 60;
+  let hpBarW = playerHealthMax * 2;
+  let hpBarH = 35;
+  let hpPercent = playerCurHealth / playerHealthMax;
+
+  noStroke();
+  fill(255, 255, 0);
+  rectMode(CORNER);
+  rect(hpBarX, hpBarY, hpBarW, hpBarH);
+
+  fill(180,0,0);
+  rect(hpBarX + hpBarW * hpPercent, hpBarY, hpBarW * (1 - hpPercent), hpBarH);
+
+  textSize(38);
+  fill(255);
+  text(`${playerCurHealth} / ${playerHealthMax}`, hpBarX + hpBarW + 20, fightButtonY - 40);
 
   x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
   y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
 
   image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+  imageMode(CENTER);
+  image(floweyPortSprites[0], width/2, height/3, 84 * 1.5, 88 * 1.5);
+  imageMode(CORNER);
 
   if (keyIsDown(37) || keyIsDown(65)) { // left 
     x -= speed;
@@ -2916,6 +2955,13 @@ function floweyFight(){
   if (keyIsDown(40) || keyIsDown(83)) { // down 
     y += speed;
   }
+
+  spawnFriendPel();
+
+}
+
+function spawnFriendPel(){
+
 }
 
 function battleInfo(monsterName){
