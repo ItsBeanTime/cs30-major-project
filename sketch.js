@@ -352,6 +352,9 @@ function draw() { //check game states
   if (gameState === "ruins"){
     startRuins();
   }
+  if (gameState === "floweyFight"){
+    floweyFight();
+  }
 }
 
 function preload() {
@@ -1069,7 +1072,8 @@ function setupTriggers(){
             floweyPortSprites,
             () => {
               floweyGone = true;
-              yourBestFriend.stop();
+              // yourBestFriend.stop();
+              gameState = "floweyFight"
             }
           );
         }
@@ -2560,22 +2564,6 @@ function chooseWhatToDoWithEnemy() {
   if (ruinsMusic.isPlaying()){
     ruinsMusic.stop();
   }
-  // if (napstablookCurHp <= 0){
-  //   startDialogue(
-  //         [" * umm... you do know you cant kill a ghost, right?",
-  //           " * we're sorta incorporeal and all",
-  //           " * i was just lowering my hp because i didn't want to be rude",
-  //           " * sorry... i just made it more awkward...",
-  //           " * pretend you beat me...",
-  //           " * oooooooooo",
-  //           " * rewards",
-  //         ],
-  //         () => {
-  //           gameState = "ruins";
-  //           ghostGone = true;
-  //           ghostFight.stop();
-  //         }
-  //        );
   if (napstablookCurHp <= 0){
     if (!ruinsMusic.isPlaying()){
       ruinsMusic.play();
@@ -2898,6 +2886,36 @@ function chooseWhatToDoWithEnemy() {
     updateDialogue();
   }
 
+}
+
+function floweyFight(){
+  background(0)
+  strokeWeight(6);
+  stroke(255);
+  fill(0);
+  rectMode(CENTER);
+  boxX = width/2
+  boxY = height/1.5
+  boxW = width/4
+  rect(boxX, boxY, boxW, boxH);
+
+  x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
+  y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
+
+  image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+
+  if (keyIsDown(37) || keyIsDown(65)) { // left 
+    x -= speed;
+  }
+  if (keyIsDown(39) || keyIsDown(68)) { //right 
+    x += speed;
+  }
+  if (keyIsDown(38) || keyIsDown(87)) { // up 
+    y -= speed;
+  }
+  if (keyIsDown(40) || keyIsDown(83)) { // down 
+    y += speed;
+  }
 }
 
 function battleInfo(monsterName){
