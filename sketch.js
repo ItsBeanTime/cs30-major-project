@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "floweyFight";
+let gameState = "start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -2857,8 +2857,8 @@ function chooseWhatToDoWithEnemy() {
     let cols = 2;
     let colW = boxW /3;
     let rowH = boxH /4;
-    let startX = boxX/3;
-    let startY = boxY - boxH/2 + 20;
+    let startX = boxX/3;            // use my fight box code so it scales perfectly even after adjusting 
+    let startY = boxY - boxH/2 + 20;// I'd also suggest that you use my fight function and just have if statements on what monster it is including all the code for eact monster
 
     for(let i = 0; i < currentMonsterActs.length; i++){
       let col = i % cols;
