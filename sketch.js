@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "start";
+let gameState = "floweyFight";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -267,6 +267,7 @@ let napstablookSparable = false;
 let napstablookMaxHp = 100;
 let napstablookCurHp = 100;
 let firstTurn = true;
+
 
 let targetBoxW = 562 * 1.5;
 let targetBoxShrinking = false;
@@ -2857,9 +2858,8 @@ function chooseWhatToDoWithEnemy() {
     let cols = 2;
     let colW = boxW /3;
     let rowH = boxH /4;
-    let startX = boxX/3;            // use my fight box code so it scales perfectly even after adjusting 
-    let startY = boxY - boxH/2 + 20;// I'd also suggest that you use my fight function and just have if statements on what monster it is including all the code for eact monster
-
+    let startX = boxX/3;
+    let startY = boxY - boxH/2 + 20;
     for(let i = 0; i < currentMonsterActs.length; i++){
       let col = i % cols;
       let row = Math.floor(i / cols);
