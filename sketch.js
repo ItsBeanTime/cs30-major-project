@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "floweyFight";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -186,18 +186,18 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = "Name";
+let playersName = "123456";
 let playerLevel = 1;
 let levelThresh = 10;
 let playerNextLevel = 10;
 let playerCurHealth = 20;
 let playerHealthMax = 20;
 let playerGuap = 0;
-let playerAttackStat = 0;
+let playerAttackStat = 10;
 let playerAttackModify = 0;
-let playerDefenseStat = 0;
+let playerDefenseStat = 10;
 let playerDefenseModify = 0;
-let playerExp = 0;
+let playerExp = 100;
 let playerKills = 0;
 let playerWeaponEquip = "Stick";
 let playerArmorEquip = "Bandage";
@@ -267,6 +267,7 @@ let napstablookSparable = false;
 let napstablookMaxHp = 100;
 let napstablookCurHp = 100;
 let firstTurn = true;
+let damage;
 
 
 let targetBoxW = 562 * 1.5;
@@ -474,23 +475,24 @@ function preload() {
 function keyPressed() {
 
   if (fightState === "fighting" && gameState === "chooseWhatToDoWithEnemy" && (keyCode === 90 || keyCode === ENTER) && !hasAttacked){
+    damage = playerAttackStat + playerAttackModify - 10; //damage = player attack + mod - enemy defence
     battleBarDir = "left";
     if (battleBarX >= fightButtonX + 100 && battleBarX  <= actButtonX + 29 || battleBarX >= itemButtonX + 110 && battleBarX <= mercyButtonX + 43) {
       console.log("1X");
-      napstablookCurHp -= 10;
+      napstablookCurHp -= 2 + damage * 1;
       hasAttacked = true;
       slashIndex = 0;
 
     }
     else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
       console.log("2X");
-      napstablookCurHp -= 20;
+      napstablookCurHp -=  2 + damage * 2;
       hasAttacked = true;
       slashIndex = 0;
     }
     else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
       console.log("crit");
-      napstablookCurHp -= 35;
+      napstablookCurHp -= 2 + damage * 2.2;
       hasAttacked = true;
       slashIndex = 0;
     }
@@ -510,7 +512,31 @@ function keyPressed() {
     selection = (selection + 1) % selections.length;
   } 
 
-  
+  if (selection === 3 && (keyCode === 90 || keyCode === ENTER)){
+    if (napstablookSparable){
+      fightDialogueDone = false;
+      ghostFight.stop();
+      boxX = width/2;
+      boxY = height /2 + height/5.4;
+      boxW = width - 120;
+      boxH = 180;
+      diaTextPosX = -70;
+      diaTextPosY = -20;
+      diaTextSize = 35;
+      startDialogue(
+        [" * rewards"],
+        () => {
+          gameState = "ruins";
+          ghostGone = true;
+          ghostFight.stop();
+        }
+      );
+    }
+    else{
+      startDialogue([" * But Napstablook doesn't want to be spared yet"]);
+    }
+    return;
+  }
   if (gameState === "chooseWhatToDoWithEnemy" && actState === "choosing"){
     if (keyCode === LEFT_ARROW || keyCode === 65){
       actSelection = (actSelection - 1 + currentMonsterActs.length) % currentMonsterActs.length;
@@ -613,7 +639,7 @@ function keyPressed() {
     return;
   }
   
-  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90)){
+  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90) && !boxExpanding ){
     if (selection === 0){
       fightState = "fighting";
       dialogue.active = false;
@@ -2546,7 +2572,8 @@ function heartAnimation() {
   x = playerX;
   y = playerY;
 
-  //...
+  //... 
+  //w animation
 
   image(redHeartImg, x, y, heartSize, heartSize);
 
@@ -2566,6 +2593,7 @@ function drawRock(){
 }
 
 function chooseWhatToDoWithEnemy() { 
+  playerLevelIncrease();//for testing
   if (!ghostFight.isPlaying()){
     ghostFight.play();
   }
@@ -2587,7 +2615,7 @@ function chooseWhatToDoWithEnemy() {
 
   fill(255);
   textSize(20);
-  textFont(determinationFont);
+  textFont(cotFont);
   stroke(0);
   text(`fightState:${fightState}`, 100, height/10);
   text(`actState:${actState}`, 100, height/8);
@@ -2635,14 +2663,14 @@ function chooseWhatToDoWithEnemy() {
   textSize(36);
   stroke(0);
   fill(255);
-  text(`${playersName}  lV ${playerLevel}`, fightButtonX, fightButtonY - 55);
-  textSize(28);
-  text(`HP`, actButtonX + actButtonX/3 - 60, fightButtonY - 55);
+  text(`${playersName}  lV ${playerLevel}`, fightButtonX, fightButtonY - 40);
+  textSize(27);
+  text(`HP`, actButtonX + actButtonX/3 - 40, fightButtonY - 40);
 
   let hpBarX = actButtonX + actButtonX/3;
-  let hpBarY = fightButtonY - 45;
+  let hpBarY = fightButtonY - 50;
   let hpBarW = playerHealthMax * 2;
-  let hpBarH = 30;
+  let hpBarH = 35;
   let hpPercent = playerCurHealth / playerHealthMax;
 
   noStroke();
@@ -2656,7 +2684,7 @@ function chooseWhatToDoWithEnemy() {
   textSize(36);
   stroke(0);
   fill(255);
-  text(`${playerCurHealth}/${playerHealthMax}`, hpBarX + hpBarW + 10, fightButtonY - 55);
+  text(`${playerCurHealth} / ${playerHealthMax}`, hpBarX + hpBarW + 30, fightButtonY - 40);
     
   if (fightState === "choose"){
     let buttonHeight = 42 * 1.5;
@@ -2771,7 +2799,7 @@ function chooseWhatToDoWithEnemy() {
 
   if (hasAttacked){
     attackTimer++;
-    if (attackTimer >= 120){
+    if (attackTimer >= 50){
       hasAttacked = false;
       attackTimer = 0;
       slashIndex = 0;
