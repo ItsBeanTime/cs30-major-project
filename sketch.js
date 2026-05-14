@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "floweyFight";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -260,22 +260,25 @@ let slashIndex = 0;
 
 let fightDialogueDone = false;
 
+let monsterData = {
+  "Napstablook": {
+    acts: ["Check", "Flirt", "Threat", "Cheer"],
+    actDialogues: {
+      "Check": [" * NAPSTABLOOK - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
+      "Flirt": [" * You flirt with Napstablook.",],
+      "Threat": [" * You give Napstablook a cruel look."],
+      "Cheer": ["CHEER_SPECIAL"],
+    }
+  }
+};
 let actState = "none";
 let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
 let currentMonster = "Napstablook";
 let napstablookMood = 0;
-// let napstablookTears = [];
-// let napstablookTearX = width/2;
-// let napstablookTearY = width/2;
-// let napstablookTear = {
-//   x: napstablookTearX,
-//   y: napstablookTearY,
-//   size: 32,
-//   speed: 10,
-//   angle: random(180),
-// };
+
+
 let napstablookCheerCount = 0;
 let napstablookThreatened = false;
 let napstablookTurnMessage = false;
@@ -292,18 +295,12 @@ let targetAlpha = 255;
 
 let ruinsMap2OffsetX = 21200;
 
-let monsterData = {
-  "Napstablook": {
-    acts: ["Check", "Flirt", "Threat", "Cheer"],
-    actDialogues: {
-      "Check": [" * NAPSTABLOOK - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
-      "Flirt": [" * You flirt with Napstablook.",],
-      "Threat": [" * You give Napstablook a cruel look."],
-      "Cheer": ["CHEER_SPECIAL"],
-    }
-  }
-};
-
+let ghostTear = [];
+let ghostTearSpawn = false;
+let ghostTearSpeed = 0.05;
+let ghostTearTimer = 0;
+let maxTear = 32;
+let tearSpawned = 0;
 function setup() {
   noSmooth();
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
@@ -336,6 +333,9 @@ function setup() {
   playerX =  width /2 - 35;
   playerY =  height / 2 - 60;
   currentSprites = playerSpriteFront;
+
+  napstablookTearX = width/2;
+  napstablookTearY = width/2;
 
   screenPosY = -height * (mapSize - 5);
 
@@ -2846,6 +2846,15 @@ function chooseWhatToDoWithEnemy() {
     }
 
     dodgeTimer++;
+
+    spawnTearAttack();
+    // for (tear of napstablookTears) {
+    //   napstablookTear.x += cos(napstablookTear.angle) * napstablookTear.speed;
+    //   napstablookTear.y += sin(napstablookTear.angle) * napstablookTear.speed;
+    //   fill(255,0,0);
+    //   rect(napstablookTearX ,napstablookTearY ,napstablookTear.size, napstablookTear.size); // replace with image
+    // }
+
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
       fightState = "choose";
@@ -2865,11 +2874,7 @@ function chooseWhatToDoWithEnemy() {
     image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
 
     
-    // for (tear of napstablookTears) {
-    //   napstablookThreatened.x += cos(napstablookTear.angle) * napstablookTear.speed;
-    //   napstablookThreatened.y += sin(napstablookTear.angle) * napstablookTear.speed;
-    //   rect(napstablookTear.x ,napstablookTear.y ,napstablookTear.size, napstablookTear.size); // replace with image
-    // }
+ 
 
     if (keyIsDown(37) || keyIsDown(65)) { // left 
       x -= speed;
@@ -3011,6 +3016,38 @@ function floweyFight(){
 
 }
 
+function spawnTearAttack(){
+  let tearYPos = boxY/2;
+  let radius = 180;
+  ghostTearTimer++;
+
+  if (ghostTearTimer > 2 && tearSpawned < maxTear){
+    ghostTearTimer = 0;
+    let angle = random(0,180);
+
+    ghostTear.push({
+      x: boxX + cos(angle) * radius,
+      y: tearYPos + sin(angle) * radius,
+      size: 15
+    });
+    tearSpawned++;
+  }
+  for (let i = ghostTear.length - 1; i >= 0; i--){
+    let tear = ghostTear[i];
+    let dx = boxX - tear.x;
+    let dy = tearYPos - tear.y;
+
+    tear.x += dx * ghostTearSpeed;
+    tear.y -= dy * ghostTearSpeed;
+  
+    fill(255);
+    noStroke();
+    ellipse(tear.x, tear.y, 20, 20);
+  }  
+
+
+}
+
 function spawnFriendPel(){
 
   let centerX = boxX;
@@ -3020,7 +3057,7 @@ function spawnFriendPel(){
 
   if (pelSpawnTimer > 2 && pelSpawned < maxPel){
     pelSpawnTimer = 0;
-    let angle = (TWO_PI / maxPel) * pelSpawned;
+    let angle = TWO_PI / maxPel * pelSpawned;
     let radius = 180;
 
     friendPels.push({
@@ -3044,8 +3081,8 @@ function spawnFriendPel(){
       let distToCenter = sqrt(dx * dx + dy * dy);
 
       if (distToCenter > 1){
-        pel.x += (dx / distToCenter) * friendPelSpeed;
-        pel.y += (dy / distToCenter) * friendPelSpeed;
+        pel.x += dx / distToCenter * friendPelSpeed;
+        pel.y += dy / distToCenter * friendPelSpeed;
       }
     }
     fill(255);
