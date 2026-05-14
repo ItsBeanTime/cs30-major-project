@@ -258,8 +258,17 @@ let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
 let currentMonster = "Napstablook";
-
 let napstablookMood = 0;
+// let napstablookTears = [];
+// let napstablookTearX = width/2;
+// let napstablookTearY = width/2;
+// let napstablookTear = {
+//   x: napstablookTearX,
+//   y: napstablookTearY,
+//   size: 32,
+//   speed: 10,
+//   angle: random(180),
+// };
 let napstablookCheerCount = 0;
 let napstablookThreatened = false;
 let napstablookTurnMessage = false;
@@ -2847,6 +2856,13 @@ function chooseWhatToDoWithEnemy() {
     y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
 
     image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
+
+    
+    // for (tear of napstablookTears) {
+    //   napstablookThreatened.x += cos(napstablookTear.angle) * napstablookTear.speed;
+    //   napstablookThreatened.y += sin(napstablookTear.angle) * napstablookTear.speed;
+    //   rect(napstablookTear.x ,napstablookTear.y ,napstablookTear.size, napstablookTear.size); // replace with image
+    // }
 
     if (keyIsDown(37) || keyIsDown(65)) { // left 
       x -= speed;
