@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "floweyFight";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -62,7 +62,14 @@ let rock;
 let battleBar;
 let damageTarget;
 let slash = [];
-let friendPel = [];
+
+let friendPels = [];
+let friendPelSpawn = false;
+let friendPelSpeed = 0.5;
+let pelSpawnTimer = 0;
+let maxPel = 32;
+let pelSpawned = 0;
+let allPelsSpawned = false;
 
 //background image
 let battleBackground;
@@ -3006,6 +3013,51 @@ function floweyFight(){
 
 function spawnFriendPel(){
 
+  let centerX = boxX;
+  let centerY = boxY;
+
+  pelSpawnTimer++;
+
+  if (pelSpawnTimer > 2 && pelSpawned < maxPel){
+    pelSpawnTimer = 0;
+    let angle = (TWO_PI / maxPel) * pelSpawned;
+    let radius = 180;
+
+    friendPels.push({
+      x: centerX + cos(angle) * radius,
+      y: centerY + sin(angle) * radius,
+      size: 15
+    });
+    pelSpawned++;
+
+    if (pelSpawned >= maxPel){
+      allPelsSpawned = true;
+    }
+  }
+
+  for (let i = friendPels.length - 1; i >= 0; i--){
+    let pel = friendPels[i];
+    if (allPelsSpawned){
+      let dx = centerX - pel.x;
+      let dy = centerY - pel.y;
+
+      let distToCenter = sqrt(dx * dx + dy * dy);
+
+      if (distToCenter > 1){
+        pel.x += (dx / distToCenter) * friendPelSpeed;
+        pel.y += (dy / distToCenter) * friendPelSpeed;
+      }
+    }
+    fill(255);
+    noStroke();
+    ellipse(pel.x, pel.y, pel.size, pel.size);
+
+    let playerDist = dist(x, y, pel.x, pel.y);
+    if (playerDist < pel.size /2 + heartSize / 2){
+      playerCurHealth =1;
+      friendPels.splice(i, 1);
+    }
+  }
 }
 
 function battleInfo(monsterName){
