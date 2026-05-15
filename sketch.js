@@ -301,6 +301,7 @@ let ghostTearSpeed = 0.005;
 let ghostTearTimer = 0;
 let maxTear = 32;
 let tearSpawned = 0;
+let tearDir = 0;
 function setup() {
   noSmooth();
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
@@ -3011,51 +3012,42 @@ function floweyFight(){
   if (keyIsDown(40) || keyIsDown(83)) { // down 
     y += speed;
   }
-
   spawnFriendPel();
-
 }
 
 function spawnTearAttack(){
   let tearYPos = boxY/2;
   let radius = 180;
   ghostTearTimer++;
-  let angle = random(180, -180);
-  if (ghostTearTimer > 4 && tearSpawned < maxTear){
+
+  if (ghostTearTimer > 30 && tearSpawned < maxTear){
     ghostTearTimer = 0;
-
-
+    let angle = random(360);
     ghostTear.push({
       x: boxX,
-      y: tearYPos - radius,
+      y: tearYPos * 2 - radius,
       size: 15,
-      dx: boxX - angle,
-      dy: tearYPos - tearYPos - radius,
+      dx: boxX + cos(angle) * radius,
+      dy: boxY,
     });
     tearSpawned++;
   }
   for (let i = ghostTear.length - 1; i >= 0; i--){
-
+    tearDir = random(round(0,1));
     let tear = ghostTear[i];
+    if (tearDir === 0){
+      tear.x += tear.dx * ghostTearSpeed;      
+    }
+    else{
+      tear.x -= tear.dx * ghostTearSpeed; 
+    }
+
+    tear.y += tear.dy * ghostTearSpeed;
     fill(255);
     noStroke();
     ellipse(tear.x, tear.y, 20, 20);
-
-    tear.x += tear.dx * ghostTearSpeed;
-    if (tear.dy < 0){
-      tear.y -= tear.dy * ghostTearSpeed;      
-    }
-    else{
-      tear.y += tear.dy * ghostTearSpeed;
-    }
-
-  
-
-  }  
-
-
+  }
 }
-
 function spawnFriendPel(){
 
   let centerX = boxX;
