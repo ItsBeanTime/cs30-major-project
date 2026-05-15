@@ -297,7 +297,7 @@ let ruinsMap2OffsetX = 21200;
 
 let ghostTear = [];
 let ghostTearSpawn = false;
-let ghostTearSpeed = 0.05;
+let ghostTearSpeed = 0.005;
 let ghostTearTimer = 0;
 let maxTear = 32;
 let tearSpawned = 0;
@@ -3020,29 +3020,37 @@ function spawnTearAttack(){
   let tearYPos = boxY/2;
   let radius = 180;
   ghostTearTimer++;
-
-  if (ghostTearTimer > 2 && tearSpawned < maxTear){
+  let angle = random(180, -180);
+  if (ghostTearTimer > 4 && tearSpawned < maxTear){
     ghostTearTimer = 0;
-    let angle = random(0,180);
+
 
     ghostTear.push({
-      x: boxX + cos(angle) * radius,
-      y: tearYPos + sin(angle) * radius,
-      size: 15
+      x: boxX,
+      y: tearYPos - radius,
+      size: 15,
+      dx: boxX - angle,
+      dy: tearYPos - tearYPos - radius,
     });
     tearSpawned++;
   }
   for (let i = ghostTear.length - 1; i >= 0; i--){
-    let tear = ghostTear[i];
-    let dx = boxX - tear.x;
-    let dy = tearYPos - tear.y;
 
-    tear.x += dx * ghostTearSpeed;
-    tear.y -= dy * ghostTearSpeed;
-  
+    let tear = ghostTear[i];
     fill(255);
     noStroke();
     ellipse(tear.x, tear.y, 20, 20);
+
+    tear.x += tear.dx * ghostTearSpeed;
+    if (tear.dy < 0){
+      tear.y -= tear.dy * ghostTearSpeed;      
+    }
+    else{
+      tear.y += tear.dy * ghostTearSpeed;
+    }
+
+  
+
   }  
 
 
