@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
