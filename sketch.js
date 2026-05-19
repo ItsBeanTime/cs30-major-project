@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "start";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -302,6 +302,15 @@ let ghostTearTimer = 0;
 let maxTear = 32;
 let tearSpawned = 0;
 let tearDir = 0;
+
+let ghostZap = [];
+let ghostZapSpawn = false;
+let ghostZapSpeed = 0.005;
+let ghostZapTimer = 0;
+let maxZap = 32;
+let zapSpawned = 0;
+let zapDir = 0;
+
 function setup() {
   noSmooth();
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
@@ -529,31 +538,6 @@ function keyPressed() {
     selection = (selection + 1) % selections.length;
   } 
 
-  if (selection === 3 && (keyCode === 90 || keyCode === ENTER)){
-    if (napstablookSparable){
-      fightDialogueDone = false;
-      ghostFight.stop();
-      boxX = width/2;
-      boxY = height /2 + height/5.4;
-      boxW = width - 120;
-      boxH = 180;
-      diaTextPosX = -70;
-      diaTextPosY = -20;
-      diaTextSize = 35;
-      startDialogue(
-        [" * rewards"],
-        () => {
-          gameState = "ruins";
-          ghostGone = true;
-          ghostFight.stop();
-        }
-      );
-    }
-    else{
-      startDialogue([" * But Napstablook doesn't want to be spared yet"]);
-    }
-    return;
-  }
   if (gameState === "chooseWhatToDoWithEnemy" && actState === "choosing"){
     if (keyCode === LEFT_ARROW || keyCode === 65){
       actSelection = (actSelection - 1 + currentMonsterActs.length) % currentMonsterActs.length;
@@ -655,7 +639,33 @@ function keyPressed() {
     }
     return;
   }
-  
+
+  if (selection === 3 && (keyCode === 90 || keyCode === ENTER)){
+    if (napstablookSparable){
+      fightDialogueDone = false;
+      ghostFight.stop();
+      boxX = width/2;
+      boxY = height /2 + height/5.4;
+      boxW = width - 120;
+      boxH = 180;
+      diaTextPosX = -70;
+      diaTextPosY = -20;
+      diaTextSize = 35;
+      startDialogue(
+        [" * rewards"],
+        () => {
+          gameState = "ruins";
+          ghostGone = true;
+          ghostFight.stop();
+        }
+      );
+    }
+    else{
+      startDialogue([" * But Napstablook doesn't want to be spared yet"]);
+    }
+    return;
+  }
+
   if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90) && !boxExpanding ){
     if (selection === 0){
       fightState = "fighting";
@@ -2848,13 +2858,9 @@ function chooseWhatToDoWithEnemy() {
 
     dodgeTimer++;
 
-    spawnTearAttack();
-    // for (tear of napstablookTears) {
-    //   napstablookTear.x += cos(napstablookTear.angle) * napstablookTear.speed;
-    //   napstablookTear.y += sin(napstablookTear.angle) * napstablookTear.speed;
-    //   fill(255,0,0);
-    //   rect(napstablookTearX ,napstablookTearY ,napstablookTear.size, napstablookTear.size); // replace with image
-    // }
+    //spawnTearAttack();
+    //ghostDoesntFeelLikeIt();
+    spawnGhostZap();
 
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
@@ -3048,6 +3054,46 @@ function spawnTearAttack(){
     ellipse(tear.x, tear.y, 20, 20);
   }
 }
+
+function spawnGhostZap(){
+  let zapYPos = boxY/2;
+  let radius = 180;
+  ghostZapTimer++;
+
+  if (ghostZapTimer > 30 && zapSpawned < maxZap){
+    ghostZapTimer = 0;
+    let angle = 90;
+    ghostZap.push({
+      x: boxX,
+      y: zapYPos * 2 - radius,
+      size: 15,
+      dx: boxX,
+      dy: boxY,
+    });
+    zapSpawned++;
+  }
+  for (let i = ghostZap.length - 1; i >= 0; i--){
+    zapDir = random(round(0,1));
+    let zap = ghostZap[i];
+    if (zapDir === 0){
+      zap.x += zap.dx * ghostZapSpeed;      
+    }
+    else{
+      zap.x -= zap.dx * ghostZapSpeed; 
+    }
+
+    zap.y += zap.dy * ghostZapSpeed;
+    fill(255);
+    noStroke();
+    ellipse(zap.x, zap.y, 20, 20);
+  }
+}
+
+function ghostDoesntFeelLikeIt(){
+  textSize(40);
+  text("PLACEHOLDER", boxX - 2, boxY);
+}
+
 function spawnFriendPel(){
 
   let centerX = boxX;

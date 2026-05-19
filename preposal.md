@@ -5,32 +5,32 @@ For my major project I would like to recreate part of the game Undertale. Undert
 # Needs To Have List
 
 - **Basics**
-    - player movement
-    - title screen
-    - tile grid for map
+    - player movement | done
+    - title screen | done
+    - tile grid for map | done (not exactly a tile grid, it uses the dementions of png map)
 
 - **Combat**
-    - 3 modes (dodging/attacking/decision)
-    - strength stat
-    - health stat
-    - defense stat
+    - 3 modes (dodging/attacking/decision) | done
+    - strength stat | done
+    - health stat | done
+    - defense stat | done
 
 - **Items**
     - items that you can find 
-    - inventory
+    - inventory 
 
 - **World Map**
-    - map uses tiles
+    - map uses tiles | done
     - puzzles
 - **Camera**
-    - Move camera(or move the map itself)
+    - Move camera(or move the map itself) | done
 - **Sprites**
     - use classes and arrays for each type of attack/object
-    - run and movement cycle
+    - run and movement cycle | done
 
 - **Music/sounds**
-    - all music will be recreated by me in FL Studios
-    - sfx for everything
+    - all music will be recreated by me in FL Studios | done
+    - sfx for everything | done
 
 # Nice To Have List
 
