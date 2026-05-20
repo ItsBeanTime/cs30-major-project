@@ -7,7 +7,7 @@ For my major project I would like to recreate part of the game Undertale. Undert
 - **Basics**
     - player movement | done
     - title screen | done
-    - tile grid for map | done (not exactly a tile grid, it uses the dementions of png map)
+    - tile grid for map 
 
 - **Combat**
     - 3 modes (dodging/attacking/decision) | done
@@ -20,7 +20,7 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - inventory 
 
 - **World Map**
-    - map uses tiles | done
+    - map uses tiles
     - puzzles
 - **Camera**
     - Move camera(or move the map itself) | done
@@ -40,14 +40,14 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - Dynamic Dialog
     - secret pathways / items
     - genocide / pacifist routes
-    - level system
+    - level system | done
     - saving system
     - rendering shadows / reflections
-    - pick own username
+    - pick own username | done
     - shop where we can buy and sell stuff
     - animated text
     - particles
-    - animated tiles  
+    - animated tiles  | done
 
 - **Sillies**
     - long unskippable cut scenes / conversations (with Toriel)

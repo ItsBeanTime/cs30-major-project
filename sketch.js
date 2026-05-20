@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -257,7 +257,7 @@ let choiceAct = 0;
 let choiceMercy = 0;
 
 let slashIndex = 0;
-
+let flickLever1 = false;
 let fightDialogueDone = false;
 
 let monsterData = {
@@ -288,10 +288,11 @@ let napstablookCurHp = 100;
 let firstTurn = true;
 let damage;
 
-
+let rockInteract1 = false;
 let targetBoxW = 562 * 1.5;
 let targetBoxShrinking = false;
 let targetAlpha = 255;
+let rock1X = 0;
 
 let ruinsMap2OffsetX = 21200;
 
@@ -317,9 +318,6 @@ function setup() {
   cnv.position(width/2, 0);
   //createCanvas(windowWidth, windowHeight);
 
-
-  //fight and dodge function shared variables (horrible code I know still experimenting though)
-
   fightButtonX = width / 10 - 40;
   battleBarX = width / 10 - 40;
 
@@ -337,6 +335,7 @@ function setup() {
   boxWTarget = width - 120;
 
   setupSound();
+
   x = width/2;
   y = height/2;
 
@@ -353,6 +352,11 @@ function setup() {
     letterJitterX.push(0);
     letterJitterY.push(0);
   }
+
+  boxX = 40;
+  boxY = height - 220;
+  boxW = width - 80;
+  boxH = 200;
 
   setupWalls();
   setupTriggers();
@@ -913,6 +917,12 @@ function setupWalls(){
     // makeWall(0,1921,6981,0),
     // makeWall(6950,0,0,1921),
 
+    //image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+    //pos = makeImagePos(5601, 696);
+  
+    //rock hitbox1
+    makeWall(4523, 636, 20, 20), //note make the rock hitbox move;
+
     //ruins first puzzel room
     makeWall(492,721,88,100),
     makeWall(490, 750, 30, 90),
@@ -1108,36 +1118,65 @@ function setupTriggers(){
   triggers = [
 
     //flowey interact
+    // {
+    //   x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+    //   action: () => {
+    //     if (!floweyMet){
+    //       floweyMet = true;
+    //       yourBestFriend.play();
+    //       boxX = 40;
+    //       boxY = 30;
+    //       boxW = width - 80;
+    //       boxH = 200;
+    //       diaTextPosX = portraitSize + 30;
+    //       diaTextSize = 33;
+    //       startDialogue(
+    //         [
+    //           " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+    //           " * Hmmm...",
+    //           " * You're new to the UNDERGROUND, aren'tcha?",
+    //           " * Golly, you must be so confused.",
+    //           " * Someone ought to teach you how things work around here!",
+    //           " * I guess little old me will have to do.",
+    //           " * Ready? Here we go!",
+    //         ],
+    //         floweyPortSprites,
+    //         () => {
+    //           floweyGone = true;
+    //           // yourBestFriend.stop();
+    //           gameState = "floweyFight";
+    //         }
+    //       );
+    //     }
+    //   }
+    // },
+
+    //lever interact
     {
-      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+      x:3130, y:1675, w:82, h:80, onInteract: true,
       action: () => {
-        if (!floweyMet){
-          floweyMet = true;
-          yourBestFriend.play();
-          boxX = 40;
-          boxY = 30;
-          boxW = width - 80;
-          boxH = 200;
-          diaTextPosX = portraitSize + 30;
-          diaTextSize = 33;
-          startDialogue(
-            [
-              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
-              " * Hmmm...",
-              " * You're new to the UNDERGROUND, aren'tcha?",
-              " * Golly, you must be so confused.",
-              " * Someone ought to teach you how things work around here!",
-              " * I guess little old me will have to do.",
-              " * Ready? Here we go!",
-            ],
-            floweyPortSprites,
-            () => {
-              floweyGone = true;
-              // yourBestFriend.stop();
-              gameState = "floweyFight";
-            }
-          );
-        }
+        flickLever1 = true;
+        boxX = 40;
+        boxY = height - 220;
+        boxW = width - 80;
+        boxH = 200;
+        diaTextPosX = 10;
+        diaTextSize = 39;
+      }
+    },
+
+    //rock interact
+    {
+      x:13680 + rock1X, y:1890, w:10, h:100, onWalk: true,
+      action: () => {
+        rockInteract1 = true;
+        rock1X++;
+        boxX = 40;
+        boxY = height - 220;
+        boxW = width - 80;
+        boxH = 200;
+        diaTextPosX = 10;
+        diaTextSize = 39;
       }
     },
 
@@ -2527,11 +2566,21 @@ function drawRuinsSwitch(){
   image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   pos = makeImagePos(843,551);
   image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
-  pos = makeImagePos(1039,551);
-  image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
-  pos = makeImagePos(1077,551);
+  pos = makeImagePos(1039,551); 
+
+  if (flickLever1 === false){
+    image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+    pos = makeImagePos(1077,551);
+  }
+  else{
+    image(ruinsSwitch[1], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+    pos = makeImagePos(1077,551);
+  }
+
+
   image(ruinsSwitch[0], pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
 }
+
 
 function drawYellowArrow(){
   let pos = makeImagePos(818, 541);
@@ -2542,9 +2591,16 @@ function drawYellowArrow(){
 
 function drawSpikes(){
   let pos = makeImagePos(1160, 641);
-  image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
-  pos = makeImagePos(1160, 661);
-  image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+
+  if (flickLever1 === false){
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+    pos = makeImagePos(1160, 661);
+    image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  }
+  else{
+    null;
+  }
+
 
   for(let i = 0; i < 280; i+= 20){
     pos = makeImagePos(2020 + i, 361);
@@ -2607,8 +2663,14 @@ function heartAnimation() {
 }
 
 function drawRock(){
+
+
   let pos = makeImagePos(4524, 636);
-  image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+  image(rock, pos.x + rock1X + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+
+
+
+
   pos = makeImagePos(5601, 696);
   image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
   pos = makeImagePos(5581, 736);
