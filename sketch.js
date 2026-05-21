@@ -1168,7 +1168,7 @@ function setupTriggers(){
 
     //rock interact
     {
-      x:13680 + rock1X, y:1890, w:10, h:100, onWalk: true,
+      x:13680, y:1890, w:10, h:100, onWalk: true,
       action: () => {
         rockInteract1 = true;
         rock1X++;
@@ -2922,8 +2922,8 @@ function chooseWhatToDoWithEnemy() {
     dodgeTimer++;
 
     //spawnTearAttack();
-    //ghostDoesntFeelLikeIt();
-    spawnGhostZap();
+    ghostDoesntFeelLikeIt();
+    //spawnGhostZap();
 
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
@@ -3084,43 +3084,44 @@ function floweyFight(){
   spawnFriendPel();
 }
 
-function spawnTearAttack(){
-  let tearYPos = boxY/2;
-  let radius = 180;
-  ghostTearTimer++;
+// function spawnTearAttack(){ I will replace this whole thing later
+//   let tearYPos = boxY/2;
+//   let radius = 180;
+//   ghostTearTimer++;
 
-  if (ghostTearTimer > 30 && tearSpawned < maxTear){
-    ghostTearTimer = 0;
-    let angle = random(360);
-    ghostTear.push({
-      x: boxX,
-      y: tearYPos * 2 - radius,
-      size: 15,
-      dx: boxX + cos(angle) * radius,
-      dy: boxY,
-    });
-    tearSpawned++;
-  }
-  for (let i = ghostTear.length - 1; i >= 0; i--){
-    tearDir = random(round(0,1));
-    let tear = ghostTear[i];
-    // new code below
-    let tearAngle = random(30, 150);
-    tear.x += cos(tearAngle) * ghostTearSpeed;
-    tear.y += sin(tearAngle) * ghostTearSpeed;
-    // if (tearDir === 0){
-    //   tear.x += tear.dx * ghostTearSpeed;      
-    // }
-    // else{
-    //   tear.x -= tear.dx * ghostTearSpeed; 
-    // }
+//   if (ghostTearTimer > 30 && tearSpawned < maxTear){
+//     ghostTearTimer = 0;
+//     let angle = random(radius);
+//     ghostTear.push({
+//       x: boxX,
+//       y: tearYPos * 2 - radius,
+//       size: 15,
+//       dx: cos(angle),
+//       dy: sin(angle) * ghostTearSpeed,
+//     });
+//     tearSpawned++;
+//   }
+//   for (let i = ghostTear.length - 1; i >= 0; i--){
+//     if (ghostTearTimer % 100 === 0){
+//       tearDir = random([0,1]);
+//     }
 
-    // tear.y += tear.dy * ghostTearSpeed;
-    fill(255);
-    noStroke();
-    ellipse(tear.x, tear.y, 20, 20);
-  }
-}
+//     text(tearDir, width/2, height / 10);
+//     let tear = ghostTear[i];
+//     // new code below
+//     if (tearDir === 0){
+//       tear.x += tear.dx;
+//     }
+//     else{
+//       tear.x -= tear.dx;
+//     }
+
+//     tear.y += 3;
+//     fill(255);
+//     noStroke();
+//     ellipse(tear.x, tear.y, tear.size, tear.size);
+//   }
+// }
 
 function spawnGhostZap(){
   let zapYPos = boxY/2;
