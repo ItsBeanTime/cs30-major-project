@@ -665,6 +665,7 @@ function keyPressed() {
       );
     }
     else{
+      // add if statement to fix bug 
       startDialogue([" * But Napstablook doesn't want to be spared yet"]);
     }
     return;
@@ -3103,14 +3104,18 @@ function spawnTearAttack(){
   for (let i = ghostTear.length - 1; i >= 0; i--){
     tearDir = random(round(0,1));
     let tear = ghostTear[i];
-    if (tearDir === 0){
-      tear.x += tear.dx * ghostTearSpeed;      
-    }
-    else{
-      tear.x -= tear.dx * ghostTearSpeed; 
-    }
+    // new code below
+    let tearAngle = random(30, 150);
+    tear.x += cos(tearAngle) * ghostTearSpeed;
+    tear.y += sin(tearAngle) * ghostTearSpeed;
+    // if (tearDir === 0){
+    //   tear.x += tear.dx * ghostTearSpeed;      
+    // }
+    // else{
+    //   tear.x -= tear.dx * ghostTearSpeed; 
+    // }
 
-    tear.y += tear.dy * ghostTearSpeed;
+    // tear.y += tear.dy * ghostTearSpeed;
     fill(255);
     noStroke();
     ellipse(tear.x, tear.y, 20, 20);
