@@ -644,7 +644,7 @@ function keyPressed() {
     return;
   }
 
-  if (selection === 3 && (keyCode === 90 || keyCode === ENTER)){
+  if (selection === 3 && (keyCode === 90 || keyCode === ENTER) && gameState === "chooseWhatToDoWithEnemy"){
     if (napstablookSparable){
       fightDialogueDone = false;
       ghostFight.stop();
@@ -1119,38 +1119,38 @@ function setupTriggers(){
   triggers = [
 
     //flowey interact
-    // {
-    //   x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
-    //   action: () => {
-    //     if (!floweyMet){
-    //       floweyMet = true;
-    //       yourBestFriend.play();
-    //       boxX = 40;
-    //       boxY = 30;
-    //       boxW = width - 80;
-    //       boxH = 200;
-    //       diaTextPosX = portraitSize + 30;
-    //       diaTextSize = 33;
-    //       startDialogue(
-    //         [
-    //           " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
-    //           " * Hmmm...",
-    //           " * You're new to the UNDERGROUND, aren'tcha?",
-    //           " * Golly, you must be so confused.",
-    //           " * Someone ought to teach you how things work around here!",
-    //           " * I guess little old me will have to do.",
-    //           " * Ready? Here we go!",
-    //         ],
-    //         floweyPortSprites,
-    //         () => {
-    //           floweyGone = true;
-    //           // yourBestFriend.stop();
-    //           gameState = "floweyFight";
-    //         }
-    //       );
-    //     }
-    //   }
-    // },
+    {
+      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+      action: () => {
+        if (!floweyMet){
+          floweyMet = true;
+          yourBestFriend.play();
+          boxX = 40;
+          boxY = 30;
+          boxW = width - 80;
+          boxH = 200;
+          diaTextPosX = portraitSize + 30;
+          diaTextSize = 33;
+          startDialogue(
+            [
+              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+              " * Hmmm...",
+              " * You're new to the UNDERGROUND, aren'tcha?",
+              " * Golly, you must be so confused.",
+              " * Someone ought to teach you how things work around here!",
+              " * I guess little old me will have to do.",
+              " * Ready? Here we go!",
+            ],
+            floweyPortSprites,
+            () => {
+              floweyGone = true;
+              // yourBestFriend.stop();
+              gameState = "floweyFight";
+            }
+          );
+        }
+      }
+    },
 
     //lever interact
     {
