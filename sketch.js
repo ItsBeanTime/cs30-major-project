@@ -439,6 +439,7 @@ function preload() {
   ruinsMap = loadImage("assets/map sprites/ruins-1.png");
   ruinsMap2 = loadImage("assets/map sprites/ruins-2.png");
   determinationFont = loadFont("assets/fonts/determination.otf");
+  napstablookFont = loadFont("assets/fonts/napstablook.otf");
   mercyFont = loadFont("assets/fonts/MERCY.otf");
   mfbFont = loadFont("assets/fonts/Monster Friend Back.otf");
   cotFont = loadFont("assets/fonts/CryptOfTomorrow.otf");
@@ -665,7 +666,6 @@ function keyPressed() {
       );
     }
     else{
-      // add if statement to fix bug 
       startDialogue([" * But Napstablook doesn't want to be spared yet"]);
     }
     return;
@@ -3158,8 +3158,14 @@ function spawnGhostZap(){
 }
 
 function ghostDoesntFeelLikeIt(){
-  textSize(40);
-  text("PLACEHOLDER", boxX - 2, boxY);
+  textSize(20);
+  // textFont(napstablookFont);
+  textFont(determinationFont);
+  let tiredText = `  REALLY NOT
+  FEELING UP
+  TO IT RIGHT
+  NOW. SORRY.`;
+  text(tiredText, boxX - 2, boxY);
 }
 
 function spawnFriendPel(){
