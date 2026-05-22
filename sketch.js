@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -174,7 +174,7 @@ let hasAttacked = false;
 let attackTimer = 0;
 let savedTurnText = "";
 let dodgeTimer = 0;
-let dodgeDuration = 180;
+let dodgeDuration = 240;
 let boxWTarget = 0;
 let boxExpanding = false;
 
@@ -2921,8 +2921,8 @@ function chooseWhatToDoWithEnemy() {
 
     dodgeTimer++;
 
-    //spawnTearAttack();
-    ghostDoesntFeelLikeIt();
+    spawnTearAttack();
+    //ghostDoesntFeelLikeIt();
     //spawnGhostZap();
 
     if(dodgeTimer >= dodgeDuration){
@@ -3084,44 +3084,44 @@ function floweyFight(){
   spawnFriendPel();
 }
 
-// function spawnTearAttack(){ I will replace this whole thing later
-//   let tearYPos = boxY/2;
-//   let radius = 180;
-//   ghostTearTimer++;
+function spawnTearAttack(){  // i made it better but its still kinda trash
+  let tearYPos = boxY/2 - 30;
+  let radius = 180;
+  ghostTearTimer++;
 
-//   if (ghostTearTimer > 30 && tearSpawned < maxTear){
-//     ghostTearTimer = 0;
-//     let angle = random(radius);
-//     ghostTear.push({
-//       x: boxX,
-//       y: tearYPos * 2 - radius,
-//       size: 15,
-//       dx: cos(angle),
-//       dy: sin(angle) * ghostTearSpeed,
-//     });
-//     tearSpawned++;
-//   }
-//   for (let i = ghostTear.length - 1; i >= 0; i--){
-//     if (ghostTearTimer % 100 === 0){
-//       tearDir = random([0,1]);
-//     }
+  if (ghostTearTimer > 20 && tearSpawned < maxTear){
+    ghostTearTimer = 0;
+    let angle = random(radius);
+    ghostTear.push({
+      x: boxX - 15,
+      x2: boxX + 40,
+      y: tearYPos * 2 - radius,
+      size: random(12, 20),
+      dx: cos(angle),
+      dy: sin(angle) * ghostTearSpeed,
+    });
+    tearSpawned++;
+  }
+  for (let i = ghostTear.length - 1; i >= 0; i--){
+    let tear = ghostTear[i];
+    if (tear.dx > radius / 2){
+      tear.x -= tear.dx;
+      tear.x2 += tear.dx;
+    }
+    else{
+      tear.x += tear.dx;
+      tear.x2 -= tear.dx;
+    }
 
-//     text(tearDir, width/2, height / 10);
-//     let tear = ghostTear[i];
-//     // new code below
-//     if (tearDir === 0){
-//       tear.x += tear.dx;
-//     }
-//     else{
-//       tear.x -= tear.dx;
-//     }
-
-//     tear.y += 3;
-//     fill(255);
-//     noStroke();
-//     ellipse(tear.x, tear.y, tear.size, tear.size);
-//   }
-// }
+    tear.y += 3;
+    fill(255);
+    stroke(0);
+    strokeWeight(2);
+    ellipse(tear.x, tear.y, tear.size, tear.size);
+    ellipse(tear.x2, tear.y, tear.size, tear.size);
+    
+  }
+}
 
 function spawnGhostZap(){
   let zapYPos = boxY/2;
@@ -3157,7 +3157,7 @@ function spawnGhostZap(){
   }
 }
 
-function ghostDoesntFeelLikeIt(){
+function ghostDoesntFeelLikeIt(){ // we can just use the asset my boy 🙏😭😭😭
   textSize(20);
   // textFont(napstablookFont);
   textFont(determinationFont);
