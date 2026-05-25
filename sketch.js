@@ -70,6 +70,9 @@ let pelSpawnTimer = 0;
 let maxPel = 32;
 let pelSpawned = 0;
 let allPelsSpawned = false;
+let invincTimer = 0;
+let invincDuration = 30; // invincibility time after hit
+
 
 //background image
 let battleBackground;
@@ -193,7 +196,7 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = "123456";
+let playersName = "TungTungTungSahur";
 let playerLevel = 1;
 let levelThresh = 10;
 let playerNextLevel = 10;
@@ -2938,15 +2941,15 @@ function chooseWhatToDoWithEnemy() {
       targetAlpha = 255;
       targetBoxShrinking = false;
     }
-    x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
-    y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
+    x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
+    y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
 
     image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
 
     
  
 
-    if (keyIsDown(37) || keyIsDown(65)) { // left 
+    if (keyIsDown(37) || keyIsDown(65)) { // left  
       x -= speed;
     }
     if (keyIsDown(39) || keyIsDown(68)) { //right 
@@ -3061,8 +3064,8 @@ function floweyFight(){
   fill(255);
   text(`${playerCurHealth} / ${playerHealthMax}`, hpBarX + hpBarW + 20, fightButtonY - 40);
 
-  x = constrain(x, boxX - boxW/2 + heartSize/2, boxX + boxW/2 - heartSize/2);
-  y = constrain(y, boxY - boxH/2 + heartSize/2, boxY + boxH/2 - heartSize/2);
+  x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
+  y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
 
   image(redHeartImg, x - heartSize/2, y - heartSize/2, heartSize, heartSize);
   imageMode(CENTER);
@@ -3119,7 +3122,7 @@ function spawnTearAttack(){  // i made it better but its still kinda trash
     strokeWeight(2);
     ellipse(tear.x, tear.y, tear.size, tear.size);
     ellipse(tear.x2, tear.y, tear.size, tear.size);
-    
+    checkProjectileHit(ghostTear, 5);
   }
 }
 
@@ -3209,11 +3212,7 @@ function spawnFriendPel(){
     noStroke();
     ellipse(pel.x, pel.y, pel.size, pel.size);
 
-    let playerDist = dist(x, y, pel.x, pel.y);
-    if (playerDist < pel.size /2 + heartSize / 2){
-      playerCurHealth =1;
-      friendPels.splice(i, 1);
-    }
+    checkProjectileHit(friendPels, 5);
   }
 }
 
@@ -3494,3 +3493,19 @@ function itemStats(){
   
 }
 
+
+function checkProjectileHit(projectiles, damage) {
+  if (invincTimer > 0) {
+    invincTimer--;
+    return;
+  }
+  for (let p of projectiles) {
+    let d = dist(x, y, p.x, p.y);
+    if (d < p.size / 2 + heartSize / 2) {
+      playerCurHealth -= damage;
+      playerCurHealth = constrain(playerCurHealth, 0, playerHealthMax);
+      invincTimer = invincDuration;
+      break;
+    }
+  }
+}
