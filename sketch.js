@@ -59,7 +59,7 @@ let spikes;
 let rock;
 
 //battle sprites
-let battleBar;
+let battleBar = [];
 let damageTarget;
 let slash = [];
 
@@ -71,7 +71,7 @@ let maxPel = 32;
 let pelSpawned = 0;
 let allPelsSpawned = false;
 let invincTimer = 0;
-let invincDuration = 30; // invincibility time after hit
+let invincDuration = 100; // invincibility time after hit
 
 
 //background image
@@ -180,6 +180,7 @@ let dodgeTimer = 0;
 let dodgeDuration = 240;
 let boxWTarget = 0;
 let boxExpanding = false;
+let barFlash = 0;
 
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
@@ -196,7 +197,7 @@ let screenPosX = 0;
 let scrollSpeed = 4;
 
 //pause screen variables
-let playersName = "TungTungTungSahur";
+let playersName = "name";
 let playerLevel = 1;
 let levelThresh = 10;
 let playerNextLevel = 10;
@@ -301,9 +302,9 @@ let ruinsMap2OffsetX = 21200;
 
 let ghostTear = [];
 let ghostTearSpawn = false;
-let ghostTearSpeed = 0.005;
+let ghostTearSpeed = 1.1;
 let ghostTearTimer = 0;
-let maxTear = 32;
+let maxTear = 10;
 let tearSpawned = 0;
 let tearDir = 0;
 
@@ -473,7 +474,10 @@ function preload() {
     ghostBattleSprite.push(loadImage(`assets/npc battle sprites/ghostbattle${i}.png`));
   }
 
-  battleBar = loadImage("assets/battle menu/battlebar.png");
+  for (let i = 1; i <= 2; i++){
+    battleBar.push(loadImage(`assets/battle menu/battlebar${i}.png`));
+  }
+
   damageTarget = loadImage("assets/battle menu/damagetarget.png");
 
   for (let i = 1; i < 7; i++){
@@ -2737,7 +2741,18 @@ function chooseWhatToDoWithEnemy() {
     image(damageTarget, centeredTarget, targetY, targetBoxW, targetH);
     noTint();
     noStroke();
-    image(battleBar, battleBarX, targetY, 14 * 1.5, 128 * 1.5); 
+
+    if (hasAttacked){
+      if (frameCount % 6 === 0){
+        if (barFlash === 0){
+          barFlash = 1;
+        }
+        else if (barFlash === 1){
+          barFlash = 0;
+        }
+      }
+    }
+    image(battleBar[barFlash], battleBarX, targetY, 14 * 1.5, 128 * 1.5);
   }
 
   if (boxExpanding){
@@ -2940,6 +2955,8 @@ function chooseWhatToDoWithEnemy() {
       targetBoxW = 562 * 1.5;
       targetAlpha = 255;
       targetBoxShrinking = false;
+      tearSpawned = 0;
+      ghostTear.splice(0);
     }
     x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
@@ -3090,38 +3107,43 @@ function floweyFight(){
 function spawnTearAttack(){  // i made it better but its still kinda trash
   let tearYPos = boxY/2 - 30;
   let radius = 180;
-  ghostTearTimer++;
+  ghostTearTimer += random(1,2);
 
   if (ghostTearTimer > 20 && tearSpawned < maxTear){
     ghostTearTimer = 0;
     let angle = random(radius);
+    let angle2 = random(radius);
     ghostTear.push({
       x: boxX - 15,
       x2: boxX + 40,
       y: tearYPos * 2 - radius,
-      size: random(12, 20),
+      y2: tearYPos * 2 - radius,
+      size: random(12, 16),
       dx: cos(angle),
-      dy: sin(angle) * ghostTearSpeed,
+      dx2: cos(angle2),
+      dy: random(2,4) * ghostTearSpeed,
+      dy2: random(2,4) * ghostTearSpeed,
     });
     tearSpawned++;
   }
   for (let i = ghostTear.length - 1; i >= 0; i--){
     let tear = ghostTear[i];
-    if (tear.dx > radius / 2){
-      tear.x -= tear.dx;
-      tear.x2 += tear.dx;
+    if (tear.y <= height/2){
+      tear.x -= tear.dx * 2;
+      tear.x2 += tear.dx2 * 2;
     }
     else{
-      tear.x += tear.dx;
-      tear.x2 -= tear.dx;
+      tear.x -= tear.dx * 1;
+      tear.x2 += tear.dx2 * 1;
     }
 
-    tear.y += 3;
+    tear.y += tear.dy;
+    tear.y2 += tear.dy2;
     fill(255);
     stroke(0);
     strokeWeight(2);
     ellipse(tear.x, tear.y, tear.size, tear.size);
-    ellipse(tear.x2, tear.y, tear.size, tear.size);
+    ellipse(tear.x2, tear.y2, tear.size, tear.size);
     checkProjectileHit(ghostTear, 5);
   }
 }
@@ -3494,7 +3516,7 @@ function itemStats(){
 }
 
 
-function checkProjectileHit(projectiles, damage) {
+function checkProjectileHit(projectiles, damage) {// you need to make it so it checks both tears on both sides
   if (invincTimer > 0) {
     invincTimer--;
     return;
