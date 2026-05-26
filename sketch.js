@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -50,6 +50,7 @@ let playerSpriteBack = [];
 
 //misc sprites
 let candyBowl = [];
+let candyFloor;
 let saveSpot = [];
 let floorButton = [];
 let ruinsDoor;
@@ -262,6 +263,7 @@ let choiceMercy = 0;
 
 let slashIndex = 0;
 let flickLever1 = false;
+let candyState = 0;
 let fightDialogueDone = false;
 
 let monsterData = {
@@ -293,6 +295,8 @@ let firstTurn = true;
 let damage;
 
 let rockInteract1 = false;
+let candyBowlInt = false;
+let frogInteract = false;
 let targetBoxW = 562 * 1.5;
 let targetBoxShrinking = false;
 let targetAlpha = 255;
@@ -307,6 +311,7 @@ let ghostTearTimer = 0;
 let maxTear = 10;
 let tearSpawned = 0;
 let tearDir = 0;
+let candyNumber = 0;
 
 let ghostZap = [];
 let ghostZapSpawn = false;
@@ -415,7 +420,7 @@ function preload() {
   }
 
   //misc sprites
-  for (let i = 1; i < 2; i++){
+  for (let i = 1; i <= 2; i++){
     candyBowl.push(loadImage(`assets/miscellaneus sprites/candybowl${i}.png`));
   }
   //npc sprites
@@ -497,7 +502,6 @@ function preload() {
   for (let i = 1; i <= 2; i++){
     ruinsSwitch.push(loadImage(`assets/miscellaneus sprites/lever${i}.png`));
   }
-
   yellowArrow = loadImage("assets/miscellaneus sprites/yellowarrow.png");
   spikes = loadImage("assets/map sprites/spikes.png");
   dummySprite = loadImage("assets/npc overworld sprites/dummyow.png");
@@ -507,6 +511,9 @@ function preload() {
   }
 
   rock = loadImage("assets/miscellaneus sprites/rock.png");
+
+  candyFloor = loadImage("assets/miscellaneus sprites/candyonfloor.png");
+
 }
 
 //INPUT FUNCTIONS//
@@ -804,8 +811,8 @@ function keyPressed() {
   // selection with arrow keys, confirm with space and if goes off screen it starts from the beginning or end depending on the direction
 
   if (gameState === "ruins" && key === " "){
-    playerX = 21349 + screenPosX;
-    playerY = 1768 + screenPosY;
+    playerX = 11799 + screenPosX;
+    playerY = 380 + screenPosY;
   }
 
   if (menuState === "name"){
@@ -1115,8 +1122,15 @@ function setupWalls(){
     makeWallM(2119, 2168, 60, 350),
 
     //ruins first save spot
-    makeWallM(1850, 3490, 40 * 1.5, 15 * 1.5)
+    makeWallM(1850, 3490, 40 * 1.5, 15 * 1.5),
 
+    makeWallM(11980,1215, 40 * 1.5, 15 * 1.5),
+
+    //candy bowl
+    makeWallM(11799, 345, 40 * 1.5, 54 * 1.5),
+
+    //frog hitbox
+    makeWallM(11650, 1020, 60, 60),
 
     
   ];
@@ -1126,38 +1140,38 @@ function setupTriggers(){
   triggers = [
 
     //flowey interact
-    {
-      x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
-      action: () => {
-        if (!floweyMet){
-          floweyMet = true;
-          yourBestFriend.play();
-          boxX = 40;
-          boxY = 30;
-          boxW = width - 80;
-          boxH = 200;
-          diaTextPosX = portraitSize + 30;
-          diaTextSize = 33;
-          startDialogue(
-            [
-              " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
-              " * Hmmm...",
-              " * You're new to the UNDERGROUND, aren'tcha?",
-              " * Golly, you must be so confused.",
-              " * Someone ought to teach you how things work around here!",
-              " * I guess little old me will have to do.",
-              " * Ready? Here we go!",
-            ],
-            floweyPortSprites,
-            () => {
-              floweyGone = true;
-              // yourBestFriend.stop();
-              gameState = "floweyFight";
-            }
-          );
-        }
-      }
-    },
+    // {
+    //   x:1480, y:5000, w:2250 - 1480, h:5120 - 4926, onWalk: true,
+    //   action: () => {
+    //     if (!floweyMet){
+    //       floweyMet = true;
+    //       yourBestFriend.play();
+    //       boxX = 40;
+    //       boxY = 30;
+    //       boxW = width - 80;
+    //       boxH = 200;
+    //       diaTextPosX = portraitSize + 30;
+    //       diaTextSize = 33;
+    //       startDialogue(
+    //         [
+    //           " * Howdy!                           * I'm FLOWEY.                               * FLOWEY the FLOWER!",
+    //           " * Hmmm...",
+    //           " * You're new to the UNDERGROUND, aren'tcha?",
+    //           " * Golly, you must be so confused.",
+    //           " * Someone ought to teach you how things work around here!",
+    //           " * I guess little old me will have to do.",
+    //           " * Ready? Here we go!",
+    //         ],
+    //         floweyPortSprites,
+    //         () => {
+    //           floweyGone = true;
+    //           // yourBestFriend.stop();
+    //           gameState = "floweyFight";
+    //         }
+    //       );
+    //     }
+    //   }
+    //},
 
     //lever interact
     {
@@ -1173,6 +1187,32 @@ function setupTriggers(){
       }
     },
 
+    {
+      x:11785, y:345, w:85, h:90, onInteract: true,
+      action: () => {
+        candyBowlInt = true;
+        boxX = 40;
+        boxY = height - 220;
+        boxW = width - 80;
+        boxH = 200;
+        diaTextPosX = 10;
+        diaTextSize = 39;
+      }
+    },
+
+    //froggit interact
+    {
+      x:11650, y:1020, w:60, h:75, onInteract: true,
+      action: () => {
+        frogInteract = true;
+        boxX = 40;
+        boxY = height - 220;
+        boxW = width - 80;
+        boxH = 200;
+        diaTextPosX = 10;
+        diaTextSize = 39;
+      }
+    },
     //rock interact
     {
       x:13680, y:1890, w:10, h:100, onWalk: true,
@@ -2150,6 +2190,7 @@ function startRuins(){
   drawDummyWorld();
   drawFrogWorld();
   drawRock();
+  drawCandyBowl();
 
   noStroke();
   fill(0);
@@ -2211,7 +2252,7 @@ function startRuins(){
   updateDialogue();
 
   //stuff ontop of player
-  drawCandyBowl();
+
 
 
 
@@ -2536,7 +2577,50 @@ function drawCandyBowl(){
   let candyBowlX = 11799 + screenPosX;
   let candyBowlY = 345 + screenPosY;
 
-  image(candyBowl[0], candyBowlX, candyBowlY, 40 * 1.5, 54 * 1.5);
+  if (candyState === 0 && candyBowlInt === true){
+    if (!dialogue.active){
+      startDialogue(["you take a piece of candy",]);
+      candyState = 1;
+      candyBowlInt = false;
+    }
+  }
+  else if (candyState === 1 && candyBowlInt === true){
+    if (!dialogue.active){
+      startDialogue(["you took more candy. How discusting..",]);
+      candyState = 2;
+      candyBowlInt = false;
+    }
+  }
+  else if (candyState === 2 && candyBowlInt === true){
+    if (!dialogue.active){
+      startDialogue(["you take another piece. you feel like the scum of the earth...",]);
+      candyState = 3;
+      candyBowlInt = false;
+    }
+  }
+  else if (candyState === 3 && candyBowlInt === true){
+    if (!dialogue.active){
+      startDialogue(["you took too much too fast. The candy spills on the floor.",]);
+      candyState = 4;
+      candyBowlInt = false;
+      candyNumber = 1;
+    }
+  }
+  else if (candyState === 4 && candyBowlInt === true){
+    if (!dialogue.active){
+      startDialogue(["look at what you've done.",]);
+      candyBowlInt = false;
+    }
+  }
+
+  if (candyNumber === 1){
+    image(candyFloor, candyBowlX + 50, candyBowlY + 65, 52 * 1.5, 14 * 1.5);
+    image(candyBowl[candyNumber], candyBowlX, candyBowlY + 20, 60 * 1.5, 40 * 1.5); 
+  }
+  if (candyNumber === 0){
+    image(candyBowl[candyNumber], candyBowlX, candyBowlY , 40 * 1.5, 54 * 1.5); 
+  }
+
 }
 
 function drawSaveSpot(){
@@ -2657,6 +2741,16 @@ function drawFrogWorld(){
   image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
   pos = makeImagePos(6799, 441);
   image(froggitSprite[frame], pos.x + screenPosX, pos.y + screenPosY, 38 * 1.5, 40 * 1.5);
+
+  if (frogInteract){
+    if (!dialogue.active){
+      startDialogue([" * (Whenever I talke they skip through my words by pressing [X].)",
+        " * (That's right.......)       * (Pressing [X]...........)     * (................)",
+        " * (Well, at least you listened to me.)"
+      ]);
+      frogInteract = false;
+    }
+  }
 }
 
 function heartAnimation() {
