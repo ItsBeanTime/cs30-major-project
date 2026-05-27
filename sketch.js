@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -306,16 +306,16 @@ let ruinsMap2OffsetX = 21200;
 
 let ghostTear = [];
 let ghostTearSpawn = false;
-let ghostTearSpeed = 1.1;
+let ghostTearSpeed = 2;
 let ghostTearTimer = 0;
-let maxTear = 10;
+let maxTear = 15;
 let tearSpawned = 0;
 let tearDir = 0;
 let candyNumber = 0;
 
 let ghostZap = [];
 let ghostZapSpawn = false;
-let ghostZapSpeed = 0.005;
+let ghostZapSpeed = 2;
 let ghostZapTimer = 0;
 let maxZap = 32;
 let zapSpawned = 0;
@@ -3035,7 +3035,7 @@ function chooseWhatToDoWithEnemy() {
 
     spawnTearAttack();
     //ghostDoesntFeelLikeIt();
-    //spawnGhostZap();
+    spawnGhostZap();
 
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
@@ -3203,39 +3203,40 @@ function spawnTearAttack(){  // i made it better but its still kinda trash
   let radius = 180;
   ghostTearTimer += random(1,2);
 
-  if (ghostTearTimer > 20 && tearSpawned < maxTear){
+  if (ghostTearTimer > 25 && tearSpawned < maxTear){
     ghostTearTimer = 0;
-    let angle = random(radius);
-    let angle2 = random(radius);
+    let angle = random(360);
+    let angle2 = random(360);
     ghostTear.push({
       x: boxX - 15,
       x2: boxX + 40,
       y: tearYPos * 2 - radius,
       y2: tearYPos * 2 - radius,
-      size: random(12, 16),
+      size: random(10, 16),
       dx: cos(angle),
       dx2: cos(angle2),
-      dy: random(2,4) * ghostTearSpeed,
-      dy2: random(2,4) * ghostTearSpeed,
+      dy: random(2,4) * 1.2,
+      dy2: random(2,4) * 1.2,
+      newSpeed: 3.5
     });
     tearSpawned++;
   }
   for (let i = ghostTear.length - 1; i >= 0; i--){
     let tear = ghostTear[i];
-    if (tear.y <= height/2){
-      tear.x -= tear.dx * 2;
-      tear.x2 += tear.dx2 * 2;
-    }
-    else{
-      tear.x -= tear.dx * 1;
-      tear.x2 += tear.dx2 * 1;
-    }
+    tear.x -= tear.dx * tear.newSpeed;
+    tear.x2 += tear.dx2 * tear.newSpeed;
 
     tear.y += tear.dy;
     tear.y2 += tear.dy2;
+
+    if (tear.newSpeed >= 0.2){
+      tear.newSpeed -= 0.07;
+    }
+
     fill(255);
     stroke(0);
     strokeWeight(2);
+    ellipseMode(CORNER);
     ellipse(tear.x, tear.y, tear.size, tear.size);
     ellipse(tear.x2, tear.y2, tear.size, tear.size);
     checkProjectileHit(ghostTear, 5);
