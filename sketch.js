@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -178,7 +178,7 @@ let hasAttacked = false;
 let attackTimer = 0;
 let savedTurnText = "";
 let dodgeTimer = 0;
-let dodgeDuration = 240;
+let dodgeDuration = 500;
 let boxWTarget = 0;
 let boxExpanding = false;
 let barFlash = 0;
@@ -3033,7 +3033,7 @@ function chooseWhatToDoWithEnemy() {
 
     dodgeTimer++;
 
-    spawnTearAttack();
+    //spawnTearAttack();
     //ghostDoesntFeelLikeIt();
     spawnGhostZap();
 
@@ -3248,32 +3248,62 @@ function spawnGhostZap(){
   let radius = 180;
   ghostZapTimer++;
 
-  if (ghostZapTimer > 30 && zapSpawned < maxZap){
+  if (ghostZapTimer > 50 && zapSpawned < maxZap){
     ghostZapTimer = 0;
     let angle = 90;
     ghostZap.push({
       x: boxX,
       y: zapYPos * 2 - radius,
       size: 15,
-      dx: boxX,
-      dy: boxY,
+      dx: 0,
+      dy: 0,
+      dir: "down",
+      rotateAng: angle
     });
     zapSpawned++;
   }
   for (let i = ghostZap.length - 1; i >= 0; i--){
-    zapDir = random(round(0,1));
     let zap = ghostZap[i];
-    if (zapDir === 0){
-      zap.x += zap.dx * ghostZapSpeed;      
+    if (zap.dir === "down"){
+      zap.dy = 3;
+      zap.y += zap.dy;
+      if (zap.y >= height / 1.25){
+        zap.dir = "left";
+      }
     }
-    else{
-      zap.x -= zap.dx * ghostZapSpeed; 
+    if (zap.dir === "left"){
+      zap.dx = 3;
+      zap.dy = 0;
+      if (zap.x <= 375){
+        zap.dir = "up";
+      }
     }
-
-    zap.y += zap.dy * ghostZapSpeed;
+    if (zap.dir === "up"){
+      zap.dx = 0;
+      zap.dy = -3;
+      if (zap.y <= boxY - 70){
+        zap.dir = "right";
+      }
+    }
+    if (zap.dir === "right"){
+      zap.dx = -3;
+      zap.dy = 0;
+      if (zap.x > x){
+        zap.dir = "last";
+        zap.dx = 0;
+      }
+    }
+    if (zap.dir === "last"){
+      zap.dy = 3;
+    }
     fill(255);
     noStroke();
-    ellipse(zap.x, zap.y, 20, 20);
+    zap.x -= zap.dx;
+    zap.y += zap.dy;
+    if (zap.dir === "left"){
+
+    }
+    ellipse(zap.x, zap.y, 5, 5);
   }
 }
 
