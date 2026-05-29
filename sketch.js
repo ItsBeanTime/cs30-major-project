@@ -3248,16 +3248,21 @@ function spawnGhostZap(){
   let radius = 180;
   ghostZapTimer++;
 
-  if (ghostZapTimer > 50 && zapSpawned < maxZap){
+  if (ghostZapTimer > 30 && zapSpawned < maxZap){
     ghostZapTimer = 0;
     let angle = 90;
     ghostZap.push({
       x: boxX,
+      x2: boxX + 50,
       y: zapYPos * 2 - radius,
+      y2: zapYPos * 2 - radius,
       size: 15,
       dx: 0,
+      dx2: 0,
       dy: 0,
+      dy2: 0,
       dir: "down",
+      dir2: "down",
       rotateAng: angle
     });
     zapSpawned++;
@@ -3272,7 +3277,7 @@ function spawnGhostZap(){
       }
     }
     if (zap.dir === "left"){
-      zap.dx = 3;
+      zap.dx = 5;
       zap.dy = 0;
       if (zap.x <= 375){
         zap.dir = "up";
@@ -3286,7 +3291,7 @@ function spawnGhostZap(){
       }
     }
     if (zap.dir === "right"){
-      zap.dx = -3;
+      zap.dx = -5;
       zap.dy = 0;
       if (zap.x > x){
         zap.dir = "last";
@@ -3296,14 +3301,51 @@ function spawnGhostZap(){
     if (zap.dir === "last"){
       zap.dy = 3;
     }
+
+    //second zap
+    if (zap.dir2 === "down"){
+      zap.dy2 = 3;
+      zap.y2 += zap.dy2;
+      if (zap.y2 >= height / 1.25){
+        zap.dir2 = "right";
+      }
+    }
+    if (zap.dir2 === "right"){
+      zap.dx2 = -5;
+      zap.dy2 = 0;
+      if (zap.x2 >= width/2 + 100){
+        zap.dir2 = "up";
+      }
+    }
+    if (zap.dir2 === "up"){
+      zap.dx2 = 0;
+      zap.dy2 = -3;
+      if (zap.y2 <= boxY - 70){
+        zap.dir2 = "left";
+      }
+    }
+    if (zap.dir2 === "left"){
+      zap.dx2 = 5;
+      zap.dy2 = 0;
+      if (zap.x2 < x){
+        zap.dir2 = "last";
+        zap.dx2 = 0;
+      }
+    }
+    if (zap.dir2 === "last"){
+      zap.dy2 = 3;
+    }
     fill(255);
     noStroke();
     zap.x -= zap.dx;
+    zap.x2 -= zap.dx2;
     zap.y += zap.dy;
-    if (zap.dir === "left"){
-
-    }
-    ellipse(zap.x, zap.y, 5, 5);
+    zap.y2 += zap.dy2;
+    stroke(0);
+    strokeWeight(2);
+    fill(255, 0, 0);
+    ellipse(zap.x, zap.y, 10, 10);
+    ellipse(zap.x2, zap.y2, 10, 10);
   }
 }
 
