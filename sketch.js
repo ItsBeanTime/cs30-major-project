@@ -527,24 +527,34 @@ function keyPressed() {
       napstablookCurHp -= 2 + damage * 1;
       hasAttacked = true;
       slashIndex = 0;
-
+      let showDamage = 2 + damage;
+      fill(255);
+      text(showDamage, width / 2, height / 5);
     }
     else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
       console.log("2X");
       napstablookCurHp -=  2 + damage * 2;
       hasAttacked = true;
       slashIndex = 0;
+      let showDamage = 2 + damage * 2;
+      fill(255);
+      text(showDamage, width / 2, height / 5);
     }
     else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
       console.log("crit");
       napstablookCurHp -= 2 + damage * 2.2;
       hasAttacked = true;
       slashIndex = 0;
+      let showDamage = 2 + damage * 2.2;
+      fill(255);
+      text(showDamage, width / 2, height / 5);
     }
     else{
       console.log("miss");
       hasAttacked = true;
       slashIndex = 0;
+      fill(255);
+      text("MISS", width / 2, height / 5); // left off
     }
     napstablookCurHp = constrain(napstablookCurHp, 0, napstablookMaxHp);
   }
@@ -3051,6 +3061,8 @@ function chooseWhatToDoWithEnemy() {
       targetBoxShrinking = false;
       tearSpawned = 0;
       ghostTear.splice(0);
+      zapSpawned = 0;
+      ghostZap.splice(0);
     }
     x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
