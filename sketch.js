@@ -182,6 +182,10 @@ let dodgeDuration = 500;
 let boxWTarget = 0;
 let boxExpanding = false;
 let barFlash = 0;
+let showDamage = false;
+let damageNumber;
+let damageFrame = 0;
+
 
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
@@ -527,34 +531,40 @@ function keyPressed() {
       napstablookCurHp -= 2 + damage * 1;
       hasAttacked = true;
       slashIndex = 0;
-      let showDamage = 2 + damage;
-      fill(255);
-      text(showDamage, width / 2, height / 5);
+      showDamage = true;
+      damageNumber = 2 + damage;
+
+      // showDamageNumber(showDamage);
+      // fill(255);
+      // text(showDamage, width / 2, height / 5);
     }
     else if (battleBarX >= actButtonX + 30 && battleBarX <= width/2 - 35 || battleBarX >= width/2 + 30 && battleBarX <= width/2 + 150) {
       console.log("2X");
       napstablookCurHp -=  2 + damage * 2;
       hasAttacked = true;
       slashIndex = 0;
-      let showDamage = 2 + damage * 2;
-      fill(255);
-      text(showDamage, width / 2, height / 5);
+      showDamage = true;
+      damageNumber = 2 + damage * 2;
+
+      // fill(255);
+      // text(showDamage, width / 2, height / 5);
     }
     else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
       console.log("crit");
       napstablookCurHp -= 2 + damage * 2.2;
       hasAttacked = true;
       slashIndex = 0;
-      let showDamage = 2 + damage * 2.2;
-      fill(255);
-      text(showDamage, width / 2, height / 5);
+      showDamage = true;
+      damageNumber = 2 + damage * 2.2;
+
+      // fill(255);
+      // text(showDamage, width / 2, height / 5);
     }
     else{
       console.log("miss");
       hasAttacked = true;
       slashIndex = 0;
-      fill(255);
-      text("MISS", width / 2, height / 5); // left off
+      damageNumber = "miss";
     }
     napstablookCurHp = constrain(napstablookCurHp, 0, napstablookMaxHp);
   }
@@ -2793,7 +2803,9 @@ function drawRock(){
   image(rock, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
 }
 
-function chooseWhatToDoWithEnemy() { 
+function chooseWhatToDoWithEnemy() {
+  
+
   playerLevelIncrease();//for testing
   if (!ghostFight.isPlaying()){
     ghostFight.play();
@@ -3001,8 +3013,8 @@ function chooseWhatToDoWithEnemy() {
     }
     else{
       if (slashIndex < slash.length){
-        image(slash[slashIndex], width/2 - 30, height/4, 52 * 1.5, 220 * 1.5);
-        if (frameCount % 3 === 0){
+        image(slash[slashIndex], width/2 - 30, height/4 - 50, 52 * 1.5, 220 * 1.5);
+        if (frameCount % 7 === 0){
           slashIndex ++;
         }        
       }
@@ -3468,6 +3480,21 @@ function drawNapstablookHealthBar(){
   fill(0, 200, 0);
   rect(barX, barY, barW * hpPercent, barH);
   rectMode(CENTER);
+
+  fill(0);
+  textSize(35);
+  textFont(mfbFont);
+  stroke(255, 0, 0);
+  strokeWeight(10);
+  if (damageNumber === "miss"){
+    text("miss", width / 2 - 20, height / 6);
+  }
+  else{
+    text(round(damageNumber), width / 2 - 20, height / 6); 
+  }
+
+  textFont(cotFont);
+
 }
 
 function playerLevelIncrease(){
