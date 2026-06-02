@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -3368,8 +3368,11 @@ function spawnGhostZap(){
     stroke(0);
     strokeWeight(2);
     fill(255, 0, 0);
-    ellipse(zap.x, zap.y, 10, 10);
-    ellipse(zap.x2, zap.y2, 10, 10);
+    let boxOffset = 90;
+    if (zap.y < boxY + boxOffset) {
+      ellipse(zap.x, zap.y, 10, 10);
+      ellipse(zap.x2, zap.y2, 10, 10);
+    }
   }
 }
 
