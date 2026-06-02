@@ -185,6 +185,7 @@ let barFlash = 0;
 let showDamage = false;
 let damageNumber;
 let damageFrame = 0;
+let letPelSpawn = false;
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -3219,7 +3220,13 @@ function floweyFight(){
   if (keyIsDown(40) || keyIsDown(83)) { // down 
     y += speed;
   }
-  spawnFriendPel();
+
+  if (letPelSpawn){
+    spawnFriendPel(); 
+  }
+  if (keyIsDown(ENTER)){
+    gameState = "ruins";
+  }
 }
 
 function spawnTearAttack(){  // i made it better but its still kinda trash
@@ -3368,11 +3375,8 @@ function spawnGhostZap(){
     stroke(0);
     strokeWeight(2);
     fill(255, 0, 0);
-    let boxOffset = 90;
-    if (zap.y < boxY + boxOffset) {
-      ellipse(zap.x, zap.y, 10, 10);
-      ellipse(zap.x2, zap.y2, 10, 10);
-    }
+    ellipse(zap.x, zap.y, 10, 10);
+    ellipse(zap.x2, zap.y2, 10, 10);
   }
 }
 
