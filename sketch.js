@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "chooseWhatToDoWithEnemy";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -93,8 +93,8 @@ let ghostSprites;
 let ghostMet = false;
 let ghostGone = false;
 let ghostBattleSprite =  [];
-let napstablookAttacked = 0;
-let chosenAttack = -1;
+let napstablookAttacked = false;
+let chosenAttack;
 
 
 //dummy
@@ -102,6 +102,7 @@ let dummySprite;
 
 //froggit
 let froggitSprite = [];
+let frogBattleSprite;
 
 //dialogue system
 let dialogue = {
@@ -181,7 +182,7 @@ let hasAttacked = false;
 let attackTimer = 0;
 let savedTurnText = "";
 let dodgeTimer = 0;
-let dodgeDuration = 500;
+let dodgeDuration = 300;
 let boxWTarget = 0;
 let boxExpanding = false;
 let barFlash = 0;
@@ -189,6 +190,7 @@ let showDamage = false;
 let damageNumber;
 let damageFrame = 0;
 let letPelSpawn = false;
+let frogTurnMessage = false;
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -283,13 +285,21 @@ let monsterData = {
       "Threat": [" * You give Napstablook a cruel look."],
       "Cheer": ["CHEER_SPECIAL"],
     }
+  },
+
+  "Froggit": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Froggit - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
+      "Talk": [" * talk frog"],
+    }
   }
 };
 let actState = "none";
 let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
-let currentMonster = "Napstablook";
+let currentMonster = "Froggit";
 let napstablookMood = 0;
 
 
@@ -363,6 +373,8 @@ function setup() {
   napstablookTearX = width/2;
   napstablookTearY = width/2;
 
+  chosenAttack = round(random(0,1));
+
   screenPosY = -height * (mapSize - 5);
 
   for (let i = 0; i < letters.length; i++){
@@ -379,7 +391,7 @@ function setup() {
   setupTriggers();
   setupCameraZones();
   setupCovers();
-  battleInfo("Napstablook");
+  battleInfo("Froggit");
 }
 
 function draw() { //check game states
@@ -521,7 +533,7 @@ function preload() {
   rock = loadImage("assets/miscellaneus sprites/rock.png");
 
   candyFloor = loadImage("assets/miscellaneus sprites/candyonfloor.png");
-
+  frogBattleSprite = loadImage("assets/ruins monster sprites/froggitbody2.png");
 }
 
 //INPUT FUNCTIONS//
@@ -553,7 +565,7 @@ function keyPressed() {
       // fill(255);
       // text(showDamage, width / 2, height / 5);
     }
-    else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) {
+    else if (battleBarX >= width/2 - 29, battleBarX <= width/2 + 29) { //fix bug when you spam click in fight it cricks 
       console.log("crit");
       napstablookCurHp -= 2 + damage * 2.2;
       hasAttacked = true;
@@ -636,15 +648,16 @@ function keyPressed() {
       startDialogue([actLine], () => {
         actState = "none";
         fightState = "dodge";
-        let randomAttack = Math.floor(random(0,2));
-        if (napstablookAttacked < 1) {
-          chosenAttack = Math.floor(random(0, 2));
-          napstablookAttacked++;
-        } 
-        else {
-          chosenAttack = 2;
-          napstablookAttacked = 0;
-        }
+
+        // let randomAttack = Math.floor(random(0,2));
+        // if (napstablookAttacked < 1) {
+        //   chosenAttack = Math.floor(random(0, 2));
+        //   napstablookAttacked++;
+        // } 
+        // else {
+        //   chosenAttack = 2;
+        //   napstablookAttacked = 0;
+        // }
         boxX = width/2;
         boxY = height /2 + height/5.4;
         boxW = width - 120;
@@ -2818,21 +2831,23 @@ function drawRock(){
 
 function chooseWhatToDoWithEnemy() {
   
-
+  if (currentMonster === "Napstablook"){
+    if (!ghostFight.isPlaying()){
+      ghostFight.play();
+    }
+    if (ruinsMusic.isPlaying()){
+      ruinsMusic.stop();
+    }
+    if (napstablookCurHp <= 0){
+      if (!ruinsMusic.isPlaying()){
+        ruinsMusic.play();
+        ghostFight.stop();
+        gameState = "ruins";
+      }   
+    }
+  }
   playerLevelIncrease();//for testing
-  if (!ghostFight.isPlaying()){
-    ghostFight.play();
-  }
-  if (ruinsMusic.isPlaying()){
-    ruinsMusic.stop();
-  }
-  if (napstablookCurHp <= 0){
-    if (!ruinsMusic.isPlaying()){
-      ruinsMusic.play();
-      ghostFight.stop();
-      gameState = "ruins";
-    }   
-  }
+
  
     
 
@@ -2846,14 +2861,19 @@ function chooseWhatToDoWithEnemy() {
   text(`fightState:${fightState}`, 100, height/10);
   text(`actState:${actState}`, 100, height/8);
 
-
-  let frame = Math.floor(frameCount / 15 % 2);
-  image(ghostBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);    
-  image(battleBackground,15,20, 620 * 1.5, 250 * 1.5);
+  if (currentMonster === "Napstablook"){
+    let frame = Math.floor(frameCount / 15 % 2);
+    image(ghostBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);    
+    image(battleBackground,15,20, 620 * 1.5, 250 * 1.5);
   
-  if (hasAttacked){
-    drawNapstablookHealthBar();    
+    if (hasAttacked){
+      drawNapstablookHealthBar();    
+    }
   }
+  else if (currentMonster === "Froggit"){
+    image(frogBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+  }
+
 
 
   let targetY = fightButtonY / 1.6;
@@ -2975,18 +2995,20 @@ function chooseWhatToDoWithEnemy() {
       diaTextPosY = -20;
       diaTextSize = 35;
       rectMode(CENTER);
-
-      let turnText;
-      if (firstTurn){
-        firstTurn = false;
-        turnText = " * Here comes Napstablook.";
+      if (currentMonster === "Napstablook"){
+        let turnText;
+        if (firstTurn){
+          firstTurn = false;
+          turnText = " * Here comes Napstablook.";
+        }
+        else{
+          turnText = getNapstablookFlavorText();
+        }
+        savedTurnText = turnText;
+        startDialogue([turnText]);
       }
-      else{
-        turnText = getNapstablookFlavorText();
-      }
-      savedTurnText = turnText;
-      startDialogue([turnText]);
     }
+
 
     if (dialogue.active){
       updateDialogue();
@@ -3067,21 +3089,27 @@ function chooseWhatToDoWithEnemy() {
     }
 
     dodgeTimer++;
-
-    //spawnTearAttack();
-    //ghostDoesntFeelLikeIt();
-    // spawnGhostZap();
-    
-    
-    if (chosenAttack === 0) {
-      spawnTearAttack();
-    } 
-    else if (chosenAttack === 1) {
-      spawnGhostZap();
-    } 
-    else {
-      ghostDoesntFeelLikeIt();
+    if (currentMonster === "Napstablook"){
+      if (!napstablookAttacked){
+        if (chosenAttack === 0){
+          spawnTearAttack();
+          dodgeDuration = 300;
+        }
+        else{
+          spawnGhostZap();
+          dodgeDuration = 400;
+        }
+      }
+      else{
+        ghostDoesntFeelLikeIt();
+        dodgeDuration = 150;
+      }
     }
+
+
+    text(napstablookAttacked, width / 2, height / 5);
+    text(chosenAttack, width /2 , height / 4);
+    
 
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
@@ -3099,8 +3127,16 @@ function chooseWhatToDoWithEnemy() {
       ghostTear.splice(0);
       zapSpawned = 0;
       ghostZap.splice(0);
-      napstablookAttacked= -1;
-      chosenAttack = -1;
+
+      if (currentMonster === "Napstablook"){
+        chosenAttack = round(random(0,1));
+        if (!napstablookAttacked){
+          napstablookAttacked = true;
+        }
+        else if (napstablookAttacked){
+          napstablookAttacked = false;
+        }
+      }
     }
     x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
@@ -3402,6 +3438,7 @@ function spawnGhostZap(){
     fill(255, 0, 0);
     ellipse(zap.x, zap.y, 10, 10);
     ellipse(zap.x2, zap.y2, 10, 10);
+    checkProjectileHit(ghostZap, 5);
   }
 }
 
@@ -3495,6 +3532,10 @@ function getNapstablookFlavorText(){
     " * The faint odor of ectoplasm permeates the vicinity."
   ];
   return neutralMessage[floor(random(neutralMessage.length))];
+}
+
+function froggitFlavourText(){
+  null;
 }
 
 function drawNapstablookHealthBar(){
@@ -3754,14 +3795,21 @@ function itemStats(){
 }
 
 
-function checkProjectileHit(projectiles, damage) {// you need to make it so it checks both tears on both sides
+function checkProjectileHit(projectiles, damage) {
   if (invincTimer > 0) {
     invincTimer--;
     return;
   }
   for (let p of projectiles) {
     let d = dist(x, y, p.x, p.y);
+    let d2 = dist(x, y, p.x2, p.y2);
     if (d < p.size / 2 + heartSize / 2) {
+      playerCurHealth -= damage;
+      playerCurHealth = constrain(playerCurHealth, 0, playerHealthMax);
+      invincTimer = invincDuration;
+      break;
+    }
+    if (d2 < p.size / 2 + heartSize / 2) {
       playerCurHealth -= damage;
       playerCurHealth = constrain(playerCurHealth, 0, playerHealthMax);
       invincTimer = invincDuration;
