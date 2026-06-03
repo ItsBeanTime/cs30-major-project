@@ -93,6 +93,9 @@ let ghostSprites;
 let ghostMet = false;
 let ghostGone = false;
 let ghostBattleSprite =  [];
+let napstablookAttacked = 0;
+let chosenAttack = -1;
+
 
 //dummy
 let dummySprite;
@@ -633,6 +636,15 @@ function keyPressed() {
       startDialogue([actLine], () => {
         actState = "none";
         fightState = "dodge";
+        let randomAttack = Math.floor(random(0,2));
+        if (napstablookAttacked < 1) {
+          chosenAttack = Math.floor(random(0, 2));
+          napstablookAttacked++;
+        } 
+        else {
+          chosenAttack = 2;
+          napstablookAttacked = 0;
+        }
         boxX = width/2;
         boxY = height /2 + height/5.4;
         boxW = width - 120;
@@ -3058,7 +3070,18 @@ function chooseWhatToDoWithEnemy() {
 
     //spawnTearAttack();
     //ghostDoesntFeelLikeIt();
-    spawnGhostZap();
+    // spawnGhostZap();
+    
+    
+    if (chosenAttack === 0) {
+      spawnTearAttack();
+    } 
+    else if (chosenAttack === 1) {
+      spawnGhostZap();
+    } 
+    else {
+      ghostDoesntFeelLikeIt();
+    }
 
     if(dodgeTimer >= dodgeDuration){
       dodgeTimer = 0;
@@ -3076,6 +3099,8 @@ function chooseWhatToDoWithEnemy() {
       ghostTear.splice(0);
       zapSpawned = 0;
       ghostZap.splice(0);
+      napstablookAttacked= -1;
+      chosenAttack = -1;
     }
     x = constrain(x, boxX - boxW/2 + heartSize/2 + fightStrokeWeight/2, boxX + boxW/2 - heartSize/2 - fightStrokeWeight/2);
     y = constrain(y, boxY - boxH/2 + heartSize/2 + fightStrokeWeight/2, boxY + boxH/2 - heartSize/2 - fightStrokeWeight/2);
