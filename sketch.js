@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "chooseWhatToDoWithEnemy";
+let gameState = "ruins";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -73,7 +73,7 @@ let pelSpawned = 0;
 let allPelsSpawned = false;
 let invincTimer = 0;
 let invincDuration = 100; // invincibility time after hit
-
+let stepsUntilEncounter = 0;
 
 //background image
 let battleBackground;
@@ -103,6 +103,15 @@ let dummySprite;
 //froggit
 let froggitSprite = [];
 let frogBattleSprite;
+
+//Loox
+let looxBattleSprite;
+
+//dance bug
+let dbugBattleSprite;
+
+//dummy
+let dummyBattleSprite;
 
 //dialogue system
 let dialogue = {
@@ -195,7 +204,7 @@ let frogTurnMessage = false;
 
 let choices = ["fight", "act", "item", "mercy"];
 let selections = ["fight", "act", "item", "mercy"];
-let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal"];
+let theMonsters = ["Froggit", "Whimsun", "Loox", "Vegetoid", "Migosp", "Moldsmal","Napstablook", "Dummy"];
 let choice;
 let selection = 0;
 
@@ -224,6 +233,8 @@ let playerKills = 0;
 let playerWeaponEquip = "Stick";
 let playerArmorEquip = "Bandage";
 let healthBarMaxWidth = 120;
+let playerSteps = 0;
+let resetStepCount = false;
 
 //player name screen variables
 
@@ -290,16 +301,64 @@ let monsterData = {
   "Froggit": {
     acts: ["Check", "Talk"],
     actDialogues: {
-      "Check": [" * Froggit - ATK:10 DEF:10     * This monster doesn't seem to have a sense of humor..."],
-      "Talk": [" * talk frog"],
+      "Check": [" * Froggit - ATK:5 DEF:5"],
+      "Compliment": [" * talk frog"],
+      "Threaten" : [" Threaten frog"]
     }
-  }
+  },
+  "Loox": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Loox - ATK:6 DEF:6"],
+      "Pick On": [" * Pick on Loox"],
+      "Don't Pick On" : [" * Don't pick on Loox "]
+    }
+  },
+  "Migosp": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Migosp - ATK:7 DEF:5     * This monster doesn't seem to have a sense of humor..."],
+      "Talk": [" * Migosp Talk"],
+    }
+  },
+  "Dummy": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Dummy - ATK:0 DEF:0"],
+      "Talk": [" * You talk to the DUMMY...." , "* It doesn't seem much for conversation."],
+    }
+  },
+  "Whimsun": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Whimsun - ATK:5 DEF:0     * This monster doesn't seem to have a sense of humor..."],
+      "Console": [" * Whimsun Console"],
+      "Terrorize" : [" * Terrorize Whimsun"]
+    }
+  },
+  "Moldsmal": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Moldsmal - ATK:6 DEF:0     * This monster doesn't seem to have a sense of humor..."],
+      "Imitate": [" * Moldsmal Imitate"],
+      "Flirt" : [" * Flirt Moldsmal"]
+    }
+  },
+  "Vegetoid": {
+    acts: ["Check", "Talk"],
+    actDialogues: {
+      "Check": [" * Vegetoid - ATK:6 DEF:6"],
+      "Talk": [" * Vegetoid talk", "* It doesn't seem much for conversation."],
+      "Devour" : [" * Devour Vegetoid"],
+      "Dinner" : [" * Vegetoid Dinner"]
+    }
+  },
 };
 let actState = "none";
 let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
-let currentMonster = "Froggit";
+let currentMonster = theMonsters[6];
 let napstablookMood = 0;
 
 
@@ -341,6 +400,7 @@ let zapDir = 0;
 
 function setup() {
   noSmooth();
+  stepsUntilEncounter = random(20, 20);
   let cnv = createCanvas(640 * 1.5, 480 * 1.5); 
   cnv.position(width/2, 0);
   //createCanvas(windowWidth, windowHeight);
@@ -391,7 +451,7 @@ function setup() {
   setupTriggers();
   setupCameraZones();
   setupCovers();
-  battleInfo("Froggit");
+  battleInfo(currentMonster);
 }
 
 function draw() { //check game states
@@ -534,6 +594,10 @@ function preload() {
 
   candyFloor = loadImage("assets/miscellaneus sprites/candyonfloor.png");
   frogBattleSprite = loadImage("assets/ruins monster sprites/froggitbody2.png");
+  looxBattleSprite = loadImage("assets/ruins monster sprites/mike1.png");
+  dbugBattleSprite = loadImage("assets/ruins monster sprites/dancebug1.png");
+  dummyBattleSprite = loadImage("assets/ruins monster sprites/dummy1.png");
+  
 }
 
 //INPUT FUNCTIONS//
@@ -2220,6 +2284,17 @@ function startGameFade(){
 
 //ACTUAL GAME FUNCTIONS//
 function startRuins(){
+  if (playerSteps > stepsUntilEncounter){
+    currentMonster = theMonsters[round(random(0,7))];
+    gameState = "chooseWhatToDoWithEnemy";
+    resetStepCount = true;
+    if (resetStepCount){
+      stepsUntilEncounter = random(200, 3000);
+      resetStepCount = false;
+    }
+  }
+
+
   playerLevelIncrease();
   background(0);
   image(ruinsMap, screenPosX, screenPosY, width * (mapSize + 10), height * (mapSize -4));
@@ -2283,8 +2358,9 @@ function startRuins(){
   textAlign(LEFT);
 
   text(`mapX: ${floor(playerX - screenPosX)} mapY: ${floor(playerY - screenPosY)}`, 10, 30);
-  // text(`screenPosY: ${floor(screenPosY)}`, 10, 55);
-  // text(`startY: ${floor(-height * (mapSize - 5))}`, 10, 80);
+
+  text(`playerSteps: ${floor(playerSteps)}`, 10, 55);
+  text(`resetStep: ${resetStepCount}`, 10, 80);
   // text(`mouseX: ${mouseX}`, 10, 100);
   // text(`mouseY: ${mouseY}`, 10, 115);
 
@@ -2356,12 +2432,14 @@ function playerMove(){
     currentSprites = playerSpriteBack;
     newDirection = "back";
     moving = true;
+    playerSteps += 0.1;
   }
   if (keyIsDown(83)){
     newMapY += speed;
     currentSprites = playerSpriteFront;
     newDirection = "front";
     moving = true;
+    playerSteps += 0.1;
   }
 
   if (keyIsDown(68)){ 
@@ -2369,12 +2447,14 @@ function playerMove(){
     currentSprites = playerSpriteRight;
     newDirection = "right";
     moving = true;
+    playerSteps += 0.1;
   }
   if (keyIsDown(65)){
     newMapX -= speed;
     currentSprites = playerSpriteLeft;
     newDirection = "left";
     moving = true;
+    playerSteps += 0.1;
   }
 
   if (!collidesWithWall(newMapX, mapPlayerY)){
@@ -2860,6 +2940,7 @@ function chooseWhatToDoWithEnemy() {
   stroke(0);
   text(`fightState:${fightState}`, 100, height/10);
   text(`actState:${actState}`, 100, height/8);
+  text(`Monster:${monsterData}`, 100, height/8 + 40);
 
   if (currentMonster === "Napstablook"){
     let frame = Math.floor(frameCount / 15 % 2);
@@ -2872,6 +2953,24 @@ function chooseWhatToDoWithEnemy() {
   }
   else if (currentMonster === "Froggit"){
     image(frogBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+  }
+  else if (currentMonster === "Loox"){
+    image(looxBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+  }
+  else if (currentMonster === "Migosp"){
+    image(dbugBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+  }
+  else if (currentMonster === "Dummy"){
+    image(dummyBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+  }
+  else if(currentMonster === "Vegetoid"){
+    null;
+  }
+  else if (currentMonster === "Moldsmal"){
+    null;
+  }
+  else if (currentMonster === "Whimsun"){
+    null;
   }
 
 
