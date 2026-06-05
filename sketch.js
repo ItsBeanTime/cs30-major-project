@@ -2814,6 +2814,7 @@ function drawSpikes(){
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
     pos = makeImagePos(1160, 661);
     image(spikes, pos.x + screenPosX, pos.y + screenPosY, 40 * 1.5, 40 * 1.5);
+    // makeWall(3452, 2013, 3552, 1775);
   }
   else{
     null;
