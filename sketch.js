@@ -103,9 +103,20 @@ let dummySprite;
 //froggit
 let froggitSprite = [];
 let frogBattleSprite;
+let froggitMaxHp = 20;
+let froggitCurHp = 20;
+let froggitPellets = [];
+let froggitPelTimer = 0;
+let froggitPelSpawned = 0;
+let froggitflies = [];
+let maxFroggitPel = 6;
 
 //Loox
 let looxBattleSprite;
+let looxMaxHp = 26;
+let looxCurHp = 26;
+let looxBullets = [];
+let looxBulletTimer = 0;
 
 //dance bug
 let dbugBattleSprite;
@@ -597,7 +608,6 @@ function preload() {
   looxBattleSprite = loadImage("assets/ruins monster sprites/mike1.png");
   dbugBattleSprite = loadImage("assets/ruins monster sprites/dancebug1.png");
   dummyBattleSprite = loadImage("assets/ruins monster sprites/dummy1.png");
-  
 }
 
 //INPUT FUNCTIONS//
@@ -2285,7 +2295,7 @@ function startGameFade(){
 //ACTUAL GAME FUNCTIONS//
 function startRuins(){
   if (playerSteps > stepsUntilEncounter){
-    currentMonster = theMonsters[round(random(0,7))];
+    currentMonster = 'froggit'; //theMonsters[round(random(0,7))];
     gameState = "chooseWhatToDoWithEnemy";
     resetStepCount = true;
     if (resetStepCount){
@@ -2927,6 +2937,8 @@ function chooseWhatToDoWithEnemy() {
       }   
     }
   }
+
+
   playerLevelIncrease();//for testing
 
  
@@ -2953,7 +2965,9 @@ function chooseWhatToDoWithEnemy() {
     }
   }
   else if (currentMonster === "Froggit"){
-    image(frogBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+    let frame = Math.floor(frameCount / 15) % 4;
+    image(frogBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+    
   }
   else if (currentMonster === "Loox"){
     image(looxBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
@@ -3551,6 +3565,59 @@ function ghostDoesntFeelLikeIt(){ // we can just use the asset my boy 🙏😭�
   TO IT RIGHT
   NOW. SORRY.`;
   text(tiredText, boxX - 2, boxY);
+}
+
+function spawnFroggitAttack() {
+  //Five small flies enter the screen one after another from the top of the Bullet Board. They stop for a while and then move towards the protagonist's SOUL.
+  let flyYPos = boxY/2 - 30;
+  let radius = 180;
+  froggitFlyTimer += random(1,2); // i want them to spawn at random intervals
+  for (let i = 0; i < 5; i++){ 
+    if (froggitFlyTimer > 25 && froggitFlySpawned < 5){
+      froggitFlyTimer = 0;
+      let angle = random(360);
+      froggitFly.push({
+        x: boxX + cos(angle) * radius,
+        y: flyYPos * 2 - radius,
+        size: random(10, 16),
+        dx: 0,
+        dy: 0,
+        newSpeed: 0,
+        state: "entering"
+      });
+      froggitFlySpawned++;
+    }
+  }
+
+  for (let i = froggitFly.length - 1; i >= 0; i--){
+    let fly = froggitFly[i]; 
+    if (fly.state === "entering"){
+      fly.y += 2;  
+    }
+  }
+  for (let i = froggitFly.length - 1; i >= 0; i--){
+    let fly = froggitFly[i];
+    if (fly.state === "entering" && fly.y >= boxY - 70){
+      fly.state = "targeting";
+    } 
+    if (fly.state === "targeting"){
+      let dx = boxX - fly.x;
+      let dy = boxY - fly.y;
+      let distToCenter = sqrt(dx * dx + dy * dy); // distance formula // also sqrt means square root btw if you didnt know cause i didnt know
+      if (distToCenter > 1){
+        fly.dx = dx / distToCenter * 2;
+        fly.dy = dy / distToCenter * 2;
+        fly.x += fly.dx;
+        fly.y += fly.dy;
+      }
+    }
+    fill(255);
+    stroke(0);
+    strokeWeight(2);
+    ellipseMode(CORNER);
+    ellipse(fly.x, fly.y, fly.size, fly.size);
+    checkProjectileHit(froggitFly, 5);
+  }
 }
 
 function spawnFriendPel(){
