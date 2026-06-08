@@ -211,6 +211,11 @@ let damageNumber;
 let damageFrame = 0;
 let letPelSpawn = false;
 let frogTurnMessage = false;
+let froggitFlyTimer = 0;
+let froggitFlySpawned = 0;
+let froggitFly = [];
+let flyYPos;
+
 
 
 let choices = ["fight", "act", "item", "mercy"];
@@ -356,7 +361,7 @@ let monsterData = {
     }
   },
   "Vegetoid": {
-    acts: ["Check", "Talk"],
+    acts: ["Check", "Talk",],
     actDialogues: {
       "Check": [" * Vegetoid - ATK:6 DEF:6"],
       "Talk": [" * Vegetoid talk", "* It doesn't seem much for conversation."],
@@ -369,7 +374,7 @@ let actState = "none";
 let actSelection = 0;
 let currentMonsterActs = [];
 let currentActDialogue = {};
-let currentMonster = theMonsters[6];
+let currentMonster = theMonsters[0];
 let napstablookMood = 0;
 
 
@@ -462,7 +467,7 @@ function setup() {
   setupTriggers();
   setupCameraZones();
   setupCovers();
-  battleInfo(currentMonster);
+  battleInfo("Froggit");
 }
 
 function draw() { //check game states
@@ -2295,7 +2300,7 @@ function startGameFade(){
 //ACTUAL GAME FUNCTIONS//
 function startRuins(){
   if (playerSteps > stepsUntilEncounter){
-    currentMonster = 'froggit'; //theMonsters[round(random(0,7))];
+    currentMonster = theMonsters[0];//theMonsters[round(random(6,6))];
     gameState = "chooseWhatToDoWithEnemy";
     resetStepCount = true;
     if (resetStepCount){
@@ -2953,7 +2958,7 @@ function chooseWhatToDoWithEnemy() {
   stroke(0);
   text(`fightState:${fightState}`, 100, height/10);
   text(`actState:${actState}`, 100, height/8);
-  text(`Monster:${monsterData}`, 100, height/8 + 40);
+  text(`Monster:${currentMonster}`, 100, height/8 + 40);
 
   if (currentMonster === "Napstablook"){
     let frame = Math.floor(frameCount / 15 % 2);
@@ -2965,8 +2970,8 @@ function chooseWhatToDoWithEnemy() {
     }
   }
   else if (currentMonster === "Froggit"){
-    let frame = Math.floor(frameCount / 15) % 4;
-    image(frogBattleSprite[frame], width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
+    // let frame = Math.floor(frameCount / 15) % 4; what even is this bro, the frogBattleSprite isnt even an array
+    image(frogBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
     
   }
   else if (currentMonster === "Loox"){
@@ -3218,6 +3223,9 @@ function chooseWhatToDoWithEnemy() {
         ghostDoesntFeelLikeIt();
         dodgeDuration = 150;
       }
+    }
+    if (currentMonster === "Froggit"){
+      spawnFroggitAttack();
     }
 
 
@@ -3567,7 +3575,7 @@ function ghostDoesntFeelLikeIt(){ // we can just use the asset my boy 🙏😭�
   text(tiredText, boxX - 2, boxY);
 }
 
-function spawnFroggitAttack() {
+function spawnFroggitAttack() { //you are using variables but you didnt even declare them????? what is you doing
   let radius = 180;
   froggitFlyTimer += random(1,2); // i want them to spawn at random intervals
   for (let i = 0; i < 5; i++){ 
