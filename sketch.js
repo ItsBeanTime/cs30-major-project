@@ -3568,8 +3568,6 @@ function ghostDoesntFeelLikeIt(){ // we can just use the asset my boy 🙏😭�
 }
 
 function spawnFroggitAttack() {
-  //Five small flies enter the screen one after another from the top of the Bullet Board. They stop for a while and then move towards the protagonist's SOUL.
-  let flyYPos = boxY/2 - 30;
   let radius = 180;
   froggitFlyTimer += random(1,2); // i want them to spawn at random intervals
   for (let i = 0; i < 5; i++){ 
