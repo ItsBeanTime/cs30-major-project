@@ -6,7 +6,7 @@
 
 
 //GAMESTATE
-let gameState = "ruins";
+let gameState = "start";
 let menuState = "instruction";
 let pauseState = "no";
 let pauseSelection = "stat";
@@ -72,7 +72,7 @@ let maxPel = 32;
 let pelSpawned = 0;
 let allPelsSpawned = false;
 let invincTimer = 0;
-let invincDuration = 100; // invincibility time after hit
+let invincDuration = 150; // invincibility time after hit
 let stepsUntilEncounter = 0;
 
 //background image
@@ -180,7 +180,7 @@ let boxWidth = fightBorderWidth + fightStrokeWeight;
 let innerHeight = boxHeight - fightStrokeWeight;
 let innerWidth = boxWidth - fightStrokeWeight;
 let heartSize = 16 * 1.5;
-let speed = 5;
+let speed = 5.5;
 let x;
 let y;
 
@@ -215,6 +215,7 @@ let froggitFlyTimer = 0;
 let froggitFlySpawned = 0;
 let froggitFly = [];
 let flyYPos;
+let gameOverScreen;
 
 
 
@@ -496,6 +497,11 @@ function draw() { //check game states
   if (gameState === "floweyFight"){
     floweyFight();
   }
+  if (gameState === "dead"){
+    playerDeathScreen();
+  }
+  currentMonster = "Napstablook";
+
 }
 
 function preload() {
@@ -613,6 +619,8 @@ function preload() {
   looxBattleSprite = loadImage("assets/ruins monster sprites/mike1.png");
   dbugBattleSprite = loadImage("assets/ruins monster sprites/dancebug1.png");
   dummyBattleSprite = loadImage("assets/ruins monster sprites/dummy1.png");
+
+  gameOverScreen = loadImage("assets/title sprites/undertale-gameover.png");
 }
 
 //INPUT FUNCTIONS//
@@ -1374,6 +1382,9 @@ function setupTriggers(){
             ],
             () => {
               ghostGone = true;
+              monsterName = "Napstablook";
+              currentMonster = "Napstablook";
+              battleInfo("Napstablook");
               gameState = "chooseWhatToDoWithEnemy";
             }
           );
@@ -2299,15 +2310,15 @@ function startGameFade(){
 
 //ACTUAL GAME FUNCTIONS//
 function startRuins(){
-  if (playerSteps > stepsUntilEncounter){
-    currentMonster = theMonsters[0];//theMonsters[round(random(6,6))];
-    gameState = "chooseWhatToDoWithEnemy";
-    resetStepCount = true;
-    if (resetStepCount){
-      stepsUntilEncounter = random(200, 3000);
-      resetStepCount = false;
-    }
-  }
+  // if (playerSteps > stepsUntilEncounter){
+  //   currentMonster = theMonsters[0];//theMonsters[round(random(6,6))];
+  //   gameState = "chooseWhatToDoWithEnemy";
+  //   resetStepCount = true;
+  //   if (resetStepCount){
+  //     stepsUntilEncounter = random(200, 3000);
+  //     resetStepCount = false;
+  //   }
+  // }
 
 
   playerLevelIncrease();
@@ -2338,13 +2349,13 @@ function startRuins(){
   noFill();
   stroke(255,0,0);
   strokeWeight(2);
-  //noStroke();
+  noStroke();
   for (let wall of walls){
     rect(wall.x + screenPosX, wall.y + screenPosY, wall.w, wall.h);
   }
 
   stroke(180, 0, 255);
-  //noStroke(); // hide hitbox
+  noStroke(); // hide hitbox
   for (let trigger of triggers){
     rect(trigger.x + screenPosX, trigger.y + screenPosY, trigger.w, trigger.h);
   }
@@ -2943,6 +2954,9 @@ function chooseWhatToDoWithEnemy() {
     }
   }
 
+  if (playerCurHealth <= 0){
+    gameState = "dead";
+  }
 
   playerLevelIncrease();//for testing
 
@@ -3410,6 +3424,14 @@ function floweyFight(){
   if (keyIsDown(ENTER)){
     gameState = "ruins";
   }
+}
+
+function playerDeathScreen(){
+  background(0);
+  image(gameOverScreen, 160, 200, 422 * 1.5, 182 * 1.5);
+
+  //game over music
+
 }
 
 function spawnTearAttack(){  // i made it better but its still kinda trash
