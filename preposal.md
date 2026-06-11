@@ -36,7 +36,7 @@ For my major project I would like to recreate part of the game Undertale. Undert
 
 - **General**
     - place to put items (chest)
-    - Random NPCs
+    - Random NPCs 
     - Dynamic Dialog
     - secret pathways / items
     - genocide / pacifist routes
@@ -45,13 +45,13 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - rendering shadows / reflections
     - pick own username | done
     - shop where we can buy and sell stuff
-    - animated text
+    - animated text | done
     - particles
     - animated tiles  | done
 
 - **Sillies**
     - long unskippable cut scenes / conversations (with Toriel)
-    - candy stealing
+    - candy stealing | done
     - talking rock
     - pick a pie
     - cheese hole

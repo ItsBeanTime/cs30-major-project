@@ -5,7 +5,7 @@ So we would tell our future selves "Manage time better and find a goal that is e
 
 
 # Did you complete everything in your “needs to have” list?
-
+No, we didnt plan things well enough to add puzzels in the game. A crutial character of undertale is Toriel who leads the player through the ruins, was unfortunately removed from our game since it would've taken much more time and could possibly take double the time it took us to make this game so far.
 
 # What was the hardest part of the project?
 
