@@ -16,8 +16,8 @@ For my major project I would like to recreate part of the game Undertale. Undert
     - defense stat | done
 
 - **Items**
-    - items that you can find 
-    - inventory 
+    - items that you can find | done
+    - inventory | done
 
 - **World Map**
     - map uses tiles
@@ -25,7 +25,7 @@ For my major project I would like to recreate part of the game Undertale. Undert
 - **Camera**
     - Move camera(or move the map itself) | done
 - **Sprites**
-    - use classes and arrays for each type of attack/object
+    - use classes and arrays for each type of attack/object | no classes
     - run and movement cycle | done
 
 - **Music/sounds**

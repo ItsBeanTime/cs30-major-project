@@ -253,6 +253,52 @@ let healthBarMaxWidth = 120;
 let playerSteps = 0;
 let resetStepCount = false;
 
+// INVENTORY SYSTEM
+let inventory = [];
+let maxInventory = 8;
+
+let itemData = {
+  "Monster Candy": {
+    type: "consumable",
+    heal: 10,
+    description: "Has a distinct, non-licorice flavor."
+  },
+  "Spider Donut": {
+    type: "consumable",
+    heal: 12,
+    description: "A donut made with Spider Cider."
+  },
+  "Butterscotch Pie": {
+    type: "consumable",
+    heal: 99,
+    description: "Butterscotch-cinnamon pie, one slice."
+  },
+  "Stick": {
+    type: "weapon",
+    attack: 0,
+    description: "Its bark is worse than its bite."
+  },
+  "Toy Knife": {
+    type: "weapon",
+    attack: 3,
+    description: "Made of plastic. A rarity nowadays."
+  },
+  "Bandage": {
+    type: "armor",
+    defense: 0,
+    description: "It has already been used several times."
+  },
+  "Faded Ribbon": {
+    type: "armor",
+    defense: 3,
+    description: "If you're cuter, monsters won't hit you as hard."
+  }
+};
+
+let itemMenuOpen = false;
+let itemSelection = 0;
+
+
 //player name screen variables
 
 let capitals = [
@@ -761,6 +807,11 @@ function keyPressed() {
     }
     return;
   }
+  if (gameState === "chooseWhatToDoWithEnemy" && fightState === "choose" && (keyCode === ENTER || keyCode === 90) && selection === 2) {
+    fightState = "item";
+    itemSelection = 0;
+    return;
+  }
   if (dialogue.active && (keyCode === 90 || keyCode === ENTER)){
     if (selection === 1 && gameState === "chooseWhatToDoWithEnemy" && actState === "none"){
       actState = "choosing";
@@ -769,6 +820,10 @@ function keyPressed() {
       fightState = "fighting";
       x = boxX;
       y = boxY;
+    }
+    if (selection === 2 && (keyCode === ENTER || keyCode === 90) && fightState === "choose") {
+      fightState = "item";
+      return;
     }
     if (!dialogue.done){
       dialogue.charIndex = dialogue.lines[dialogue.lineIndex].length;
@@ -1298,7 +1353,7 @@ function setupTriggers(){
             floweyPortSprites,
             () => {
               floweyGone = true;
-              // yourBestFriend.stop();
+              yourBestFriend.stop();
               gameState = "floweyFight";
             }
           );
@@ -2731,21 +2786,36 @@ function drawCandyBowl(){
 
   if (candyState === 0 && candyBowlInt === true){
     if (!dialogue.active){
-      startDialogue(["you take a piece of candy",]);
+      if (addItem("Monster Candy")) {
+        startDialogue([" * You took a piece of candy."]);
+      } 
+      else {
+        startDialogue([" * You can't carry any more items."]);
+      }
       candyState = 1;
-      candyBowlInt = false;
+      candyBowlInt = false;  
     }
   }
   else if (candyState === 1 && candyBowlInt === true){
     if (!dialogue.active){
-      startDialogue(["you took more candy. How discusting..",]);
+      if (addItem("Monster Candy")) {
+        startDialogue([" * You took a piece of candy."]);
+      } 
+      else {
+        startDialogue([" * You can't carry any more items."]);
+      }
       candyState = 2;
       candyBowlInt = false;
     }
   }
   else if (candyState === 2 && candyBowlInt === true){
     if (!dialogue.active){
-      startDialogue(["you take another piece. you feel like the scum of the earth...",]);
+      if (addItem("Monster Candy")) {
+        startDialogue([" * You took a piece of candy."]);
+      } 
+      else {
+        startDialogue([" * You can't carry any more items."]);
+      }
       candyState = 3;
       candyBowlInt = false;
     }
@@ -2984,7 +3054,7 @@ function chooseWhatToDoWithEnemy() {
     }
   }
   else if (currentMonster === "Froggit"){
-    // let frame = Math.floor(frameCount / 15) % 4; what even is this bro, the frogBattleSprite isnt even an array
+   
     image(frogBattleSprite, width/2.4, height/4 + 20, 104 * 1.5, 150 * 1.5);
     
   }
@@ -3007,7 +3077,7 @@ function chooseWhatToDoWithEnemy() {
     null;
   }
 
-
+  
 
   let targetY = fightButtonY / 1.6;
   let targetH = 128 * 1.5;
@@ -3189,6 +3259,18 @@ function chooseWhatToDoWithEnemy() {
     }
   }
 
+  if (fightState === "item") {
+    let buttonHeight = 42 * 1.5;
+    let buttonWidth = 110 * 1.5;
+    image(fightButton[0], fightButtonX, fightButtonY, buttonWidth, buttonHeight);
+    image(actButton[0], actButtonX, actButtonY, buttonWidth, buttonHeight);
+    image(itemButton[0], itemButtonX, itemButtonY, buttonWidth, buttonHeight);
+    image(mercyButton[0], mercyButtonX, mercyButtonY, buttonWidth, buttonHeight);
+    
+    drawInventoryMenu();
+  }
+
+
   if (hasAttacked){
     attackTimer++;
     if (attackTimer >= 50){
@@ -3248,6 +3330,7 @@ function chooseWhatToDoWithEnemy() {
     
 
     if(dodgeTimer >= dodgeDuration){
+      itemSelection = 0;
       dodgeTimer = 0;
       fightState = "choose";
       fightDialogueDone = false;
@@ -3295,7 +3378,33 @@ function chooseWhatToDoWithEnemy() {
       y += speed;
     }
   }
-
+  if (fightState === "item") {
+    if (keyCode === UP_ARROW || keyCode === 87) {
+      itemSelection = max(0, itemSelection - 1);
+    }
+    if (keyCode === DOWN_ARROW || keyCode === 83) {
+      itemSelection = min(inventory.length - 1, itemSelection + 1);
+    }
+    if (keyCode === ENTER || keyCode === 90) {
+      if (inventory.length > 0) {
+        let msg = useItem(itemSelection);
+        itemSelection = constrain(itemSelection, 0, inventory.length - 1);
+        fightState = "dodge"; // using an item ends your turn
+        boxX = width / 2;
+        boxY = height / 2 + height / 5.4;
+        boxW = width - 120;
+        boxH = 180;
+        diaTextPosX = -70;
+        diaTextPosY = -20;
+        diaTextSize = 35;
+        startDialogue([msg]);
+      }
+    }
+    if (keyCode === 88 || keyCode === SHIFT) {
+      fightState = "choose"; // cancel back to menu
+    }
+    return;
+  }
 
   if (actState === "choosing"){
     let buttonHeight = 42 * 1.5;
@@ -4009,6 +4118,85 @@ function checkProjectileHit(projectiles, damage) {
       playerCurHealth = constrain(playerCurHealth, 0, playerHealthMax);
       invincTimer = invincDuration;
       break;
+    }
+  }
+}
+
+function addItem(itemName) {
+  if (inventory.length < maxInventory) {
+    inventory.push(itemName);
+    return true;
+  }
+  return false; // Inventory full
+}
+
+function removeItem(index) {
+  if (index >= 0 && index < inventory.length) {
+    inventory.splice(index, 1);
+  }
+}
+
+function useItem(index) {
+  let itemName = inventory[index];
+  let item = itemData[itemName];
+  
+  if (!item) {
+    return;
+  } 
+  
+  if (item.type === "consumable") {
+    playerCurHealth += item.heal;
+    playerCurHealth = constrain(playerCurHealth, 0, playerHealthMax);
+    removeItem(index);
+    return ` * You ate the ${itemName}. You recovered ${item.heal} HP!`;
+  } 
+  else if (item.type === "weapon") {
+    // Swap current weapon into inventory
+    let oldWeapon = playerWeaponEquip;
+    playerWeaponEquip = itemName;
+    playerAttackModify = item.attack;
+    inventory[index] = oldWeapon;
+    return ` * You equipped the ${itemName}.`;
+  } 
+  else if (item.type === "armor") {
+    let oldArmor = playerArmorEquip;
+    playerArmorEquip = itemName;
+    playerDefenseModify = item.defense;
+    inventory[index] = oldArmor;
+    return ` * You equipped the ${itemName}.`;
+  }
+}
+
+function drawInventoryMenu() {
+  // Draw inventory box
+  fill(0);
+  stroke(255);
+  strokeWeight(6);
+  rectMode(CENTER);
+  rect(boxX, boxY, boxW, boxH);
+  
+  noStroke();
+  fill(255);
+  textFont(determinationFont);
+  textSize(32);
+  textAlign(LEFT, TOP);
+  
+  let startX = boxX - boxW / 2 + 30;
+  let startY = boxY - boxH / 2 + 20;
+  let rowH = 40;
+  
+  if (inventory.length === 0) {
+    text(" * (Empty)", startX, startY);
+  } 
+  else {
+    for (let i = 0; i < inventory.length; i++) {
+      let yPos = startY + i * rowH;
+      
+      if (i === itemSelection) {
+        image(redHeartImg, startX - 25, yPos + 5, heartSize, heartSize);
+      }
+      
+      text(" * " + inventory[i], startX, yPos);
     }
   }
 }
